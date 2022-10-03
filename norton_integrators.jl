@@ -1,4 +1,4 @@
-using Random, LinearAlgebra
+using Random, LinearAlgebra,Molly
 
 struct NortonSVIntegrator{TF,TG}
     dt::Float64
@@ -118,7 +118,7 @@ end
 function Norton_B_step!(s,dt_eff, accelerations, r, v_x,F_y,G_y,FdotG)
     s.velocities .+= accelerations * dt_eff
     λ = (r- dot(v_x, G_y)) /FdotG
-    s.velocities .+= λ * F_y
+    v_x .+= λ * F_y
 
     return λ
 end
@@ -128,13 +128,34 @@ function Molly.simulate!(sys::System, sim::NortonSplitting, n_steps; n_threads::
     α_eff = exp(-sim.γ * sim.dt / count('O', sim.splitting))
     σ_eff = sqrt(sim.T * (1 - α_eff^2)) #noise on velocities, not momenta
 
+    effective_dts=[sim.dt / count(c,sim.splitting) for c in sim.splitting]
+
+    forces_known = true
+    force_computation_steps = Bool[]
+
+    occursin(r"^.*B[^B]*A[^B]*$", sim.splitting) && (forces_known = false) #determine the need to recompute accelerations before B steps
+
+    for op in sim.splitting
+        if op == 'O'
+            push!(force_computation_steps, false)
+        elseif op == 'A'
+            push!(force_computation_steps, false)
+            forces_known = false
+        elseif op == 'B'
+            if forces_known
+                push!(force_computation_steps, false)
+            else
+                push!(force_computation_steps, true)
+                forces_known = true
+            end
+        end
+    end
+
     sys.coords = wrap_coords.(sys.coords, (sys.boundary,))
     neighbors = find_neighbors(sys, sys.neighbor_finder; n_threads=n_threads)
     run_loggers!(sys, neighbors, 0; n_threads=n_threads)
 
-    effective_dts=[sim.dt / count(c,sim.splitting) for c in sim.splitting]
-    
-    accelerations = accelerations(sys, neighbors; n_threads=n_threads)
+    accels = accelerations(sys, neighbors; n_threads=n_threads)
 
     velocities_array = reinterpret(reshape, Float64, sys.velocities)
     coords_array = reinterpret(reshape, Float64, sys.coords)
@@ -152,7 +173,7 @@ function Molly.simulate!(sys::System, sim::NortonSplitting, n_steps; n_threads::
     FdotG = dot(F_y, G_y)
 
     #initialize state on constant response manifold
-    λ = (sim.η-dot(G_y,v_x))/FdotG
+    λ = (sim.r-dot(G_y,v_x))/FdotG
     v_x .+= λ * F_y
 
 
@@ -165,17 +186,36 @@ function Molly.simulate!(sys::System, sim::NortonSplitting, n_steps; n_threads::
 
         for (i,op)=enumerate(sim.splitting)
             if op=='A'
-                λ,FdotG = Norton_A_step!(sys,effective_dts[i],neighbors,accelerations,n_threads,sim.r,q_y,v_x,F_y,G_y)
+                sys.coords .+= sys.velocities * effective_dts[i]
+                sys.coords .= Molly.wrap_coords.(sys.coords, (sys.boundary,))
+
+                accels .= accelerations(sys,neighbors, n_threads=n_threads)
+
+                F_y .= F.(q_y)
+                G_y .= G.(q_y)
+                FdotG = dot(F_y,G_y)
+                λ = (r - dot(G_y, v_x))/ FdotG #reprojection in p onto the constant response manifold
+                v_x .+= λ * F_y
+
                 λ_A += λ
+
             elseif op=='B'
-                λ = Norton_B_step!(sys,effective_dts[i],accelerations,sim.r,v_x,F_y,G_y,FdotG)
+                ( force_computation_steps[i] ) &&  ( accels .= accelerations(sys,neighbors, n_threads=n_threads) )
+                sys.velocities .+= accels * effective_dts[i]
+                λ = (r- dot(v_x, G_y)) /FdotG
+                v_x .+= λ * F_y
                 λ_B += λ
+
             elseif op=='O'
-                λ =  Norton_O_step!(sys,α_eff,σ_eff,sim.γ,rng,sim.T,sim.r,v_x,F_y,G_y,FdotG)
+                sys.velocities .= α_eff * sys.velocities + σ_eff * random_velocities(sys,sim.T; rng=rng)
+                λ = (r -dot(G_y,v_x))/FdotG
+                v_x .+= λ * F_y
+
+                λ_O += sim.γ*r / FdotG # no need to keep martingale part of the forcing
             end
         end
 
-        λ_est= (λ_A / count('A',sim.splitting) + λ_B / count('B', sim.splitting) + λ_O / count('O', sim.splitting)) / sim.dt
+        λ_est= (λ_A + λ_B) / sim.dt + λ_O / count('O',sim.splitting)
 
         push!(λ_hist, λ_est)
 
