@@ -3,7 +3,7 @@ function place_atoms_on_3D_lattice(N_per_dim::Integer,box_size)
     reshape([SVector(i * Lx/N_per_dim, j * Ly/N_per_dim, k * Lz/N_per_dim) for i = 0:N_per_dim-1, j = 0:N_per_dim-1, k = 0:N_per_dim-1],N_per_dim^3)
 end
 
-
+"""
 function animate_system(sys,filename,F)
     l,l,l=sys.boundary.side_lengths
     map_color(y)=RGB(1-(y+1)/2,0.0,(y+1)/2)#color particles based on y coordinate
@@ -13,7 +13,7 @@ function animate_system(sys,filename,F)
     N=length(first(P))
     anim=@animate for i=1:n_steps
         if i%100==0
-            println("Frame $(i)/$(n_steps)")
+            println("Frame \$(i)/\$(n_steps)")
         end
         X=[P[i][j][1] for j=1:N]
         Y=[P[i][j][2] for j=1:N]
@@ -22,4 +22,4 @@ function animate_system(sys,filename,F)
     end
     mp4(anim,filename,fps=30)
 
-end
+end"""

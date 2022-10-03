@@ -1,4 +1,4 @@
-using Molly, Plots
+using Molly
 
 include("utils.jl")
 include("norton_integrators.jl")
