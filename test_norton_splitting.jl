@@ -43,8 +43,8 @@ elseif forcing_type=="CONSTANT"
     F=F_const
 end
 
-
-simulator=NortonSplitting(dt,r,T,γ,"OBABO",F,G)
+splitting="BAOAB"
+simulator=NortonSplitting(dt,r,T,γ,splitting,F,G)
 
 nf = (3.6r_c < L) ? CellListMapNeighborFinder(nb_matrix=trues(N,N),n_steps=n_steps_neighbors,dist_cutoff= 1.2r_c,unit_cell=box_size) : DistanceNeighborFinder(nb_matrix=trues(N,N),n_steps=n_steps_neighbors,dist_cutoff=1.2r_c)
 
@@ -60,13 +60,35 @@ sys=System(atoms=atoms,coords=coords,velocities=velocities,pairwise_inters=(inte
 
 _=simulate!(sys,simulator,n_steps_eq)
 
+coordinate_observable(s, neighbors; n_threads=Threads.nthreads())=copy(s.coords)
+loggers=(coords=GeneralObservableLogger(coordinate_observable,Vector{SVector{3,Float64}},1),temp=TemperatureLogger(Float64,1),energy=TotalEnergyLogger(Float64,1))
+sys= System(atoms=atoms,coords=sys.coords,velocities=sys.velocities,pairwise_inters=(inter,),boundary=box_size,neighbor_finder=nf,force_units=NoUnits,energy_units=NoUnits,k=1.0, loggers=loggers)
+
+"""
 for i=1:n_iter_sim
-    println("$i / $n_iter_sim")
+    println("\$i / $n_iter_sim")
     force = simulate!(sys,simulator,n_steps_eq)
     f=open("norton_forcing_$(forcing_type)_$(r).out","a")
     write(f,force)
     println(sum(force)/length(force))
     close(f)
-end
+end"""
 
-animate_system(sys,"$method.mp4")
+
+force_hist=simulate!(sys,simulator,5000)
+
+t_range=dt*(0:length(force_hist)-1)
+plot(t_range,force_hist,xlabel="t",ylabel="λ",label="")
+savefig("lambda_$splitting.pdf")
+
+temps=values(sys.loggers.temp)
+t_range=dt*(0:length(temps)-1)
+plot(t_range,temps,xlabel="t",ylabel="T",label="")
+savefig("temp_$splitting.pdf")
+
+energies=values(sys.loggers.energy)
+t_range=dt*(0:length(energies)-1)
+plot(t_range,energies,xlabel="t",ylabel="H",label="")
+savefig("energy_$splitting.pdf")
+
+animate_system(sys,"$(forcing_type)_$splitting.mp4",F)

@@ -10,14 +10,14 @@ struct NortonSVIntegrator{TF,TG}
 end
 NortonSVIntegrator(dt::Float64, η::Float64, T::Float64, γ::Float64, F::Function, G::Function) = NortonSVIntegrator{typeof(F),typeof(G)}(dt, η, T, γ, F, G)
 
-function Molly.simulate!(sys::System, sim::NortonSVIntegrator, n_steps; parallel::Bool=true, rng=Random.GLOBAL_RNG)
+function Molly.simulate!(sys::System, sim::NortonSVIntegrator, n_steps; n_threads::Integer=Threads.nthreads(), rng=Random.GLOBAL_RNG)
     force_hist=Float64[]
 
-    neighbors = find_neighbors(sys, sys.neighbor_finder; parallel=parallel)
+    neighbors = find_neighbors(sys, sys.neighbor_finder; n_threads=n_threads)
     α = exp(-sim.γ * sim.dt)
     σ = sqrt(1 - α^2)
 
-    accels = accelerations(sys, neighbors; parallel=parallel)
+    accels = accelerations(sys, neighbors; n_threads=n_threads)
 
     velocities_array = reinterpret(reshape, Float64, sys.velocities)
     coords_array = reinterpret(reshape, Float64, sys.coords)
@@ -38,7 +38,7 @@ function Molly.simulate!(sys::System, sim::NortonSVIntegrator, n_steps; parallel
     λ = (sim.η-dot(G_y,v_x))/FdotG
     v_x .+= λ * F_y
     
-    run_loggers!(sys, neighbors, 0; parallel=parallel)
+    run_loggers!(sys, neighbors, 0; n_threads=n_threads)
     for step_n = 1:n_steps
         #B step
         sys.velocities .+= accels * sim.dt / 2
@@ -49,7 +49,7 @@ function Molly.simulate!(sys::System, sim::NortonSVIntegrator, n_steps; parallel
         sys.coords .+= sys.velocities * sim.dt
         sys.coords .= Molly.wrap_coords.(sys.coords, (sys.boundary,))
 
-        accels .= accelerations(sys, neighbors; parallel=parallel)
+        accels .= accelerations(sys, neighbors; n_threads=n_threads)
 
         F_y .= sim.F.(q_y)
         G_y .= sim.G.(q_y)
@@ -76,8 +76,8 @@ function Molly.simulate!(sys::System, sim::NortonSVIntegrator, n_steps; parallel
 
         push!(force_hist, F_ham+F_corr+F_ou)
 
-        neighbors = find_neighbors(sys, sys.neighbor_finder,neighbors,step_n; parallel=parallel)
-        run_loggers!(sys, neighbors, step_n; parallel=parallel)
+        neighbors = find_neighbors(sys, sys.neighbor_finder,neighbors,step_n; n_threads=n_threads)
+        run_loggers!(sys, neighbors, step_n; n_threads=n_threads)
     end
     return force_hist
 end
@@ -151,7 +151,7 @@ function Molly.simulate!(sys::System, sim::NortonSplitting, n_steps; n_threads::
         end
     end
 
-    sys.coords = wrap_coords.(sys.coords, (sys.boundary,))
+    sys.coords .= wrap_coords.(sys.coords, (sys.boundary,))
     neighbors = find_neighbors(sys, sys.neighbor_finder; n_threads=n_threads)
     run_loggers!(sys, neighbors, 0; n_threads=n_threads)
 
@@ -180,9 +180,7 @@ function Molly.simulate!(sys::System, sim::NortonSplitting, n_steps; n_threads::
     λ_hist=Float64[]
 
     for step_n=1:n_steps
-        λ_A=0.0
-        λ_B=0.0
-        λ_O=0.0
+        λ_A = λ_B = λ_O = 0.0
 
         for (i,op)=enumerate(sim.splitting)
             if op=='A'
@@ -202,16 +200,16 @@ function Molly.simulate!(sys::System, sim::NortonSplitting, n_steps; n_threads::
             elseif op=='B'
                 ( force_computation_steps[i] ) &&  ( accels .= accelerations(sys,neighbors, n_threads=n_threads) )
                 sys.velocities .+= accels * effective_dts[i]
-                λ = (r- dot(v_x, G_y)) /FdotG
+                λ = (r- dot(G_y, v_x)) /FdotG
                 v_x .+= λ * F_y
                 λ_B += λ
 
             elseif op=='O'
                 sys.velocities .= α_eff * sys.velocities + σ_eff * random_velocities(sys,sim.T; rng=rng)
-                λ = (r -dot(G_y,v_x))/FdotG
+                λ = (r -dot(G_y, v_x))/FdotG
                 v_x .+= λ * F_y
 
-                λ_O += sim.γ*r / FdotG # no need to keep martingale part of the forcing
+                λ_O += sim.γ*r / FdotG # no need to keep martingale part of the forcing, bounded-variation part is analytically known
             end
         end
 

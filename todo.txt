@@ -1,0 +1,28 @@
+Rédaction
+    Intro
+    "classical" NEMD
+        definir pour une dynamique générale
+        def coeffs transports
+        point sur la discrétisation des EDS (e.g. methodes de splitting pour le cas Langevin)
+
+    Norton
+        definition dynamique de Norton, cas EDS generale
+        specialiser au cas R(q,p)=G(q)⋅p, lien avec les coeffs de transport
+        methode de discrétisation
+    
+    Numerical results
+        comparaison NEMD/Norton dans les cas mobilité et shear viscosity (validité de la méthode)
+        equivalence du profil de réponse non-linéaire dans la limite thermo/ forcage bulk
+        mise en évidence de la discrepancy in the non-bulk forcing case // small N
+        comparaison des variances asymptotiques
+
+
+Calculs
+    vérification empirique ∃ steady state
+    mise en évidence de l'importance de la limite thermo
+    régime bcp plus non-linéaires pour le shear viscosity
+
+Théorie
+    Principe de moindre contrainte dans le cas F ≠ G
+    
+
