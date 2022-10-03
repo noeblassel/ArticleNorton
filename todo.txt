@@ -16,6 +16,9 @@ Rédaction
         mise en évidence de la discrepancy in the non-bulk forcing case // small N
         comparaison des variances asymptotiques
 
+    Perspective
+        list of interesting open questions
+
 
 Calculs
     vérification empirique ∃ steady state
@@ -23,6 +26,6 @@ Calculs
     régime bcp plus non-linéaires pour le shear viscosity
 
 Théorie
-    Principe de moindre contrainte dans le cas F ≠ G
-    
+    Généralisation principe de moindre contrainte dans le cas F ≠ G
+
 
