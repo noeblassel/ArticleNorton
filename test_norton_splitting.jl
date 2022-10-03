@@ -73,7 +73,7 @@ for i=1:n_iter_sim
 
     temps=values(sys.loggers.temp)
     f=open("norton_temp_$(forcing_type)_$(r)_$(Npd).out","a")
-    write(f,temp)
+    write(f,temps)
     close(f)
 
     empty!(sys.loggers.temp.history)
