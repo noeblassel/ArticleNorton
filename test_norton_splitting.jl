@@ -75,4 +75,6 @@ for i=1:n_iter_sim
     f=open("norton_temp_$(forcing_type)_$(r).out","a")
     write(f,temp)
     close(f)
+
+    empty!(sys.loggers.temp.history)
 end
