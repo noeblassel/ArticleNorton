@@ -67,12 +67,12 @@ sys= System(atoms=atoms,coords=sys.coords,velocities=sys.velocities,pairwise_int
 
 for i=1:n_iter_sim
     force = simulate!(sys,simulator,n_steps_eq)
-    f=open("norton_forcing_$(forcing_type)_$(r).out","a")
+    f=open("norton_forcing_$(forcing_type)_$(r)_$(Npd).out","a")
     write(f,force)
     close(f)
 
     temps=values(sys.loggers.temp)
-    f=open("norton_temp_$(forcing_type)_$(r).out","a")
+    f=open("norton_temp_$(forcing_type)_$(r)_$(Npd).out","a")
     write(f,temp)
     close(f)
 
