@@ -21,9 +21,9 @@ end
 output_file="norton_forcing_SINUSOIDAL_0.1.dat"
 f_output=open(output_file,"w")
 println(f_output,"N r λ T N_samps AV_λ AV_T")
-println(n)
 
 for Npd in 1:15
+    println(Npd)
     λ_file=open("norton_forcing_SINUSOIDAL_0.1_$Npd.dat","r")
     λ_series=reinterpret(Float64,read(λ_file))
     close(λ_file)
