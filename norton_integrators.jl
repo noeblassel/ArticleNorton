@@ -92,41 +92,9 @@ struct NortonSplitting{S,E,K,F,W,TF,TG}
     G::TG # response profile
 end
 
-function Norton_O_step!(s,α_eff,σ_eff, γ, rng,temperature,r,v_x, F_y, G_y, FdotG)
-    s.velocities .= α_eff * s.velocities + σ_eff * random_velocities(s,temperature; rng=rng)
-    λ = (r -dot(G_y,v_x))/FdotG
-    v_x .+= λ * F_y
-
-    return γ*r / FdotG # no need to keep martingale part of the forcing
-end
-
-function Norton_A_step!(s,dt_eff, neighbors,accelerations,n_threads,r,q_y,v_x,F_y,G_y)
-    s.coords .+= s.velocities * dt_eff
-    s.coords .= Molly.wrap_coords.(s.coords, (s.boundary,))
-
-    accelerations .= accelerations(s,neighbors, n_threads=n_threads)
-
-    F_y .= F.(q_y)
-    G_y .= G.(q_y)
-    FdotG = dot(F_y,G_y)
-    λ = (r - dot(G_y, v_x))/ FdotG #reprojection in p onto the constant response manifold
-    v_x .+= λ * F_y
-
-    return (λ , FdotG) # update FdotG to avoid recomputation
-end
-
-function Norton_B_step!(s,dt_eff, accelerations, r, v_x,F_y,G_y,FdotG)
-    s.velocities .+= accelerations * dt_eff
-    λ = (r- dot(v_x, G_y)) /FdotG
-    v_x .+= λ * F_y
-
-    return λ
-end
-
-
 function Molly.simulate!(sys::System, sim::NortonSplitting, n_steps; n_threads::Integer=Threads.nthreads(), rng=Random.GLOBAL_RNG)
     α_eff = exp(-sim.γ * sim.dt / count('O', sim.splitting))
-    σ_eff = sqrt(sim.T * (1 - α_eff^2)) #noise on velocities, not momenta
+    σ_eff = sqrt(1 - α_eff^2) #noise on velocities, not momenta
 
     effective_dts=[sim.dt / count(c,sim.splitting) for c in sim.splitting]
 
