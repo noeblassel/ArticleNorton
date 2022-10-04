@@ -20,7 +20,8 @@ N=Npd^3
 L=(N/ρ)^(1//3)
 box_size=CubicBoundary(L,L,L)
 
-@assert 2r_c<= L "Cutoff radius too large relative to domain"
+max_speed=10.0*sqrt(T)
+n_steps_neighbors=floor(Int64,0.2*r_c/(dt*max_speed))
 
 max_speed=10.0*(sqrt(T)+η)
 n_steps_neighbors=floor(Int64,0.2*r_c/(dt*max_speed))
