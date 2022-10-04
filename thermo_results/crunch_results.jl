@@ -18,22 +18,22 @@ function asymptotic_variance(v)
     return max_var
 end
 
-output_file="norton_results.txt"
+output_file="thevenin_results.txt"
 f_output=open(output_file,"w")
-println(f_output,"N r λ T N_samps AV_λ AV_T")
+println(f_output,"N η R T N_samps AV_R AV_T")
 
 for Npd in 1:15
     println(Npd)
-    λ_file=open("./norton_forcing_SINUSOIDAL_0.1_$Npd.out","r")
-    λ_series=reinterpret(Float64,read(λ_file))
-    close(λ_file)
-    T_file=open("./norton_temp_SINUSOIDAL_0.1_$Npd.out","r")
+    R_file=open("../thevenin_response_SINUSOIDAL_0.1_$Npd.out","r")
+    R_series=reinterpret(Float64,read(R_file))
+    close(R_file)
+    T_file=open("../thevenin_temp_SINUSOIDAL_0.1_$Npd.out","r")
     T_series=reinterpret(Float64,read(T_file))
     close(T_file)
-    av_λ=asymptotic_variance(λ_series)
+    av_R=asymptotic_variance(R_series)
     av_T=asymptotic_variance(T_series)
-    N_samps=length(λ_series)
-    println(f_output,"$(Npd^3) $(0.1) $(mean(λ_series)) $(mean(T_series)) $(N_samps) $(av_λ) $(av_T)")
+    N_samps=length(R_series)
+    println(f_output,"$(Npd^3) $(0.1) $(mean(R_series)) $(mean(T_series)) $(N_samps) $(av_R) $(av_T)")
 end
 
 close(f_output)
