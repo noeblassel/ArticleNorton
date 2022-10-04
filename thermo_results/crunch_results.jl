@@ -33,7 +33,7 @@ for Npd in 1:15
     av_R=asymptotic_variance(R_series)
     av_T=asymptotic_variance(T_series)
     N_samps=length(R_series)
-    println(f_output,"$(Npd^3) $(0.1) $(mean(R_series)) $(mean(T_series)) $(N_samps) $(av_R) $(av_T)")
+    println(f_output,"$(Npd^3) $(0.3) $(mean(R_series)) $(mean(T_series)) $(N_samps) $(av_R) $(av_T)")
 end
 
 close(f_output)

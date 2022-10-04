@@ -43,7 +43,7 @@ elseif forcing_type=="CONSTANT"
     F=F_const
 end
 
-splitting="OBABO"
+splitting="BAOAB"
 simulator=NortonSplitting(dt,r,T,γ,splitting,F,G)
 
 nf = (3.6r_c < L) ? CellListMapNeighborFinder(nb_matrix=trues(N,N),n_steps=n_steps_neighbors,dist_cutoff= 1.2r_c,unit_cell=box_size) : DistanceNeighborFinder(nb_matrix=trues(N,N),n_steps=n_steps_neighbors,dist_cutoff=1.2r_c)
@@ -57,13 +57,13 @@ inter=LennardJones(cutoff=ShiftedForceCutoff(r_c),nl_only=true,force_units=NoUni
 n_steps_eq=floor(Int64,t_eq/dt)
 
 sys=System(atoms=atoms,coords=coords,velocities=velocities,pairwise_inters=(inter,),boundary=box_size,neighbor_finder=nf,force_units=NoUnits,energy_units=NoUnits,k=1.0)
-
+println(temperature(sys))
 _=simulate!(sys,simulator,n_steps_eq)
 
 coordinate_observable(s, neighbors; n_threads=Threads.nthreads())=copy(s.coords)
 loggers=(temp=TemperatureLogger(Float64,1),)
 sys= System(atoms=atoms,coords=sys.coords,velocities=sys.velocities,pairwise_inters=(inter,),boundary=box_size,neighbor_finder=nf,force_units=NoUnits,energy_units=NoUnits,k=1.0, loggers=loggers)
-
+println(temperature(sys))
 
 for i=1:n_iter_sim
     force = simulate!(sys,simulator,n_steps_eq)
@@ -75,6 +75,6 @@ for i=1:n_iter_sim
     f=open("norton_temp_$(forcing_type)_$(r)_$(Npd).out","a")
     write(f,temps)
     close(f)
-
+    #println(sum(values(sys.loggers.temp))/length(values(sys.loggers.temp)))
     empty!(sys.loggers.temp.history)
 end
