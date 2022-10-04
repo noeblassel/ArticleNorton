@@ -18,16 +18,16 @@ function asymptotic_variance(v)
     return max_var
 end
 
-output_file="norton_forcing_SINUSOIDAL_0.1.dat"
+output_file="norton_results.txt"
 f_output=open(output_file,"w")
 println(f_output,"N r λ T N_samps AV_λ AV_T")
 
 for Npd in 1:15
     println(Npd)
-    λ_file=open("../norton_forcing_SINUSOIDAL_0.1_$Npd.out","r")
+    λ_file=open("./norton_forcing_SINUSOIDAL_0.1_$Npd.out","r")
     λ_series=reinterpret(Float64,read(λ_file))
     close(λ_file)
-    T_file=open("../norton_temp_SINUSOIDAL_0.1_$Npd.out","r")
+    T_file=open("./norton_temp_SINUSOIDAL_0.1_$Npd.out","r")
     T_series=reinterpret(Float64,read(T_file))
     close(T_file)
     av_λ=asymptotic_variance(λ_series)
