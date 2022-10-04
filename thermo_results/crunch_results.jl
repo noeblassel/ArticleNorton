@@ -1,6 +1,6 @@
 using Statistics
 
-function asymptotic_var(v)
+function asymptotic_variance(v)
     data=copy(v)
     avg=mean(v)
     data .-= avg
