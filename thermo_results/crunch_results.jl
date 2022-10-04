@@ -27,7 +27,7 @@ for Npd in 1:15
     λ_file=open("../norton_forcing_SINUSOIDAL_0.1_$Npd.out","r")
     λ_series=reinterpret(Float64,read(λ_file))
     close(λ_file)
-    T_file=open("norton_temp_SINUSOIDAL_0.1_$Npd")
+    T_file=open("norton_temp_SINUSOIDAL_0.1_$Npd.out","r")
     T_series=reinterpret(Float64,read(T_file))
     close(T_file)
     av_λ=asymptotic_variance(λ_series)
