@@ -33,8 +33,7 @@ for Npd in 1:15
     av_λ=asymptotic_variance(λ_series)
     av_T=asymptotic_variance(T_series)
     N_samps=length(λ_series)
-
-    join(f_output,[Npd^3, 0.1, mean(λ_series),mean(T_series),N_samps,av_λ,av_T]," ","\n")
+    println(f_output,"$(Npd^3) $(0.1) $(mean(λ_series)) $(mean(T_series)) $(N_samps) $(av_λ) $(av_T)")
 end
 
 close(f_output)
