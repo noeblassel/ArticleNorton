@@ -1,7 +1,7 @@
 using Molly, LinearAlgebra
 
-include("../utils/place_atoms.jl")
-println("Usage: T ρ dt γ η forcing_type=SINUSOIDAL|LINEAR|CONSTANT t_equilibration t_simulation N_atoms_per_dimension scheme cutoff_radius")
+include("utils.jl")
+println("Usage: T ρ dt γ η forcing_type=SINUSOIDAL|LINEAR|CONSTANT t_equilibration n_iter_sim Npd scheme cutoff_radius")
 
 T=parse(Float64,ARGS[1])
 ρ=parse(Float64,ARGS[2])
@@ -44,7 +44,7 @@ function fourier_response(s::System,args...;kwargs...)
     q_y=view(reinterpret(reshape,Float64,s.coords),2,:)
     Ly=s.boundary.side_lengths[2]
     N=length(s)
-    return dot(p_x,exp.(2im*π*q_y/Ly))/N
+    return imag(dot(p_x,exp.(2im*π*q_y/Ly))/N)
 end
 
 sinus_forcing=(y-> sin(2π*y/L))
@@ -73,12 +73,16 @@ sim=LangevinSplitting(dt=dt,friction=γ,temperature=T,splitting=splitting;remove
 sys=System(atoms=atoms,coords=coords,velocities=velocities,pairwise_inters=(inter,),general_inters=(forcing,),boundary=box_size,neighbor_finder=nf,force_units=NoUnits,energy_units=NoUnits,k=1.0)
 
 simulate!(sys,sim,n_steps_eq)
-sys=System(atoms=atoms,coords=sys.coords,velocities=sys.velocities,pairwise_inters=(inter,),general_inters=(forcing,),boundary=box_size,neighbor_finder=nf,force_units=NoUnits,energy_units=NoUnits,k=1.0,loggers=(fourier=GeneralObservableLogger(fourier_response,ComplexF64,1),))
+sys=System(atoms=atoms,coords=sys.coords,velocities=sys.velocities,pairwise_inters=(inter,),general_inters=(forcing,),boundary=box_size,neighbor_finder=nf,force_units=NoUnits,energy_units=NoUnits,k=1.0,loggers=(fourier=GeneralObservableLogger(fourier_response,Float64,1),temp=TemperatureLogger(Float64,1)))
 
 for i=1:n_iter_sim
     simulate!(sys,sim,n_steps_eq)
-    f=open("fourier_response_$(forcing_type)_$(η)_$(Npd).out","a")
+    f=open("thevenin_response_$(forcing_type)_$(η)_$(Npd).out","a")
     write(f,values(sys.loggers.fourier))
     close(f)
     empty!(sys.loggers.fourier.history)
+    f=open("thevenin_temp_$(forcing_type)_$(η)_$(Npd).out","a")
+    write(f,values(sys.loggers.temp))
+    close(f)
+    empty!(sys.loggers.temp.history)
 end
