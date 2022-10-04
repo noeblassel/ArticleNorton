@@ -18,8 +18,6 @@ function asymptotic_var(v)
     return max_var
 end
 
-run(`./scp_sv_results.sh`)
-
 output_file="norton_forcing_SINUSOIDAL_0.1.dat"
 f_output=open(output_file,"w")
 println(f_output,"N r λ T N_samps AV_λ AV_T")
