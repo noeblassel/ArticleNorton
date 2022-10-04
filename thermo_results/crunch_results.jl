@@ -24,10 +24,10 @@ println(f_output,"N η R T N_samps AV_R AV_T")
 
 for Npd in 1:15
     println(Npd)
-    R_file=open("../thevenin_response_SINUSOIDAL_0.1_$Npd.out","r")
+    R_file=open("../thevenin_response_SINUSOIDAL_0.3_$Npd.out","r")
     R_series=reinterpret(Float64,read(R_file))
     close(R_file)
-    T_file=open("../thevenin_temp_SINUSOIDAL_0.1_$Npd.out","r")
+    T_file=open("../thevenin_temp_SINUSOIDAL_0.3_$Npd.out","r")
     T_series=reinterpret(Float64,read(T_file))
     close(T_file)
     av_R=asymptotic_variance(R_series)
