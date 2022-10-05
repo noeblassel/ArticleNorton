@@ -29,7 +29,7 @@ println(f_output,header)
 for Npd in 6:15
     println(Npd)
     S_file= (method == "THEVENIN") ? open("thevenin_response_SINUSOIDAL_0.3_$Npd.out","r") : open("../norton_forcing_SINUSOIDAL_0.1_$Npd.out","r")
-    S_series=reinterpret(Float64,read(S_series))
+    S_series=reinterpret(Float64,read(S_file))
     close(S_file)
     T_file=(method == "THEVENIN") ? open("thevenin_temp_SINUSOIDAL_0.3_$Npd.out","r") : open("../norton_temp_SINUSOIDAL_0.1_$Npd.out","r")
     T_series=reinterpret(Float64,read(T_file))
