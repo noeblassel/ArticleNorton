@@ -23,7 +23,7 @@ for f in files
     println(m," ", M, " ",minimum(is)," ",maximum(is))
     map(i-> hist[i]+=1,is)
 
-    output_f=open("histograms/$f","w")
+    output_f=open("histograms/hist_$f","w")
     println(output_f,"$m $M $n_bins")
     print(output_f,join(hist,", "))
     close(output_f)
