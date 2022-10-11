@@ -19,7 +19,7 @@ for f in files
 
     ts = (M .- series) / (M-m)
     is = ceil.(Int64,ts*n_bins)
-    
+    clamp!(is,1,n_bins)
     println(m," ", M, " ",minimum(is)," ",maximum(is))
     map(i-> hist[i]+=1,is)
 
