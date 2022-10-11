@@ -17,8 +17,8 @@ for f in files
     dx=(M-m)/n_bins
     hist=zeros(n_bins)
 
-    ts = (M .- x) / (M-m)
-    is =floor.(Int64,t*n_bins)
+    ts = (M .- series) / (M-m)
+    is =floor.(Int64,ts*n_bins)
     map(i-> hist[i]+=1,is)
 
     output_f=open("histograms/$f","w")
