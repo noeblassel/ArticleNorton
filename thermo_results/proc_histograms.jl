@@ -19,6 +19,7 @@ for f in files
 
     ts = (M .- series) / (M-m)
     is =floor.(Int64,ts*n_bins)
+    println(is)
     map(i-> hist[i]+=1,is)
 
     output_f=open("histograms/$f","w")
