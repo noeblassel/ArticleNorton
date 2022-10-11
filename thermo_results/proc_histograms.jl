@@ -6,6 +6,8 @@ if !isdir("histograms")
     mkdir("histograms")
 end
 
+n_bins=parse(Int64,n_bins)
+
 for f in files
     println(f)
     fh=open(f,"r")
