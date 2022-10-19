@@ -79,7 +79,6 @@ inter=LennardJones(cutoff=ShiftedForceCutoff(r_c),nl_only=true,force_units=NoUni
 n_steps_eq=Int64(floor(t_eq/dt))
 
 sim=LangevinSplitting(dt=dt,friction=γ,temperature=T,splitting=splitting;remove_CM_motion=false)
-
 sys=System(atoms=atoms,coords=coords,velocities=velocities,pairwise_inters=(inter,),general_inters=(forcing,),boundary=box_size,neighbor_finder=nf,force_units=NoUnits,energy_units=NoUnits,k=1.0)
 
 simulate!(sys,sim,n_steps_eq)

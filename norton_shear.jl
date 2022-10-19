@@ -36,12 +36,12 @@ max_speed=10.0*sqrt(T)
 n_steps_neighbors=floor(Int64,0.2*r_c/(dt*max_speed))
 
 
-F_sin(y) = sin(2π * y / L)
-F_const(y) = (y < L / 2) ? 1.0 : -1.0
-F_lin(y) = (y < L / 2) ? 4 * (y - L / 4) / L : 4 * (3L / 4 - y) / L
+F_sin(y) = sin(2π * y / Ly)
+F_const(y) = (y < Ly / 2) ? 1.0 : -1.0
+F_lin(y) = (y < Ly / 2) ? 4 * (y - Ly / 4) / L : 4 * (3Ly / 4 - y) / Ly
 
-G_imag(y) = sin(2π * y / L) / N
-G_real(y) = cos(2π * y/ L) / N
+G_imag(y) = sin(2π * y / Ly) / N
+G_real(y) = cos(2π * y/ Ly) / N
 
 F=F_sin
 G=G_imag
@@ -55,7 +55,7 @@ end
 
 simulator=NortonSplitting(dt,r,T,γ,splitting,F,G)
 
-nf = (3.6r_c < L) ? CellListMapNeighborFinder(nb_matrix=trues(N,N),n_steps=n_steps_neighbors,dist_cutoff= 1.2r_c,unit_cell=box_size) : DistanceNeighborFinder(nb_matrix=trues(N,N),n_steps=n_steps_neighbors,dist_cutoff=1.2r_c)
+nf = (3.6r_c < min(Lx,Ly,Lz)) ? CellListMapNeighborFinder(nb_matrix=trues(N,N),n_steps=n_steps_neighbors,dist_cutoff= 1.2r_c,unit_cell=box_size) : DistanceNeighborFinder(nb_matrix=trues(N,N),n_steps=n_steps_neighbors,dist_cutoff=1.2r_c)
 coords=place_atoms_on_3D_lattice(Nx,Ny,Nz,box_size)
 atoms = [Atom(σ=1.0, ϵ=1.0, mass=1.0) for i in 1:N]
 velocities = [velocity(1.0, T, 1.0) for i = 1:N]
