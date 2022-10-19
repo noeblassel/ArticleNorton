@@ -57,13 +57,11 @@ inter=LennardJones(cutoff=ShiftedForceCutoff(r_c),nl_only=true,force_units=NoUni
 n_steps_eq=floor(Int64,t_eq/dt)
 
 sys=System(atoms=atoms,coords=coords,velocities=velocities,pairwise_inters=(inter,),boundary=box_size,neighbor_finder=nf,force_units=NoUnits,energy_units=NoUnits,k=1.0)
-println(temperature(sys))
 _=simulate!(sys,simulator,n_steps_eq)
 
 coordinate_observable(s, neighbors; n_threads=Threads.nthreads())=copy(s.coords)
 loggers=(temp=TemperatureLogger(Float64,1),)
 sys= System(atoms=atoms,coords=sys.coords,velocities=sys.velocities,pairwise_inters=(inter,),boundary=box_size,neighbor_finder=nf,force_units=NoUnits,energy_units=NoUnits,k=1.0, loggers=loggers)
-println(temperature(sys))
 
 for i=1:n_iter_sim
     force = simulate!(sys,simulator,n_steps_eq)

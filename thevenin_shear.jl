@@ -1,7 +1,7 @@
 using Molly, LinearAlgebra
 
 include("utils.jl")
-println("Usage: T ρ dt γ η forcing_type=SINUSOIDAL|LINEAR|CONSTANT t_equilibration n_iter_sim Npd scheme cutoff_radius")
+println("Usage: T ρ dt γ η forcing_type=SINUSOIDAL|LINEAR|CONSTANT t_equilibration n_iter_sim Nx scheme cutoff_radius y_ratio z_ratio")
 
 T=parse(Float64,ARGS[1])
 ρ=parse(Float64,ARGS[2])
@@ -12,13 +12,22 @@ forcing_type=ARGS[6]
 t_eq=parse(Float64,ARGS[7])
 n_iter_sim=parse(Int64,ARGS[8])
 
-Npd=parse(Int64,ARGS[9])
+Nx=parse(Int64,ARGS[9])
 splitting=ARGS[10]
 r_c=parse(Float64,ARGS[11])
+y_ratio = parse(Float64,ARGS[12])
+z_ratio = parse(Float64,ARGS[13])
 
-N=Npd^3
-L=(N/ρ)^(1//3)
-box_size=CubicBoundary(L,L,L)
+Ny=round(Int64,Nx*y_ratio)
+Nz=round(Int64,Nx*z_ratio)
+
+N=Nx*Ny*Nz
+
+Lx=Nx*cbrt(ρ)
+Ly=Lx*y_ratio
+Lz=Lx*z_ratio
+
+box_size=CubicBoundary(Lx,Ly,Lz)
 
 max_speed=10.0*sqrt(T)
 n_steps_neighbors=floor(Int64,0.2*r_c/(dt*max_speed))
@@ -48,9 +57,9 @@ function fourier_response(s::System,args...;kwargs...)
     return imag(dot(p_x,exp.(2im*π*q_y/Ly))/N)
 end
 
-sinus_forcing=(y-> sin(2π*y/L))
-constant_forcing=(y -> (y<L/2) ? 1 : -1)
-linear_forcing=(y -> (y<L/2) ? 4*(y-L/4)/L : 4*(3L/4-y)/L)
+sinus_forcing=(y-> sin(2π*y/Ly))
+constant_forcing=(y -> (y<Ly/2) ? 1 : -1)
+linear_forcing=(y -> (y<Ly/2) ? 4*(y-Ly/4)/Ly : 4*(3Ly/4-y)/Ly)
 
 forcing=NEMD_longitudinal_forcing(sinus_forcing,η)
 
@@ -60,10 +69,10 @@ elseif forcing_type=="CONSTANT"
     forcing=NEMD_longitudinal_forcing(constant_forcing,η)
 end
 
-nf = (3.6r_c < L) ? CellListMapNeighborFinder(nb_matrix=trues(N,N),n_steps=n_steps_neighbors,dist_cutoff= 1.2r_c,unit_cell=box_size) : DistanceNeighborFinder(nb_matrix=trues(N,N),n_steps=n_steps_neighbors,dist_cutoff=1.2r_c)
+nf = (3.6r_c < min(Lx,Ly,Lz)) ? CellListMapNeighborFinder(nb_matrix=trues(N,N),n_steps=n_steps_neighbors,dist_cutoff= 1.2r_c,unit_cell=box_size) : DistanceNeighborFinder(nb_matrix=trues(N,N),n_steps=n_steps_neighbors,dist_cutoff=1.2r_c)
 
 atoms=[Atom(index=i,ϵ=1.0,σ=1.0,mass=1.0) for i=1:N]
-coords=place_atoms_on_3D_lattice(Npd,box_size)
+coords=place_atoms_on_3D_lattice(Nx,Ny,Nz,box_size)
 velocities=[velocity(1.0,T,1.0) for i=1:N]
 inter=LennardJones(cutoff=ShiftedForceCutoff(r_c),nl_only=true,force_units=NoUnits,energy_units=NoUnits)
 
@@ -78,11 +87,11 @@ sys=System(atoms=atoms,coords=sys.coords,velocities=sys.velocities,pairwise_inte
 
 for i=1:n_iter_sim
     simulate!(sys,sim,n_steps_eq)
-    f=open("thermo_results/thevenin_response_$(forcing_type)_$(η)_$(Npd).out","a")
+    f=open("thermo_results/thevenin_response_$(forcing_type)_$(η)_$(Nx).out","a")
     write(f,values(sys.loggers.fourier))
     close(f)
     empty!(sys.loggers.fourier.history)
-    f=open("thermo_results/thevenin_temp_$(forcing_type)_$(η)_$(Npd).out","a")
+    f=open("thermo_results/thevenin_temp_$(forcing_type)_$(η)_$(Nx).out","a")
     write(f,values(sys.loggers.temp))
     close(f)
     empty!(sys.loggers.temp.history)

@@ -258,16 +258,17 @@ function Molly.simulate!(sys::System, sim::GeneralizedNortonSplitting, n_steps; 
 
     λ_hist=Float64[]
     r_hist=Float64[]
+    λ_mart_hist=Float64[]
 
-    for step_n=1:n_steps
-        λ_A = λ_B = λ_O = 0.0
+    @showprogress for step_n=1:n_steps
+        λ_A = λ_B = λ_O = λ_tilde_A = λ_tilde_B = λ_tilde_O = 0.0
         push!(r_hist,r)
         for (i,op)=enumerate(sim.splitting)
             if op=='A'
 
                 ## response updates
-                xi=sim.ξ(effective_dts[i]/3) #martingale increment -- note update of the response in the A steps account for 1/3 of the total evolution of the response
-                r=sim.φ(r,effective_dts[i]/3) #udpate with deterministic flow
+                xi=sim.ξ(effective_dts[i]) #martingale increment
+                r=sim.φ(r,effective_dts[i]) #udpate with deterministic flow
 
                 ## tentative normal A-step
 
@@ -286,6 +287,7 @@ function Molly.simulate!(sys::System, sim::GeneralizedNortonSplitting, n_steps; 
                 v_x .+= (λ_bar + λ_mart) * F_y
 
                 λ_A += λ_bar
+                λ_tilde_A += λ_mart
                 ## add stochastic component to the response
                 r += xi
 
@@ -293,8 +295,8 @@ function Molly.simulate!(sys::System, sim::GeneralizedNortonSplitting, n_steps; 
                 ( force_computation_steps[i] ) &&  ( accels .= accelerations(sys,neighbors, n_threads=n_threads) ) # recompute accelerations if need be
                 
                 ## response updates
-                xi=sim.ξ(effective_dts[i]/3) #martingale increment
-                r=sim.φ(r,effective_dts[i]/3) #udpate with deterministic flow
+                xi=sim.ξ(effective_dts[i]) #martingale increment
+                r=sim.φ(r,effective_dts[i]) #udpate with deterministic flow
 
                 ## tentative normal B-step
                 sys.velocities .+= accels * effective_dts[i]
@@ -304,11 +306,12 @@ function Molly.simulate!(sys::System, sim::GeneralizedNortonSplitting, n_steps; 
                 λ_mart = xi / FdotG # martingale component
                 v_x .+= (λ_bar + λ_mart) * F_y
                 λ_B += λ_bar
+                λ_tilde_B += λ_mart
 
             elseif op=='O'
                 ## response updates
-                xi=sim.ξ(effective_dts[i]/3) #martingale increment
-                r=sim.φ(r,effective_dts[i]/3) #udpate with deterministic flow
+                xi=sim.ξ(effective_dts[i]) #martingale increment
+                r=sim.φ(r,effective_dts[i]) #udpate with deterministic flow
 
                 ## Tentative O-step
                 dW .= random_velocities(sys,sim.T; rng=rng) #noise
@@ -322,12 +325,15 @@ function Molly.simulate!(sys::System, sim::GeneralizedNortonSplitting, n_steps; 
                 v_x .+= (λ_bar + λ_mart) * F_y
 
                 λ_O += λ_bar
+                λ_tilde_O += λ_mart
             end
         end
 
         λ_est= (λ_A + λ_B +λ_O) / sim.dt
+        λ_tilde_est = (λ_tilde_A + λ_tilde_B + λ_tilde_O) / sim.dt
 
         push!(λ_hist, λ_est)
+        push!(λ_mart_hist,λ_tilde_est)
         run_loggers!(sys,neighbors,step_n)
 
         if step_n != n_steps
@@ -335,5 +341,5 @@ function Molly.simulate!(sys::System, sim::GeneralizedNortonSplitting, n_steps; 
         end
     end
     
-    return λ_hist
+    return λ_hist,λ_mart_hist,r_hist
 end
