@@ -1,4 +1,4 @@
-using Random, LinearAlgebra, ProgressMeter
+using Random, LinearAlgebra
 
 struct NortonSVIntegrator{TF,TG}
     dt::Float64
