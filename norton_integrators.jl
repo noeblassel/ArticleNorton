@@ -124,14 +124,17 @@ function Molly.simulate!(sys::System, sim::NortonSplitting, n_steps; n_threads::
     run_loggers!(sys, neighbors, 0; n_threads=n_threads)
 
     accels = accelerations(sys, neighbors; n_threads=n_threads)
+    dW = zero(sys.velocities)
 
     velocities_array = reinterpret(reshape, Float64, sys.velocities)
     coords_array = reinterpret(reshape, Float64, sys.coords)
+    dW_array = reinterpret(reshape, Float64,dW)
 
     #views into longitudinal and transverse components
 
     v_x = view(velocities_array, 1, :)
     q_y = view(coords_array, 2, :)
+    dW_x = view(dW_array,1,: )
 
     #initialize F and G vectors
     F_y = sim.F.(q_y)
@@ -160,8 +163,9 @@ function Molly.simulate!(sys::System, sim::NortonSplitting, n_steps; n_threads::
                 FdotG = dot(F_y,G_y)
                 λ = (r - dot(G_y, v_x))/ FdotG #reprojection in p onto the constant response manifold
                 v_x .+= λ * F_y
-
                 λ_A += λ
+#=                 # println("λ_A: $(λ)")
+                 println("resp:" ,dot(G_y,v_x))  =#
 
             elseif op=='B'
                 ( force_computation_steps[i] ) &&  ( accels .= accelerations(sys,neighbors, n_threads=n_threads) )
@@ -169,18 +173,27 @@ function Molly.simulate!(sys::System, sim::NortonSplitting, n_steps; n_threads::
                 λ = (r- dot(G_y, v_x)) /FdotG
                 v_x .+= λ * F_y
                 λ_B += λ
-
+                
+#=                 println("λ_B: $(λ)")
+                println("resp:" ,dot(G_y,v_x))
+ =#
             elseif op=='O'
-                sys.velocities .= α_eff * sys.velocities + σ_eff * random_velocities(sys,sim.T; rng=rng)
-                λ = (r -dot(G_y, v_x))/FdotG
-                v_x .+= λ * F_y
+                dW .= σ_eff * random_velocities(sys,sim.T; rng=rng)
+                sys.velocities .*= α_eff
+                λ_bar = (r -dot(G_y, v_x))/FdotG
+                λ_mart = -dot(G_y,dW_x)/FdotG
+                sys.velocities .+= dW
+                v_x .+= (λ_bar+λ_mart)* F_y
 
-                λ_O += sim.γ*r / FdotG # no need to keep martingale part of the forcing, bounded-variation part is analytically known
+                λ_O += λ_bar # no need to keep martingale part of the forcing, bounded-variation part is analytically known
+
+#=             println("λ_O: $(λ_O)","analytic: $(effective_dts[i]*α_eff*sim.r/FdotG)")
+            println("resp:" ,dot(G_y,v_x)) =#
+ 
             end
         end
 
-        λ_est= (λ_A + λ_B) / sim.dt + λ_O / count('O',sim.splitting)
-
+        λ_est= (λ_A + λ_B + λ_O) / sim.dt
         push!(λ_hist, λ_est)
 
         run_loggers!(sys,neighbors,step_n)
@@ -189,7 +202,6 @@ function Molly.simulate!(sys::System, sim::NortonSplitting, n_steps; n_threads::
             neighbors = find_neighbors(sys, sys.neighbor_finder, neighbors, step_n ; n_threads=n_threads)
         end
     end
-    
     return λ_hist
 end
 
@@ -311,14 +323,14 @@ function Molly.simulate!(sys::System, sim::GeneralizedNortonSplitting, n_steps; 
                 r=sim.φ(r,effective_dts[i]/3) #udpate with deterministic flow
 
                 ## Tentative O-step
-                dW .= random_velocities(sys,sim.T; rng=rng) #noise
+                dW .= σ_eff * random_velocities(sys,sim.T; rng=rng) #noise
 
                 sys.velocities .*= α_eff #dissipation -- necessary to add fluctuation noise later to compute the finite-variation component of the multiplier
 
                 ## compute Lagrange multiplier
                 λ_bar = (r -dot(G_y, v_x))/FdotG # finite-variation component
                 λ_mart = (xi - dot(G_y, dW_x)) # martingale component
-                sys.velocities .+= σ_eff * dW
+                sys.velocities .+= dW
                 v_x .+= (λ_bar + λ_mart) * F_y
 
                 λ_O += λ_bar
@@ -334,6 +346,7 @@ function Molly.simulate!(sys::System, sim::GeneralizedNortonSplitting, n_steps; 
             neighbors = find_neighbors(sys, sys.neighbor_finder, neighbors, step_n ; n_threads=n_threads)
         end
     end
+    
     
     return λ_hist
 end
