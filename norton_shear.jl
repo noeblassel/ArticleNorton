@@ -32,8 +32,7 @@ Lx=Nx / cbrt(ρ)
 Ly=Lx*y_ratio
 Lz=Lx*z_ratio
 
-println("Lx: $Lx, Ly: $Ly, Lz: $Lz")
-println("$(Lx*Ly*Lz/(Nx*Ny*Nz))")
+println("Lx: $Lx, Ly: $Ly, Lz: $Lz")    
 box_size=CubicBoundary(Lx,Ly,Lz)
 
 max_speed=10.0*sqrt(T)
@@ -76,13 +75,11 @@ v_array=reinterpret(reshape,Float64,sys.velocities)
 
 q_y=view(q_array,2,:)
 v_x=view(v_array,1,:)
-
+#= 
 R(args...;kwargs...)=dot(G.(q_y),v_x)
 loggers=(temp=TemperatureLogger(Float64,1),resp=GeneralObservableLogger(R,Float64,1))
-
-sys= System(atoms=atoms,coords=sys.coords,velocities=sys.velocities,pairwise_inters=(inter,),boundary=box_size,neighbor_finder=nf,force_units=NoUnits,energy_units=NoUnits,k=1.0, loggers=loggers)
-
-using Statistics 
+ =#
+sys= System(atoms=atoms,coords=sys.coords,velocities=sys.velocities,pairwise_inters=(inter,),boundary=box_size,neighbor_finder=nf,force_units=NoUnits,energy_units=NoUnits,k=1.0)
 
 for i=1:n_iter_sim
     println("iteration $i")
@@ -90,7 +87,7 @@ for i=1:n_iter_sim
     f=open("thermo_results/norton_forcing_$(forcing_type)_$(r)_$(Nx)_$(Ny)_$(Nz).out","a")
     write(f,force)
     close(f)
-
+#= 
     println("mean force: $(mean(force))")
     println("estimated ρ: $(r/mean(force))")
 
@@ -107,5 +104,5 @@ for i=1:n_iter_sim
 
     #println(sum(values(sys.loggers.temp))/length(values(sys.loggers.temp)))
     empty!(sys.loggers.temp.history)
-    empty!(sys.loggers.resp.history)
+    empty!(sys.loggers.resp.history) =#
 end
