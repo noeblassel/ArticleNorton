@@ -124,17 +124,14 @@ function Molly.simulate!(sys::System, sim::NortonSplitting, n_steps; n_threads::
     run_loggers!(sys, neighbors, 0; n_threads=n_threads)
 
     accels = accelerations(sys, neighbors; n_threads=n_threads)
-    dW = zero(sys.velocities)
-
+    
     velocities_array = reinterpret(reshape, Float64, sys.velocities)
     coords_array = reinterpret(reshape, Float64, sys.coords)
-    dW_array = reinterpret(reshape, Float64,dW)
 
     #views into longitudinal and transverse components
 
     v_x = view(velocities_array, 1, :)
     q_y = view(coords_array, 2, :)
-    dW_x = view(dW_array,1,: )
 
     #initialize F and G vectors
     F_y = sim.F.(q_y)
@@ -164,8 +161,6 @@ function Molly.simulate!(sys::System, sim::NortonSplitting, n_steps; n_threads::
                 λ = (r - dot(G_y, v_x))/ FdotG #reprojection in p onto the constant response manifold
                 v_x .+= λ * F_y
                 λ_A += λ
-#=                 # println("λ_A: $(λ)")
-                 println("resp:" ,dot(G_y,v_x))  =#
 
             elseif op=='B'
                 ( force_computation_steps[i] ) &&  ( accels .= accelerations(sys,neighbors, n_threads=n_threads) )
@@ -174,22 +169,13 @@ function Molly.simulate!(sys::System, sim::NortonSplitting, n_steps; n_threads::
                 v_x .+= λ * F_y
                 λ_B += λ
                 
-#=                 println("λ_B: $(λ)")
-                println("resp:" ,dot(G_y,v_x))
- =#
             elseif op=='O'
-                dW .= σ_eff * random_velocities(sys,sim.T; rng=rng)
-                sys.velocities .*= α_eff
-                λ_bar = (r -dot(G_y, v_x))/FdotG
-                λ_mart = -dot(G_y,dW_x)/FdotG
-                sys.velocities .+= dW
-                v_x .+= (λ_bar+λ_mart)* F_y
+                sys.velocities .= α_eff*sys.velocities + σ_eff * random_velocities(sys,sim.T; rng=rng)
+                λ = (r- dot(G_y, v_x)) /FdotG
+                v_x .+= λ * F_y
 
-                λ_O += λ_bar # no need to keep martingale part of the forcing, bounded-variation part is analytically known
+                λ_O += (1-α_eff)*sim.r /FdotG # only record bounded-variation increment, which is analytically known
 
-#=             println("λ_O: $(λ_O)","analytic: $(effective_dts[i]*α_eff*sim.r/FdotG)")
-            println("resp:" ,dot(G_y,v_x)) =#
- 
             end
         end
 

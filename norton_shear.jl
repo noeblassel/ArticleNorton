@@ -26,10 +26,14 @@ Nz=round(Int64,Nx*z_ratio)
 
 N=Nx*Ny*Nz
 
-Lx=Nx*cbrt(ρ)
+println("N: $N, Nx: $Nx, Ny: $Ny, Nz: $Nz")
+
+Lx=Nx / cbrt(ρ)
 Ly=Lx*y_ratio
 Lz=Lx*z_ratio
 
+println("Lx: $Lx, Ly: $Ly, Lz: $Lz")
+println("$(Lx*Ly*Lz/(Nx*Ny*Nz))")
 box_size=CubicBoundary(Lx,Ly,Lz)
 
 max_speed=10.0*sqrt(T)
@@ -67,19 +71,41 @@ n_steps_eq=floor(Int64,t_eq/dt)
 sys=System(atoms=atoms,coords=coords,velocities=velocities,pairwise_inters=(inter,),boundary=box_size,neighbor_finder=nf,force_units=NoUnits,energy_units=NoUnits,k=1.0)
 _=simulate!(sys,simulator,n_steps_eq)
 
-loggers=(temp=TemperatureLogger(Float64,1),)
+q_array=reinterpret(reshape,Float64,sys.coords)
+v_array=reinterpret(reshape,Float64,sys.velocities)
+
+q_y=view(q_array,2,:)
+v_x=view(v_array,1,:)
+
+R(args...;kwargs...)=dot(G.(q_y),v_x)
+loggers=(temp=TemperatureLogger(Float64,1),resp=GeneralObservableLogger(R,Float64,1))
+
 sys= System(atoms=atoms,coords=sys.coords,velocities=sys.velocities,pairwise_inters=(inter,),boundary=box_size,neighbor_finder=nf,force_units=NoUnits,energy_units=NoUnits,k=1.0, loggers=loggers)
 
+using Statistics 
+
 for i=1:n_iter_sim
+    println("iteration $i")
     force = simulate!(sys,simulator,n_steps_eq)
     f=open("thermo_results/norton_forcing_$(forcing_type)_$(r)_$(Nx)_$(Ny)_$(Nz).out","a")
     write(f,force)
     close(f)
 
+    println("mean force: $(mean(force))")
+    println("estimated ρ: $(r/mean(force))")
+
     temps=values(sys.loggers.temp)
     f=open("thermo_results/norton_temp_$(forcing_type)_$(r)_$(Nx)_$(Ny)_$(Nz).out","a")
     write(f,temps)
     close(f)
+
+    println("mean temp: $(mean(temps))")
+
+    resps=values(sys.loggers.resp)
+    println("mean response: $(mean(resps))")
+    println("extreme responses: $(minimum(resps)), $(maximum(resps))")
+
     #println(sum(values(sys.loggers.temp))/length(values(sys.loggers.temp)))
     empty!(sys.loggers.temp.history)
+    empty!(sys.loggers.resp.history)
 end
