@@ -23,7 +23,7 @@ Nz=round(Int64,Nx*z_ratio)
 
 N=Nx*Ny*Nz
 
-Lx=Nx*cbrt(ρ)
+Lx=Nx/cbrt(ρ)
 Ly=Lx*y_ratio
 Lz=Lx*z_ratio
 
@@ -82,7 +82,7 @@ sim=LangevinSplitting(dt=dt,friction=γ,temperature=T,splitting=splitting;remove
 sys=System(atoms=atoms,coords=coords,velocities=velocities,pairwise_inters=(inter,),general_inters=(forcing,),boundary=box_size,neighbor_finder=nf,force_units=NoUnits,energy_units=NoUnits,k=1.0)
 
 simulate!(sys,sim,n_steps_eq)
-sys=System(atoms=atoms,coords=sys.coords,velocities=sys.velocities,pairwise_inters=(inter,),general_inters=(forcing,),boundary=box_size,neighbor_finder=nf,force_units=NoUnits,energy_units=NoUnits,k=1.0,loggers=(fourier=GeneralObservableLogger(fourier_response,Float64,1),temp=TemperatureLogger(Float64,1)))
+sys=System(atoms=atoms,coords=sys.coords,velocities=sys.velocities,pairwise_inters=(inter,),general_inters=(forcing,),boundary=box_size,neighbor_finder=nf,force_units=NoUnits,energy_units=NoUnits,k=1.0,loggers=(fourier=GeneralObservableLogger(fourier_response,Float64,1),))#temp=TemperatureLogger(Float64,1)))
 
 for i=1:n_iter_sim
     simulate!(sys,sim,n_steps_eq)
@@ -90,8 +90,8 @@ for i=1:n_iter_sim
     write(f,values(sys.loggers.fourier))
     close(f)
     empty!(sys.loggers.fourier.history)
-    f=open("thermo_results/thevenin_temp_$(forcing_type)_$(η)_$(N).out","a")
+    #= f=open("thermo_results/thevenin_temp_$(forcing_type)_$(η)_$(N).out","a")
     write(f,values(sys.loggers.temp))
     close(f)
-    empty!(sys.loggers.temp.history)
+    empty!(sys.loggers.temp.history) =#
 end
