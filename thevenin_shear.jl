@@ -86,7 +86,7 @@ sys=System(atoms=atoms,coords=sys.coords,velocities=sys.velocities,pairwise_inte
 
 for i=1:n_iter_sim
     simulate!(sys,sim,n_steps_eq)
-    f=open("thermo_results/thevenin_response_$(forcing_type)_$(η)_$(N).out","a")
+    f=open("thermo_results/thevenin_response_$(forcing_type)_$(η)_$(Nx)_$(Ny)_$(Nz).out","a")
     write(f,values(sys.loggers.fourier))
     close(f)
     empty!(sys.loggers.fourier.history)
