@@ -58,6 +58,7 @@ for f in input_files
     catch e
         if isa(e,InexactError)
             println(f_output,"$f NaN NaN NaN NULL")
+            println("NaN out!")
         end
     end
 
