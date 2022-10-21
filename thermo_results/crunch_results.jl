@@ -48,7 +48,7 @@ for f in input_files
     println(m," ", M, " ",minimum(is)," ",maximum(is))
     map(i-> hist[i]+=1,is)
 
-    hist_file=open("histograms/histogram_$(n_bins)_$f")
+    hist_file=open("histograms/histogram_$(n_bins)_$f","w")
     println(hist_file,"$m $M $n_bins")
     print(hist_file,join(hist,", "))
     close(hist_file)
