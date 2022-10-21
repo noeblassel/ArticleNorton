@@ -1,6 +1,11 @@
 using Statistics
 
-method = ARGS[1]
+n_bins,output_file, input_files... = ARGS
+n_bins=parse(Int64,n_bins)
+
+if !isdir("histograms")
+    mkdir("histograms")
+end
 
 function asymptotic_variance(v)
     data=copy(v)
@@ -20,25 +25,32 @@ function asymptotic_variance(v)
     return max_var
 end
 
-output_file= (method == "THEVENIN") ? "thevenin_results.txt" : "norton_results.txt"
-header = (method =="THEVENIN") ? "N η R T N_samps AV_R AV_T" : "N λ r T N_samps AV_λ AV_T"
+header = "FILENAME MEAN N_SAMPLES ASYMPTOTIC_VARIANCE HISTOGRAM_PATH"
 f_output=open(output_file,"w")
 
 println(f_output,header)
 
-for Npd in 6:20
-    println(Npd)
-    S_file= (method == "THEVENIN") ? open("thevenin_response_SINUSOIDAL_0.3_$Npd.out","r") : open("./norton_forcing_SINUSOIDAL_0.1_$Npd.out","r")
-    S_series=reinterpret(Float64,read(S_file))
-    close(S_file)
-    T_file=(method == "THEVENIN") ? open("thevenin_temp_SINUSOIDAL_0.3_$Npd.out","r") : open("./norton_temp_SINUSOIDAL_0.1_$Npd.out","r")
-    T_series=reinterpret(Float64,read(T_file))
-    close(T_file)
-    av_S=asymptotic_variance(S_series)
-    av_T=asymptotic_variance(T_series)
-    N_samps=length(S_series)
-    output_str= (method =="THEVENIN") ? "$(Npd^3) 0.3 $(mean(S_series)) $(mean(T_series)) $(N_samps) $(av_S) $(av_T)" : "$(Npd^3) $(mean(S_series)) 0.1 $(mean(T_series)) $(N_samps) $(av_S) $(av_T)"
-    println(f_output,output_str)
+for f in input_files
+    series=reinterpret(Float64,read(f))
+    av=asymptotic_variance(series)
+    avg=mean(series)
+    N_samps=length(series)
+    println(f_output,"$f $avg $N_samps $av $(ENV["PWD"])/histograms/histogram_$f")
+
+    # compute histogram
+    m,M=minimum(series),maximum(series)
+    dx=(M-m)/n_bins
+    hist=zeros(n_bins)
+    ts = (M .- series) / (M-m)
+    is = ceil.(Int64,ts*n_bins)
+    clamp!(is,1,n_bins)
+    println(m," ", M, " ",minimum(is)," ",maximum(is))
+    map(i-> hist[i]+=1,is)
+
+    hist_file=open("histograms/histogram_$(n_bins)_$f")
+    println(hist_file,"$m $M $n_bins")
+    print(hist_file,join(hist,", "))
+    close(hist_file)
 end
 
 close(f_output)
