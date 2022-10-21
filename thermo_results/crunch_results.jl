@@ -1,7 +1,7 @@
 using Statistics
 
 println(ARGS)
-n_bins,output_file, input_files... = ARGS
+n_bins,output_file,input_files... = ARGS
 n_bins=parse(Int64,n_bins)
 
 if !isdir("histograms")
