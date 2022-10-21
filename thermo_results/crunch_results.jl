@@ -32,26 +32,35 @@ f_output=open(output_file,"w")
 println(f_output,header)
 
 for f in input_files
-    series=reinterpret(Float64,read(f))
-    av=asymptotic_variance(series)
-    avg=mean(series)
-    N_samps=length(series)
-    println(f_output,"$f $avg $N_samps $av $(ENV["PWD"])/histograms/histogram_$f")
+    println("Processing $f:")
 
-    # compute histogram
-    m,M=minimum(series),maximum(series)
-    dx=(M-m)/n_bins
-    hist=zeros(n_bins)
-    ts = (M .- series) / (M-m)
-    is = ceil.(Int64,ts*n_bins)
-    clamp!(is,1,n_bins)
-    println(m," ", M, " ",minimum(is)," ",maximum(is))
-    map(i-> hist[i]+=1,is)
+    try
+        series=reinterpret(Float64,read(f))
+        av=asymptotic_variance(series)
+        avg=mean(series)
+        N_samps=length(series)
+        println(f_output,"$f $avg $N_samps $av $(ENV["PWD"])/histograms/histogram_$f")
 
-    hist_file=open(joinpath("histograms","histogram_$(n_bins)_$f"),"w")
-    println(hist_file,"$m $M $n_bins")
-    print(hist_file,join(hist,", "))
-    close(hist_file)
+        # compute histogram
+        m,M=minimum(series),maximum(series)
+        dx=(M-m)/n_bins
+        hist=zeros(n_bins)
+        ts = (M .- series) / (M-m)
+        is = ceil.(Int64,ts*n_bins)
+        clamp!(is,1,n_bins)
+        println(m," ", M, " ",minimum(is)," ",maximum(is))
+        map(i-> hist[i]+=1,is)
+
+        hist_file=open(joinpath("histograms","histogram_$(n_bins)_$f"),"w")
+        println(hist_file,"$m $M $n_bins")
+        print(hist_file,join(hist,", "))
+        close(hist_file)
+    catch e
+        if isa(e,InexactError)
+            println(f_output,"$f NaN NaN NaN NULL")
+        end
+    end
+
 end
 
 close(f_output)
