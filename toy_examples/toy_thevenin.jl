@@ -1,5 +1,4 @@
-using Plots,LinearAlgebra,Base.Threads
-
+using LinearAlgebra,Base.Threads
 
 N=1000
 β=5.0
