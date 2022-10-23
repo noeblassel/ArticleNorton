@@ -82,7 +82,7 @@ for η in η_range
     push!(responses,sum(r_hist)/length(r_hist))
     println(sum(r_hist)/length(r_hist))
     flush(STDOUT)
-
+end
 f=open("toy_thevenin_profile.txt")
 println(f,join(η_range," "))
 println(f,join(responses," "))
