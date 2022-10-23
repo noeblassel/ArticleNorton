@@ -1,8 +1,7 @@
-using LinearAlgebra,Base.Threads
+using LinearAlgebra,Base.Threads,Statistics
 
 N=1000
 β=5.0
-η=15.0
 
 
 function F!(q,F_vect;num_threads=Threads.nthreads())
@@ -75,19 +74,14 @@ savefig("thevenin_v.pdf")
 
 q=1 .- 2rand(N,2)
 η_range=0.0:1.0:10.0
-responses=Float64[]
 
 n_eq_steps=5000
 n_sim_steps=500000
 
 for η in η_range
     simulate_euler_maruyama!(q,1e-3,n_eq_steps,β,η;record_hist=false)
-    println(η)
     r_hist=simulate_euler_maruyama!(q,1e-3,n_sim_steps,β,η;record_hist=true)
-    push!(responses,sum(r_hist)/length(r_hist))
-    println(sum(r_hist)/length(r_hist))
-    flush(STDOUT)
+    f=open("toy_thevenin_profile.txt","a")
+    println(f,"$η $(mean(r_hist))")
+    close(f)
 end
-f=open("toy_thevenin_profile.txt")
-println(f,join(η_range," "))
-println(f,join(responses," "))
