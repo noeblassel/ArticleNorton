@@ -53,7 +53,7 @@ function simulate_euler_maruyama!(q,Δt,n_iterations,β,η; record_hist::Bool=fa
 end
 
 
-#= q=1 .- 2rand(N,2)
+#= 
 
 n_eq_steps=5000
 n_sim_steps=5000000
@@ -73,6 +73,7 @@ plot(v_history,label="")
 savefig("thevenin_v.pdf")
  =#
 
+q=1 .- 2rand(N,2)
 η_range=0.0:1.0:10.0
 responses=Float64[]
 for η in η_range
