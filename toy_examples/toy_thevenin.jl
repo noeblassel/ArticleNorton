@@ -14,7 +14,7 @@ function F!(q,F_vect;num_threads=Threads.nthreads())
         for i in ixs
             x,y=q[i,:]
             r=sqrt(x^2+y^2)
-            F_vect[i,:]=[y/r,-x/r]
+            F_vect[i,:]=[y/r,-x/r]  
         end
     end
 
@@ -53,7 +53,7 @@ function simulate_euler_maruyama!(q,Δt,n_iterations,β,η; record_hist::Bool=fa
 end
 
 
-q=1 .- 2rand(N,2)
+#= q=1 .- 2rand(N,2)
 
 n_eq_steps=5000
 n_sim_steps=5000000
@@ -61,7 +61,7 @@ n_sim_steps=5000000
 q_history,v_history=simulate_euler_maruyama!(q,5e-3,n_steps,β,η; record_hist=true)
 
 xlims=(-2,2)
-ylims=(-2,2)
+ylims=(-2,2) =#
 
 #= anim=@animate for i=1:n_steps
     println("$i/$n_steps")
@@ -76,8 +76,9 @@ savefig("thevenin_v.pdf")
 η_range=0.0:1.0:10.0
 responses=Float64[]
 for η in η_range
+    simulate_euler_maruyama!(q,1e-3,n_eq_steps,β,η;record_hist=false)
     println(η)
-    r_hist=simulate_euler_maruyama!(q,1e-3,n_steps,β,η;record_hist=true)
+    r_hist=simulate_euler_maruyama!(q,1e-3,n_sim_steps,β,η;record_hist=true)
     push!(responses,sum(r_hist)/length(r_hist))
     println(sum(r_hist)/length(r_hist))
     flush(STDOUT)
