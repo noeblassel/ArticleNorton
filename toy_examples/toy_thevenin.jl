@@ -78,7 +78,7 @@ q=1 .- 2rand(N,2)
 responses=Float64[]
 
 n_eq_steps=5000
-n_sim_steps=5000000
+n_sim_steps=500000
 
 for η in η_range
     simulate_euler_maruyama!(q,1e-3,n_eq_steps,β,η;record_hist=false)
