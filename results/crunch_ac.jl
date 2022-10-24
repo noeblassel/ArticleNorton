@@ -28,6 +28,6 @@ of=open(output_file,"w")
 println(of,"FILENAME MEAN MEAN_SQUARE AUTOCORRELATION_SERIES")
 
 for f in files
-    C,m,msq = crunch_autocorrelation(joinpath(base_dir,filename), n_corr)
+    C,m,msq = crunch_autocorrelation(joinpath(base_dir,f), n_corr)
     println(of,"$f $m $msq $(join(C,','))")
 end
