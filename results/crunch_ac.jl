@@ -7,7 +7,7 @@ n_corr = parse(Int64,n_corr)
 function crunch_autocorrelation(filename,n_corr)
     series = reinterpret(Float64,read(filename))
     m=mean(series)
-    series .-= mean
+    series .-= m
     msq = mean(series .^ 2)
 
     C_threaded=[zeros(n_corr) for i=1:nthreads()]
