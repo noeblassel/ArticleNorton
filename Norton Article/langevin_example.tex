@@ -1,0 +1,26 @@
+
+\begin{example}[Mobility computations for overdamped Langevin dynamics]\label{ex:norton_overdamped_langevin}
+We consider the following SDE, which is a mechanically-driven perturbation of the overdamped Langevin or Brownian dynamics.
+\begin{equation}
+    \d q^\eta_t = -\nabla V(q^\eta_t)\d t +\sqrt{\frac2{\beta}}\d W_t + \eta F\d t,
+\end{equation}
+with $V$ the potential and $F\in \mathbb{R}^d$ a fixed forcing direction.
+The equilibrium dynamics is known to sample the configurational marginal of the Boltzmann-Gibbs distribution 
+\[\nu(\d q) = \mathrm{e}^{-\beta V(q)}\d q\]
+ergodically, with exponential decay rates to equilibrium based on Poincaré inequalities, under relatively tame regularity assumptions on $V$. (refs)
+We measure the mobility by considering the drift velocity in the direction $F$, namely
+\[R(q)=-\nabla V(q)\cdot F.\]
+In particular,
+\[ \nabla R = -\nabla^2 V\cdot F, \qquad \nabla^2 R = - D^3 V \cdot F,\]
+so that the Norton dynamics writes, under the constant response condition
+\[\forall t\geq 0,\qquad R(y_t)=R(y_0)=r,\]
+\begin{equation}
+    \begin{aligned}
+    \label{eq:norton_overdamped_equation}
+    \d y_t &= \overline{P}_{F,\nabla^2 V\cdot F}\left(-\nabla V(y_t)\d t + \sqrt{\frac{2}\beta}\d W_t\right) - \frac1\beta D^3 V(y_t)\cdot F : \Pi_{F,\nabla^2 V\cdot F,\mathrm{Id}}(y_t)F\d t.
+    \end{aligned}
+\end{equation}
+
+The autonomous dynamics has a complicated expression, which can however be forgotten for the purpose of numerical simulations. Indeed one need only take the dynamics under the form 
+\[d y_t = -\nabla V(y_t)\d t +\sqrt{\frac2{\beta}}\d W_t + \d \Lambda_t F,\]
+\end{example}

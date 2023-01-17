@@ -1,0 +1,1988 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath,amsthm} 
+\usepackage{amssymb,mathrsfs, mathtools} 
+\usepackage{bbm}
+\usepackage{a4wide} 
+\usepackage{graphicx}
+\usepackage{physics}
+\usepackage{color} 
+\usepackage{enumerate}
+\usepackage{todonotes}
+\usepackage[normalem]{ulem}
+\usepackage{graphicx}
+\usepackage{epsfig}
+\usepackage{xcolor}
+\usepackage{comment}
+\usepackage{url}
+\usepackage{xargs}
+\usepackage{hyperref}
+\usepackage[nameinlink,capitalize]{cleveref}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{autonum}
+\newcommand{\gene}[1]{\todo[inline,color=blue!10, author=Geneviève]{#1}}
+
+%------- styles ---------
+\newtheorem{theorem}{Theorem}
+\newtheorem{algo}[theorem]{Algorithm}
+\newtheorem{track}{Work track}
+\newtheorem{assumption}{Assumption}
+\Crefname{assumption}{Assumption}{Assumption}
+\crefname{assumption}{assumption}{assumption}
+
+\newtheorem{lemma}{Lemma}
+\Crefname{lemma}{Lemma}{Lemma}
+\crefname{lemma}{lemma}{lemma}
+
+\newtheorem{corollary}{Corollary}
+\Crefname{corollary}{Corollary}{Corollary}
+\crefname{corollary}{corollary}{corollary}
+\newtheorem{remark}{Remark}
+\Crefname{remark}{Remark}{Remark}
+\crefname{remark}{remark}{remark}
+
+\newtheorem{proposition}{Proposition}
+\Crefname{proposition}{Proposition}{Proposition}
+\crefname{proposition}{proposition}{proposition}
+
+\newtheorem{definition}{Definition}
+\Crefname{definition}{Definition}{Definition}
+\crefname{definition}{definition}{definition}
+
+\newtheorem{example}{Example}
+\Crefname{example}{Example}{Example}
+\crefname{example}{example}{example}
+
+%----- definitions ----------
+\DeclareMathAlphabet{\mathpzc}{OT1}{pzc}{m}{it}
+\newcommand{\dps}{\displaystyle } 
+\newcommand{\rme}{\mathrm{e}}
+\newcommand{\ri}{\mathrm{i}} 
+\newcommand{\cL}{\mathcal{L}}
+\newcommand{\cLs}{\mathcal{L}_\mathrm{s}}
+\newcommand{\cLa}{\mathcal{L}_\mathrm{a}}
+\newcommand{\cLham}{\mathcal{L}_{\rm ham}}
+\newcommand{\cLFD}{\mathcal{L}_{\rm FD}}
+\newcommand{\cB}{\mathcal{B}}
+\newcommand{\cM}{\mathcal{M}}
+\newcommand{\cN}{\mathcal{N}}
+\newcommand{\cX}{\mathcal{X}}
+\newcommand{\cD}{\mathcal{D}}
+\newcommand{\cQ}{\mathcal{Q}}
+\newcommand{\eps}{\varepsilon}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\Id}{\mathrm{Id}} 
+\newcommand{\Ran}{\mathrm{Ran}}
+\newcommand{\cR}{\mathcal{R}}
+\newcommand{\cH}{\mathcal{H}}
+\newcommand{\cK}{\mathcal{K}}
+\newcommand{\invAs}{\left[A^{-1}\right]_\mathrm{s}}
+\renewcommand{\leq}{\leqslant}
+\renewcommand{\le}{\leqslant}
+\renewcommand{\geq}{\geqslant}
+\renewcommand{\ge}{\geqslant}
+\def\div{{\rm div \;}}
+\def\N{\mathbb{N}}
+\def\R{\mathbb{R}}
+\def\T{\mathbb{T}}
+\def\Z{\mathbb{Z}}
+\def\C{\mathbb{C}}
+\def\E{\mathbb{E}} %esp\'erance
+\def\P{\mathbb{P}} %probabilit\'e, \'el\'ements finis
+\def\tr{\mathrm{tr}} %trace d'une matrice
+\def\Var{\mathrm{Var}} %variance d'une variable al\'eatoire
+\def\Vect{\mathrm{Vect}} %espace vectoriel engendr\'e par ...
+\def\I{\m $\psi_n(q)\geq 0$ for a.e. $q\in\T^p$. We denote $\Psi = \operatorname{Span}(\psi_1,\ldots,\psi_N)$; dbox{Id}} % l'identité
+\def\erf{\mbox{erf}} % fonction erreur
+\newcommand{\A}{\mathcal{A}} 
+\newcommand{\Diff}{\mathcal{D}} 
+\newcommand{\Diffset}{\mathfrak{D}} 
+\newcommand{\Df}{\mathscr{D}}
+\newcommand{\Dfset}{\Delta} 
+\newcommand{\diff}{D} 
+\newcommand{\diffset}{\delta} 
+
+\newcommand{\uu}[1]  {{\boldsymbol #1} }
+\renewcommandx{\norm}[2][2=]{\left\| #1 \right\|_{#2}}
+\newcommand{\F}{\mathrm{F}}
+\newcommand{\normF}[1]{\left| #1 \right|_{\F}}
+
+%-------- Gabriel ---------
+\renewcommand{\dim}{d}
+\newcommand{\cLD}{\cL_\Diff}
+
+%----------------------- debut document --------------------
+\begin{document}
+
+\title{Optimizing the diffusion of overdamped Langevin dynamics}
+\author{T. Leli\`evre$^{1}$, G. Pavliotis$^2$, G. Robin$^{3}$, R. Santet$^{1}$ and G. Stoltz$^{1}$ \\
+  \small 1: CERMICS, Ecole des Ponts, Marne-la-Vallée, France \& MATHERIALS project-team, Inria Paris, France \\
+  \small 2: Department of Mathematics, Imperial College, London, United-Kingdom \\
+  \small 3: ??
+}
+ 
+\maketitle
+
+\begin{abstract}
+... TO BE WRITTEN ...
+\end{abstract}
+
+%---------------- introduction ----------------------
+\section{Introduction}
+
+Predicting properties of materials and macroscopic physical systems in the framework of statistical physics~\cite{Balian}, for instance using molecular dynamics~\cite{FrenkelSmit,Tuckerman,LM15,lelievre_stoltz_2016,AT17}, or obtaining the distribution of parameter values for problems Bayesian inference~\cite{Robert07}, both rely on sampling high dimensional probability measures. Methods of choice to sample high dimensional probability measures rely on stochastic dynamics, in particular Markov Chain Monte Carlo (MCMC) methods. The convergence of these methods may however be quite slow because the target measure is typically concentrated on a few high probability modes separated by low probability regions. Various algorithms have been proposed over the years to improve the sampling of high dimensional probability measures, for instance using importance sampling strategies, and/or interacting replicas; see for instance the extensive review~\cite{HLSVD22} in the context of molecular dynamics.
+
+We focus in this work on (overdamped) Langevin dynamics, which are popular both in molecular dynamics, computational statistics~\cite{RobertsTweedie1996}, and also machine learning (see for instance~\cite{CFG14}). These dynamics are ergodic with respect to the Boltzmann--Gibbs distribution, which is a probability measure with density 
+\begin{equation}
+\label{eq:mu}
+\mu(q) = Z^{-1}\rme^{-\beta V(q)}, \qquad Z = \int_\mathcal{Q} \rme^{-\beta V} < +\infty,
+\end{equation} 
+where $V \in C^\infty(\mathcal{Q})$ and $\beta>0$. To simplify the presentation, and because periodic boundary conditions are relevant for molecular dynamics, we restrict ourselves to the case when the configuration space~$\mathcal{Q}$ is the $\dim$-dimensional torus~$\T^\dim$ (with~$\T = \mathbb{R}\backslash \mathbb{Z}$ the one dimensional torus). Many arguments in our work can be extended, at least formally, to systems defined on unbounded configuration spaces. Overdamped Langevin dynamics are the following stochastic differential equations (SDEs):
+\[
+dq_t = -\nabla V(q_t) \, dt + \sqrt{\frac2\beta} \, dW_t,
+\]
+where $(W_t)_{t \geq 0}$ is a standard $\dim$-dimensional Brownian motion. This dynamics enjoys many nice properties. In particular, it is reversible, and its law converges exponentially fast to the target distribution~\eqref{eq:mu} in various functional analytic frameworks under certain assumptions on the potential energy function~$V$ (see for instance~\cite{bakry}). We consider in this work convergence in~$L^2(\mu)$, as this is the relevant setting for obtaining error estimates on ergodic estimators for classes of functions, relying on the Central Limit Theorem.
+
+There are in fact infinitely many SDEs which are ergodic for~\eqref{eq:mu}, even in the class of overdamped Langevin dynamics. For instance, all dynamics of the form
+\[
+dq_t = \left( -\nabla V(q_t) + \gamma(q_t)\right) dt + \sqrt{\frac2\beta} \, dW_t,
+\]
+where the vector field $\gamma:\T^\dim\to \R^\dim$ is smooth and such that
+\[
+\mathrm{div}\left( \gamma \mu \right) = 0,
+\]
+leave invariant the target probability measure with density~\eqref{eq:mu}; and are ergodic with respect to this probability measure under certain assumptions on~$V,\gamma$. The idea is that the added drift term~$\gamma$ makes the dynamics non reversible, which improves the convergence rate, measured in various way (spectral gap, asymptotic variance, large deviations rate function, etc.). This approach was extensively studied in the past decade~\cite{HHS93,HHS05,LelievreNierPavliotis2013,RS15,RBS16,DLP16,DPZ17}. One output of the theoretical analysis is that the nonreversible term should be taken as large as possible, which raises issues from a numerical viewpoint~\cite{LS18}. 
+
+We take a somewhat orthogonal route to optimizing overdamped Langevin dynamics in this work, staying in the realm of reversible dynamics, and optimizing the shape of the diffusion function in order to accelerate convergence. Intuitively, it seems relevant to accelerate the diffusion in regions of low probability under the target measure (equivalently, regions of high values of the energy function~$V$), in order to more efficiently and rapidly find another mode, and slow down the diffusion in regions of high probability since these are the zones where sampling should be favored. Modulating the diffusion to improve the sampling was explored to some extent both in the computational statistics literature~\cite{RobertsStramer} and in molecular dynamics~\cite{RBS16,ABDULLE2019349}; and also for simulated annealing~\cite{FQG97}. For a given diffusion tensor $\Diff \in C^1(\T^\dim,\mathcal{S}_\dim^{+})$ (with $\mathcal{S}_\dim^{+}$ the set of real, symmetric, positive matrices of size~$\dim \times \dim$), the associated overdamped Langevin dynamics reads
+\begin{equation}
+  \label{eq:dynamics_mult}
+  dq_t = \left(- \Diff(q_t)\nabla V(q_t) + \frac1\beta \mathrm{div}\Diff(q_t) \right) dt + \sqrt{\frac2\beta} \Diff^{1/2}(q_t) \, dW_t,
+\end{equation}
+where $\Diff^{1/2}$ is defined by spectral calculus, and $\mathrm{div}\, \Diff$ is the vector whose $i$-th component is the divergence of the $i$-th column of the matrix $\Diff = [\Diff_1,\dots,\Diff_\dim]$, \emph{i.e.} $\mathrm{div}\, \Diff = \left(\mathrm{div}\, \Diff_1,\dots,\mathrm{div}\, \Diff_\dim\right)^{\top}$. The convergence rate of a Langevin diffusion is related to the spectral gap of the dynamics' infinitesimal generator. The latter operator acts on test functions~$\varphi$ as
+\begin{equation}
+  \label{eq:generator_cLD}
+  \cLD \varphi = \left(- \Diff \nabla V + \frac1\beta \mathrm{div}(\Diff)\right)^{\top} \nabla \varphi + \frac1\beta \Diff : \nabla^2 \varphi.
+\end{equation}
+It is standard to show (see, \emph{e.g.}~\cite{LelievreNierPavliotis2013,bakry,lelievre_stoltz_2016}) that, for any initial condition $f(0) = \mu_0/\mu\in L^2(\mu)$, and denoting by $f(t)\mu$ the probability density function of the process $q_t$ at time $t$,
+\begin{equation}
+\label{eq:cvg}
+\|f(t) - 1\|_{L^2(\mu)} \leq \mathrm{e}^{-R(\cLD)t/\beta}\|f(0) - 1\|_{L^2(\mu)},
+\end{equation}
+where $\|\cdot\|_{L^2(\mu)}$ is the canonical norm on~$L^2(\T^\dim, \mu)$, and $R(\cLD)$ is the spectral gap of the operator~$-\beta \cLD$; see Section~\ref{subsec:general-problem} for precise definitions. For a fixed target probability density~$\mu$ (\emph{i.e.} a fixed potential energy function~$V$), the generator $\cLD$, and thus its spectral gap $R(\cLD)$, are parameterized by the diffusion tensor~$\Diff$.
+
+The aim of this work is to compute, explicitly or numerically, the optimal diffusion function leading to the largest spectral gap, and thus to the fastest convergence rate. For reversible Markov chains on discrete spaces, this question was explored in~\cite{Boyd_fastMC}. A subtle issue in this endeavour is the normalization of the diffusion matrix~$\Diff$. Indeed, the convergence rate in~\eqref{eq:cvg} can trivially be increased by a factor~$\alpha\geq 1$ upon multiplying~$\Diff$ by~$\alpha$. In fact, it seems advantageous to let~$\alpha$ go to infinity. The catch is of course that one should compare dynamics which are defined on similar timescales. From a practical point of view, one way of setting a timescale is to consider discretizations of Langevin dynamics. Too large diffusion matrices will then be compensated by smaller values of the timestep. The issue of normalization is discussed more thoroughly in Section~\ref{subsec:normalization}.
+
+The optimization of the diffusion matrix is related to a body of literature on accelerating the convergence of the Langevin-like dynamics through particular choices for the diffusion $\Diff$. One of the most famous examples of such methods is the Riemannian manifold Langevin Monte Carlo method, introduced in~\cite{Girolami_RiemannMC}, and which reduces to~\eqref{eq:dynamics_mult} in the so-called overdamped limit. There, the diffusion $\Diff$ is equal to the Fisher--Rao metric tensor associated to the target measure (in essence, the inverse of the Hessian of~$V$, when this makes sense).\todo{confirmer avec Regis Santet} Let us also mention results obtained via the theory of partial differential equations for eigenvalue problems associated with operators of the form~$-\mathrm{div}(\Diff \nabla \cdot)$, see~\cite[Chapter~10]{Henrot}. The main difference with such results and ours is that we consider a non trivial density~$\mu$, and periodic boundary conditions, so we are led to optimizing the second eigenvalue of the operator in order to maximize the convergence rate (somewhat similarly to the situation encountered for operators with Neumann boundary conditions, and in contrast to operators with Dirichlet boundary conditions, where convergence is driven by the first eigenvalue).   
+
+\paragraph{Main contributions and extensions.} Let us first describe the main contributions of this work:
+\begin{itemize}
+\item Our first main contribution is to formalize the maximization of the convergence rate of Langevin dynamics~\eqref{eq:dynamics_mult}  as a convex optimization program, for which the well-posedness is guaranteed by a simple adaption of standard results in the literature~\cite{Henrot}. We also discuss some  important properties of the resulting optimal diffusion function, such as its positivity.
+\item our second main contribution is to propose, in low dimensional scenarios, a numerical procedure combining a finite element parameterization and an optimization algorithm, to compute the optimal diffusion in practice. The numerical procedure is illustrated on simple one-dimensional examples. All the methods and experiments are provided in an open source python code (available at \url{https://gitlab.com/genevieverobin/optimal-langevin-diffusion}).
+\item Our third main contribution is to study the behaviour of the optimal diffusion in the homogenized limit where the target measure is characterized by a highly oscillating potential. In this setting, we show that the optimal diffusion function has an analytical expression, proportional to the inverse of the target density, which is in accordance with various previous heuristics (as in~\cite{RobertsStramer}). This simple limiting behaviour can be used as an initialization point to our algorithm, or as a proxy for the optimal diffusion which does not require costly convex optimization procedures.
+\item our last main contribution is to propose a sampling algorithm based on a simple Random Walk Metropolis Hastings algorithm with a proposal variance depending on the current state, which takes advantage of the pre-computed optimal diffusion function. We show that this algorithm corresponds to the limit behaviour of the Langevin dynamics with optimal diffusion function in the diffusive limit. We also present some numerical experiments illustrating the empirical behaviour of the complete procedure on simple examples, and highlighting in particular that the dynamics is less metastable with the optimal diffusion or its homogenized approximation.
+\end{itemize}
+In our opinion, this work calls for various perspectives and extensions, in particular:
+\begin{itemize}
+\item a key issue remains to find a relevant normalization constraint, ideally based on a numerical criterion, as discussed in Remark~\ref{rmk:normalization_numerics};
+\item in various contexts, in particular for numerical simulations, we restrict ourselves to isotropic diffusion matrices. Considering genuinely matricial diffusions may be important to tackle anisotropic targets;
+\item in order to apply the methodology to actual systems of interest, one needs to adapt our numerical approach to higher dimensional scenarios, even in the case of a scalar diffusion. It is indeed impossible to numerically optimize a diffusion which genuinely depends on the full configuration~$q$ using discretization techniques such as finite elements, because of the too high dimensionality of the corresponding approximation space. Apart from resorting to more sparse representations of the diffusion matrix (which usually presuppose some form of smoothness), it seems appropriate to look for diffusions parametrized by a low dimensional function~$\xi(q)$, so-called reaction coordinate in molecular dynamics~\cite{LRS10}, which summarizes some important information on the system, in particular the location of the modes of the target probability measure. In this context, the potential energy function is replaced by the free energy associated with~$\xi$, and the optimization problem can again be reformulated in a low dimensional setting where finite element methods can be used.
+\end{itemize}
+
+\paragraph{Outline of the work.}
+We formally define the maximization of the spectral gap in Section~\ref{sec:general} and make precise the normalization of the diffusion matrix. We then study the well posedness of the maximization problem in Section~\ref{sec:scalar}, and discuss the positivity of the diffusion matrix. We next present in Section~\ref{sec:numerical} how to numerically solve the problem, using in particular a finite element method to discretize it. As an alternative to a full blown numerical solution, or in order to start the optimization procedure with a relevant initial guess, we consider in Section~\ref{sec:homog} the optimal diffusion arising in the homogenization limit where the given probability density is periodically replicated with a decreasing spatial period. We finally demonstrate in Section~\ref{sec:sampling} with Monte Carlo simulations that an optimized diffusion matrix is beneficial for the convergence of the dynamics. The appendices gather the proofs of various technical results.
+
+%---------------------------------------------------------------
+\section{Maximizing the spectral gap of Langevin dynamics}
+\label{sec:general}
+
+We present in this section the problem of interest, namely the maximization of the spectral gap of the Langevin dynamics~\eqref{eq:dynamics_mult} with invariant measure~$\mu$. We start by precisely formulating the optimization problem in \Cref{subsec:general-problem}. Then, in \Cref{subsec:normalization}, we discuss normalization constraints which are required for the well-posedness of the problem. For simplicity, we restrict ourselves to the case when the diffusion under consideration has values in the $d$-dimensional torus~$\T^\dim$. Various results can easily be adapted to more general domains.
+
+\subsection{Formulation of the optimization problem}
+\label{subsec:general-problem}
+
+As discussed in the introduction around~\eqref{eq:cvg}, the rate of convergence of the dynamics~\eqref{eq:dynamics_mult} towards the invariant measure $\mu$ is governed by the spectral gap of the operator~$-\cLD$ (see \emph{e.g.} \cite[Chapter~4]{bakry}). In order to precisely define this quantity in our context, we work on the Hilbert space~$L^2(\mu)$. For a given diffusion function $\Diff : \T^\dim \to \mathcal{S}_\dim^{+}$, a simple computation shows that the generator~$\cLD$, considered as an operator on~$L^2(\mu)$, writes
+\begin{equation}
+  \label{eq:cLD}
+  \cLD = -\frac{1}{\beta} \nabla^*\Diff\nabla = -\frac1\beta \sum_{i,j=1}^\dim \partial_{q_j}^* \Diff_{i,j} \partial_{q_i},
+\end{equation}
+where $A^*$ is the $L^2(\mu)$-adjoint of a closed operator~$A$. In particular, $\partial_{q_i}^* = -\partial_{q_i} + \beta \partial_{q_i}V$. The quadratic form associated with~$\cLD$ is easily obtained from the expression~\eqref{eq:cLD} of the generator: formally, for any~$u : \T^\dim \to \R$, 
+\[
+\left\langle u, \cLD u \right\rangle_{L^2(\mu)} = - \frac1\beta \int_{\T^\dim} \nabla u(q)^{\top} \Diff(q) \nabla u(q) \, \mu(q) \, dq.
+\]
+The right hand side of the above equality is nonpositive, but possibly infinite at this level of generality. It is finite for instance when~$\Diff \in L^\infty(\T^\dim,\mathcal{S}_\dim^{+})$ and $u \in H^1(\mu)$, the subspace of~$L^2(\mu)$ composed of functions in~$L^2(\mu)$ whose (distributional) partial derivatives with respect to~$q_i$ also belong to~$L^2(\mu)$.\todo{equivalent a $H^1$ si espace compact... Noter $H^1(\T^\dim)$ ou $H^1(\mu)$ par la suite ? ou rester ainsi en motivant que ca permet de generaliser au dela du tore} We restrict for simplicity to this setting in the sequel, and consider in particular diffusion matrices with bounded coefficients.
+
+Since~0 is an eigenvalue of~$\cLD$ whose associated eigenvectors are constant functions, we introduce the following subspace to define the spectral gap:
+\[
+H^1_0(\mu) = \left\{ u \in H^1(\mu) \ \middle| \ \int_{\T^\dim} u(q) \, \mu(q) \, dq = 0\right\}.
+\]
+We also define~$H^1_0(\T^\dim)$ as the space~$H^1_0(\mathbf{1})$. 
+The spectral gap is finally defined (up to a constant factor $\beta^{-1}$) as
+\begin{equation}
+  \label{eq:lambdaD-init}
+  \Lambda(\Diff) = \inf_{u \in H^1_0(\mu) \setminus\{0\}} \frac{\dps \int_{\T^\dim} \nabla u (q)^{\top}\Diff(q) \nabla u (q) \, \mu(q)\,dq}{\dps \int_{\T^\dim} u(q)^2 \mu(q)\,dq}.
+\end{equation}
+
+For a bounded, positive definite diffusion function~$\Diff$ satisfying $\Diff(q) \geq c \Id_\dim$ almost everywhere for some~$c>0$ (the inequality being understood in the sense of symmetric matrices), standard arguments from calculus of variations
+%\todo[inline]{c'est bien vrai, meme si $\Diff$ pas bornée ? Argument possible : $-\cLD \geq T_M = \nabla^* \min(\Diff,M) \nabla$, avec $T_M$ a resolvante compact, donc par Rayleigh Ritz et comparaison, on n'a que du spectre discret pour $\cLD$ aussi} % A VOIR QUAND MEME, CF. SUIVRE Henrot Section 1.2 par exemple, quel espace de Hilbert si D pas bornee ?
+show that the infimum is attained for an eigenvector~$u_\Diff$ associated with the second eigenvalue of~$-\cLD$ (ranked by increasing values), \emph{i.e.} with the first non-zero eigenvalue of~$-\cLD$; and that $\Lambda(\Diff)$ is in fact the first non-zero eigenvalue of $-\cLD$ (see for instance~\cite[Chapter~1]{Henrot}).
+
+\begin{remark}[Degenerate diffusion matrices]
+  \label{rmk:SG_when_\dim_cancels}
+  %The quantity $\Lambda(\Diff)$ is defined as the infimum over observables $u\in H^1_0(\T^p)$ of the Rayleigh quotient on the right-hand side of~\eqref{eq:lambdaD-init}.
+  If there exists $q\in\T^\dim$ such that $\Diff(q)$ is rank deficient (\emph{i.e.} $\xi^{\top}\Diff(q)\xi=0$ for some $\xi\in\R^\dim \setminus \{0\}$), the domain of the quadratic form associated with~$-\cLD$ can in fact be larger than $H^1_0(\mu)$; see~\cite{Zhikov_1998}. In this case, $\Lambda(\Diff)$ is in general no longer equal to the spectral gap of the operator~$-\beta \cLD$, but is larger than the spectral gap (and hence provides a too optimistic convergence rate) since the infimum is taken on a set of functions not sufficiently large. A trivial example is the situation when~$\Diff$ vanishes on an open set, in which case the spectral gap is~0, as can easily be seen from the Rayleigh--Ritz principle. See~\cite[Remark~1.2.3]{Henrot} for a discussion on sufficient conditions for the operator~$\cLD$ to have a discrete spectrum even in the presence of degeneracies of the diffusion coefficient.
+\end{remark}
+
+\begin{remark}[Unbounded diffusion matrices]
+  Let us emphasize that we restrict ourselves to bounded diffusion matrices, otherwise the upper semicontinuity of the mapping~$\Diff \mapsto \Lambda(\Diff)$ is not clear. The latter property is crucial to ensure that the maximization problem is well posed.
+\end{remark}
+
+We propose to maximize the spectral gap of the overdamped Langevin dynamics with respect to the diffusion function~$\Diff$. This corresponding here to solving the following optimization problem:
+\begin{equation}
+\label{eq:optim-continuous-init}
+\Lambda^{\star} = \sup_{\Diff\in\Diffset}\Lambda(\Diff),
+\end{equation}
+where~$\Diffset$ is a subset of the set of measurable functions from~$\T^\dim$ to~$\mathcal{S}_\dim^{+}$. The choices we consider in the sequel for~$\Diffset$ take into account that the diffusion needs to be normalized in some way since, for any $\Diff:\T^\dim\rightarrow\mathcal{S}_\dim^{+}$,
+\begin{equation}
+  \label{eq:t_Lambda_scaling}
+  \forall t\geq 0, \qquad \Lambda(t \Diff) = t\Lambda(\Diff),
+\end{equation}
+so that a maximization over a set containing a line~$\R \Diff$ with $\Lambda(\Diff) > 0$ would lead to $\Lambda^{\star} = +\infty$.
+
+\begin{remark}[A numerical motivation for normalizing the diffusion matrix]
+  \label{rmk:normalization_numerics}
+  The need for a normalization can also be motivated by numerical considerations. For instance, a Euler--Maruyama discretization of~\eqref{eq:dynamics_mult} with a timestep~$\Delta t>0$ reads
+  \begin{equation}
+    \label{eq:EM_ovd_multiplicative}
+    q^{n+1} = q^n + \Delta t \left[- \Diff \nabla V + \frac1\beta \mathrm{div}\,\Diff \right](q^n) + \sqrt{\frac{2\Delta t}{\beta}} \Diff^{1/2}(q^n) \, G^n,
+  \end{equation}
+  where~$(G^n)_{n \geq 0}$ is a family of independent and identically distributed standard $d$-dimensional Gaussian random variables, and~$\Diff^{1/2}$ is defined by spectral calculus. It is apparent from the above formula that the behavior of the numerical scheme actually depends on~$\Delta t \, \Diff$ (and the divergence of this quantity), and not on~$\Diff$ or~$\Delta t$ alone, so that multiplying~$\Diff$ by a constant can be equivalently seen as multiplying the timestep by the same constant. In this context, one should think of normalization criteria aiming at fixing the amount of numerical error involved in the discretization, for instance by fixing the average rejection rate in a Metropolis--Hastings scheme whose proposal is provided by~\eqref{eq:EM_ovd_multiplicative}. The normalization we discuss in \Cref{subsec:normalization} is conceptually simpler than such a criterion, and not related to a specific numerical scheme, but we certainly intend to further study this perspective in following works.
+\end{remark}
+
+\subsection{Normalization constraint} 
+\label{subsec:normalization}
+
+We make precise in this section the normalization we consider for diffusion matrices, in view of the discussion after~\eqref{eq:optim-continuous-init}. In essence, we choose a (weighted) Lebesgue norm to be smaller than~1. For notational simplicity, we assume from now on that the potential energy function~$V$ is such that the normalization constant in~\eqref{eq:mu} is~$Z = 1$ (which can be ensured by adding a constant to~$V$). 
+
+A quantity which naturally appears in the mathematical formulation of the problem is the product~$\Diff(q) \rme^{-\beta V(q)}$, present for instance in the numerator of the Rayleigh ratio~\eqref{eq:lambdaD-init}. Note also that the divergence of this product is the drift in~\eqref{eq:dynamics_mult} (up to the factor~$\rme^{-\beta V(q)}$). This motivates normalizing the product~$\Diff \rme^{-\beta V}$, or equivalently~$\Diff \mu$, rather than~$\Diff$ itself.
+
+To formulate precisely the normalization we consider, it is convenient to introduce, for~$a,b \geq 0$, the set 
+\begin{equation}
+  \label{eq:Mset-coercive}
+  \mathcal{M}_{a, b} = \left\{ M\in\mathcal{S}_\dim^+ \, \middle| \, \forall \xi \in \R^\dim, \ a|\xi|^2\leq \xi^{\top}M\xi \leq \frac{1}{b} |\xi|^2 \right \},
+\end{equation}
+with~$|\cdot|$ the Euclidean norm on~$\R^\dim$, and the convention that the right hand side of the last inequality is~$+\infty$ when~$b=0$. Considering $a,b > 0$ is useful to study homogenization limits, as we do in Section~\ref{sec:homog}. We will always require that~$ab \leq 1$ in order for~$\mathcal{M}_{a, b}$ to be non empty.
+
+We next denote by $L^p_\mu(\T^\dim, \mathcal{M}_{a,b})$ the Banach space of measurable functions from~$\T^\dim$ to~$\mathcal{M}_{a,b}$ endowed with the norm
+\begin{equation}
+  \label{eq:norm_L^p_mu_matrices}
+  \| \Diff \|_{L^p_\mu} = \left( \int_{\T^\dim} \normF{\Diff(q)}^p \, \rme^{-\beta p V(q)} \, dq \right)^{1/p}, 
+\end{equation}
+where~$\normF{\cdot}$ is any matrix norm, the subscript~`F' standing for ``finite'' (at places, as in Theorem~\ref{thm:commutation}, we will additionally require this norm to be compatible with the order on symmetric positive matrices; or even that it is the Frobenius norm, as in Lemma~\ref{lem:EL}). Note that a normalization $\| \Diff \|_{L^p_\mu} \leq 1$ consists in fixing the usual (unweighted) $L^p$ norm of the product~$\normF{\Diff} \rme^{-\beta V}$ to be smaller than~1. Similarly, we denote by~$L_\mu^{\infty}(\T^\dim,\mathcal{M}_{a,b})$ the Banach space of measurable functions from~$\T^\dim$ to~$\mathcal{S}_\dim^+$ such that~$\Diff(q) \rme^{-\beta V(q)} \in \mathcal{M}_{a,b}$ for almost every~$q \in \T^\dim$, endowed with the norm
+\[
+\| \Diff \|_{L^\infty_\mu} = \left\| \normF{\Diff} \rme^{-\beta V} \right\|_{L^\infty(\T^\dim)}. 
+\]
+
+Simply considering a bound on the maximal values of the diffusion leads to a trivial solution for the maximization of the spectral gap, as shown in the following result (similar to discussions in~\cite[Section~10.1]{Henrot}).
+
+\begin{lemma}
+  \label{lem:Malphabeta}
+  Fix~$a \geq 0$ and $b >0$ such that $ab \leq 1$, and consider, for~$M \in \mathcal{S}_\dim^+$, the matrix norm~$\normF{M} = \max \sigma(M)$, where~$\sigma(M)$ is the spectrum of~$M$. Then, the spectral gap
+  \[
+  \Lambda(\Diff) = \inf_{u \in H^1_0(\mu) \setminus\{0\}} \frac{\dps \int_{\T^\dim}\nabla u(q)^\top \Diff(q)\nabla u(q) \, \rme^{-\beta V(q)} \, dq}{\dps \int_{\T^\dim} u^2(q) \, \rme^{-\beta V(q)}\,dq}
+  \]
+  is maximized on $L^{\infty}_{\mu}(\T^\dim,\mathcal{M}_{a,b})$ by the constant diffusion tensor~$\Diff_\infty^\star(q) = b^{-1} \Id_\dim$. 
+\end{lemma}
+
+\begin{proof}
+  Note first that, for any~$\Diff \in L^{\infty}_{\mu}(\T^\dim,\mathcal{M}_{a,b})$, it holds $\Diff(q) \leq b^{-1} \rme^{-\beta V(q)}$ in the sense of symmetric matrices for almost all $q\in\T^\dim$. Therefore, for any~$u \in H^1_0(\mu)$,
+  \[
+  \frac{\dps \int_{\T^\dim}\nabla u(q)^\top \Diff(q)\nabla u(q) \, \rme^{-\beta V(q)} \, dq}{\dps \int_{\T^\dim} u(q)^2 \, \rme^{-\beta V(q)}\,dq} \leq \frac1b \frac{\dps \int_{\T^\dim} |\nabla u(q)|^2 \, \rme^{-\beta V(q)} \, dq}{\dps \int_{\T^\dim} u(q)^2 \, \rme^{-\beta V(q)}\,dq}.
+  \]
+  Passing to the infimum over~$u$ on the left-hand side first, then on the right-hand side, leads to~$\Lambda(\Diff)\leq \Lambda(\Diff_\infty^\star)$ for all $\Diff \in L^{\infty}_{\mu}(\T^\dim,\mathcal{M}_{a,b})$. Moreover, it obviously holds that $b^{-1}\Id_\dim \in L^{\infty}_{\mu}(\T^\dim,\mathcal{M}_{a,b})$, which allows to conclude.
+\end{proof}
+
+Since the $L_\mu^\infty$ constraint is trivial in general (although the result of Lemma~\ref{lem:Malphabeta} is less clear for other choices of matrix norms), we fix in the remainder of this work the~$L^p_\mu$ norm of the diffusion matrix for $1\leq p < +\infty$, and therefore consider the subsets
+\begin{equation}
+  \label{eq:constrained-set-matriciel}
+  \Diffset_p^{a,b} = \left\{\Diff\in L^{\infty}_{\mu}(\T^\dim,\mathcal{M}_{a,b}) \,\middle|\, \int_{\T^\dim}\normF{\Diff(q)}^p \, \rme^{-\beta p V(q)} \, dq \leq 1 \right\}.
+\end{equation}
+%To alleviate the notation, we write~$\Diffset_\dim = \Diffset_\dim^{0, 0}$.
+In order for these sets to be non empty, the parameter~$a\geq 0$ should be small enough. More precisely, it is required that
+\begin{equation}
+  \label{eq:compatibility_conditions_continuous_level}
+  ab \leq 1, \qquad a \leq a_\mathrm{max} := \frac{1}{\normF{\Id_d}}. 
+\end{equation}
+
+%---------------------- theoretical analysis -----------------------
+\section{Theoretical analysis of the spectral gap optimization} 
+\label{sec:scalar}
+
+We present in this section some theoretical results on the mathematical analysis of the optimization problem~\eqref{eq:optim-continuous-init}. We start by well-posedness results in \Cref{subsec:well-posedness}, then formally discuss in \Cref{subsec:euler-lagrange} the positive definiteness of the optimal diffusion.
+
+\subsection{Well posedness of the optimization problem}
+\label{subsec:well-posedness}
+
+The aim of this section is to show that the maximization of the spectral gap~$\Lambda(\Diff)$ on the set~$\Diffset_p^{a,b}$ defined in~\eqref{eq:constrained-set-matriciel} is a well-posed problem. This is easily done by adapting arguments in~\cite{Henrot}. Some results rely on the fact that the probability measure~$\mu$ satisfies a Poincar\'e inequality. Recall that the potential~$V$ is assumed to be~$C^{\infty}(\T^\dim)$ in all this work. This implies in particular that the potential~$V$ and the density~$\mu$ are bounded on~$\T^\dim$. The measure with density~\eqref{eq:mu} also satisfies a Poincaré inequality, \emph{i.e.} there exists $C_{\mu} \in (0,+\infty)$ such that 
+\begin{equation}
+  \label{eq:Poincare}
+  \forall u\in H^1_0(\mu),
+  \qquad
+  \frac{\dps \int_{\T^\dim}|\nabla u(q)|^2 \, \mu(q)\,dq}{\dps \int_{\T^\dim} u(q)^2 \, \mu(q) \, dq} \geq \frac{1}{C_{\mu}}.
+\end{equation}
+In addition, there exists $u_{\mu}\in H^1_0(\mu)\setminus \{0\}$ such that the inequality \eqref{eq:Poincare} is saturated, \emph{i.e.}
+\begin{equation}
+  \label{eq:Poincare-sat}
+  \frac{\dps \int_{\T^\dim}|\nabla u_{\mu}(q)|^2 \, \mu(q) \, dq}{\dps \int_{\T^\dim} u_{\mu}(q)^2 \, \mu(q) \, dq} = \frac{1}{C_{\mu}}.
+\end{equation}
+
+Let us first prove that the function~$\Lambda$ is well defined on~$\Diffset_p^{a,b}$ for~$a,b \geq 0$. On the one hand, $\Lambda(\Diff)\geq 0$ (since $\Diff$ is positive semi-definite on $\Diffset_p^{a,b}$). On the other hand, for a fixed function $u \in C^{\infty}(\T^\dim)$ satisfying $\int_{\T^\dim}u(q)\, \mu(q) \, dq = 0$ and $\int_{\T^\dim}u(q)^2\mu(q)\,dq = 1$, the function~$|\nabla u(q)|^2$ is bounded on~$\T^\dim$. Since~$0 \leq \xi^\top \Diff(q) \xi \leq \normF{\Diff(q)} |\xi|^2$, % argument : \xi^T D \xi = (U\xi)^T \Lambda U\xi = \sum_i \Lambda_i (U\xi)_i^2 \leq \max(\Lambda_i) |U\xi|^2 = \max(\Lambda_i) |\xi|^2 \leq \sqrt{\sum_i \Lambda_i^2} |\xi|^2 = |D|_F |\xi|^2  
+it holds 
+\begin{align}
+  \Lambda(\Diff)&\leq \norm{|\nabla u|^2}[L^\infty(\T^\dim)]\int_{\T^\dim}\normF{\Diff(q)}\, \rme^{-\beta V(q)}\,dq \\
+  & \leq \left(\int_{\T^\dim}\normF{\Diff(q)}^p \rme^{-\beta p V(q)}\, dq\right)^{1/p} \norm{|\nabla u|^2}[L^\infty(\T^\dim)]<+\infty,
+\end{align}
+using H\"older's inequality on~$\T^d$ to obtain the last term. This shows that~$\Lambda(\Diff)$ is well-defined and that there exists~$C>0$ such that, for any~$a,b \geq 0$ and any $\Diff \in \Diffset_p^{a,b}$ with~$\|\Diff\|_{L^p_\mu} \leq 1$, one has 
+\begin{equation}\label{eq:bounds}
+0 \le \Lambda(\Diff) \le C.
+\end{equation}
+Moreover, for any $1\leq p \leq \infty$, the subset~$\Diffset_{p}^{a,b}$ is weakly closed for the norm~$L^p_\mu$ defined in~\eqref{eq:norm_L^p_mu_matrices} (this follows directly from the weak closedness of standard Lebesgue spaces).
+
+A first useful property to prove the well posedness of the maximization problem is the following classical result on the concavity of the functional~$\Lambda$, directly obtained from the fact that~$\Lambda(\Diff)$ is an infimum of linear functionals in~$\Diff$ (see for instance~\cite[Theorem~10.1.1]{Henrot}).
+
+\begin{lemma}
+  \label{lem:concave-mat}
+  The functional $\Diff \mapsto\Lambda(\Diff)$ is concave on the set of bounded, measurable functions~$\T^\dim \to \mathcal{S}_\dim^+$.
+\end{lemma}
+
+%\begin{proof}
+%The concavity is direct as an infimum of affine functions.
+%This is a simple\todo{le livre d'Henrot evacue en une phrase... on peut imaginer faire de meme...} consequence of the fact that, for $t \in [0,1]$ and two diffusion functions~$\Diff,\widetilde{\Diff}\in \mathcal{S}(\cQ)$, it holds, for any~$u \in H^1_0(\T^p)$,
+%\begin{align}
+%  & t\Lambda(\Diff) + (1-t)\Lambda(\widetilde{\Diff}) \\
+%  %& \qquad = t \inf_{u \in H^1_0(\T^p)}  \frac{\int_{\T^p} \Diff(q)\nabla u(q)\cdot  \nabla u(q)\mu(q)\,dq}{\int_{\T^p} u^2(q) \mu(q)\,dq} \\
+%  %+ (1-t) \inf_{u \in H^1_0(\T^p)} \frac{\int_{\T^p} \widetilde{\Diff}(q)\nabla u(q)\cdot  \nabla u(q) \mu(q)\,dq }{\int_{\T^p} u(q)^2 \mu(q)\,dq}\\
+%  & \qquad \leq t \frac{\dps \int_{\T^p} \nabla u(q)^\top\Diff(q)\nabla u(q) \, \mu(q) \, dq}{\dps \int_{\T^p} u^2(q) \, \mu(q) \, dq} + (1-t) \frac{\dps \int_{\T^p} \nabla u(q)^\top\widetilde{\Diff}(q)\nabla u(q) \, \mu(q) \, dq}{\dps \int_{\T^p} u(q)^2 \, \mu(q) \, dq}.
+%\end{align}
+%Thus, passing to the infimum on the right hand side,
+%\begin{align}
+%t\Lambda(\Diff) + (1-t)\Lambda(\widetilde{\Diff}) & \le \inf_{u \in H^1_0(\T^p)} \frac{\int_{\T^p}{ \left[t \Diff(q) + (1-t) \widetilde{\Diff}\right]\nabla u(q)\cdot\nabla u(q)\mu(q)\,dq}}{\int_{\T^p} u(q)^2 \mu(q)\,dq} \\
+%& = \Lambda\left(t\Diff + (1-t)\widetilde{\Diff}(q)\right),
+%\end{align}
+%which concludes the proof.
+%\end{proof}
+
+The following theorem, proved in Appendix~\ref{app:thm:well-posedness-1D} states the well-posedness of the optimization problem we consider.
+
+\begin{theorem}
+  \label{thm:well-posedness-1D}
+  Fix~$p \in [1,+\infty)$.\todo{$p=1$ possible en fait, a confirmer} For any $a \in [0,a_\mathrm{max}]$ and~$b > 0$ such that~$ab \leq 1$, there exists $\Diff^{\star}_p \in \Diffset_p^{a,b}$ such that
+  \begin{equation}
+    \label{eq:maximizer_in_thm}
+    \Lambda(\Diff^{\star}_p) = \sup_{\Diff\in\Diffset_p^{a,b}} \Lambda(\Diff).
+  \end{equation}
+  In addition, the optimal diffusion $\Diff^{\star}_p$ satisfies the following properties:
+  \begin{enumerate}[(i)]
+  \item For any open set $\Omega \subset \T^\dim$, there exists $q\in\Omega$ such that $\Diff^{\star}_p(q)\neq 0$;
+  \item $\dps \int_{\T^\dim}\normF{\Diff^{\star}_p(q)}^p \, \rme^{-\beta p V(q)} \, dq =1$.
+  \end{enumerate}
+\end{theorem}
+
+Property~(ii) states that, as expected in view of~\eqref{eq:t_Lambda_scaling}, the optimal diffusion matrix saturates the constraint. Property~(i) is useful only for~$a=0$. It guarantees that~$\Diff^{\star}_p$ cannot be identically~0 on open sets, but a priori~$\Diff^{\star}_p(q)$ need not be positive, and could vanish on sets of measure~0, in particular at single points. If $\Diff^{\star}_p$ cancels at some point, it may be optimal in the sense of our functional~$\Lambda$ but not necessarily in the sense of the spectral gap; see Remark~\ref{rmk:SG_when_\dim_cancels}. We discuss in Section~\ref{subsec:euler-lagrange} the degeneracy of $\Diff^{\star}_p$ in the general case, and relate it with a formal argument to the non degeneracy of the second eigenvalue of the diffusion operator. In addition, from a numerical perspective, we prove in Section~\ref{subsec:FE} that the optimal diffusion can be guaranteed to be bounded below by a positive constant when the minimization set is restricted to some finite dimensional parametrization; although this lower bound is numerically observed to decrease in certain cases when the discretization space is refined (see Figure~\ref{fig:res_1}). 
+
+\subsection{Discussion on the positivity of $\Diff^{\star}_p$}
+\label{subsec:euler-lagrange}
+
+We formally discuss in this section the positivity of~$\Diff^{\star}_p$, based on the Euler--Lagrange condition formally satisfied by a maximizer of the functional~$\Lambda$. We introduce to this end, for~$p \in [1,+\infty)$ and~$a \in [0,a_\mathrm{max}]$, $b>0$ such that~$ab \leq 1$, the application 
+\begin{align}
+  \textsc{J} \colon  \Diffset_p^{a,b} \times H^1_0(\mu)&\longrightarrow \R_+  \\
+  ( \Diff, u) &\longmapsto \int_{\T^\dim} \nabla u(q)^\top \Diff(q) \nabla u(q) \, \mu(q)\,dq.
+\end{align}
+The spectral gap~$\Lambda(\Diff)$ corresponds to a minimum of~$\textsc{J}(\Diff,u)$ with respect to the second variable, over the set of normalized functions
+\[
+\textsf{N} = \left\{\varphi \in H^1_0(\mu) \, \middle| \,\|\varphi\|_{L^2(\mu)}= 1 \right\}.
+\]
+A standard argument shows that, for any~$\Diff \in \Diffset_p^{a,b}$ such that~$\Diff \geq c \Id_\dim$ for some constant~$c>0$, there exists a function~$u_{\Diff}\in\textsf{N}$ such that $\Lambda(\Diff) = \textsc{J}(\Diff, u_{\Diff})$ (see for instance~\cite[Chapter~1]{Henrot}). By Theorem~\ref{thm:well-posedness-1D}, the matrix valued function~$\Diff^{\star}_p$ is a maximizer of~$\Lambda$ over the constrained set~$\Diffset_p^{a,b}$. When~$\Lambda(\Diff^\star_p)$ is a non-degenerate eigenvalue of the operator~$\mathcal{L}_{\Diff^\star_p}$ and~$\Diff^{\star}_p$ is bounded below by a positive constant, it is possible to choose the eigenvector~$u_\Diff$ so that the function~$\Diff \mapsto \Lambda(\Diff) = \textsc{J}(\Diff, u_{\Diff})$ is regular enough at the optimum~$\Diff^{\star}_p$. One can then derive the Euler--Lagrange equation satisfied by~$\Diff^{\star}_p$, and show that~$\Diff^{\star}_p$ actually cannot be bounded below by a positive constant. This is made precise in  following lemma, in which we need to distinguish for technical reasons the cases~$\dim=1$ and~$\dim>1$.
+
+\begin{lemma}
+  \label{lem:EL}
+  Choose the Frobenius norm for the matrix norm~$\normF{\cdot}$, consider~$p \in [1,+\infty)$, $a \in [0,a_\mathrm{max}]$, $b>0$ such that~$ab \leq 1$, and fix a minimizer~$\Diff^\star_p$ of~\eqref{eq:maximizer_in_thm}. Assume that there exists~$c>0$ such that~$\Diff_p^{\star}(q)\geq c \Id_\dim$ for almost all~$q\in\T^\dim$; and additionally that~$\Diff_p^{\star} \in C^0(\T,\R_+)$ when~$\dim=1$. Then the optimal spectral gap~$\Lambda(\Diff_p^{\star})$ is a degenerate eigenvalue of the diffusion operator~$\mathcal{L}_{\Diff^\star_p}$.
+\end{lemma}
+
+\begin{proof}
+  The proof proceeds by contradiction. Let us first emphasize that, for any $\delta \Diff \in L_\mu^{\infty}(\T^\dim,\mathcal{S}_\dim)$, where~$\mathcal{S}_\dim$ is the set of real, symmetric, matrices of size~$d \times d$ (note that~$\delta \Diff$ is not a positive matrix a priori), the matrix valued function~$\Diff_p^{\star} + t\delta\Diff$ has values in the space of symmetric positive definite matrices when~$|t|$ is sufficiently small.
+
+  Suppose that the eigenvalue~$\Lambda(\Diff_p^{\star})$ is non-degenerate. In this case, the eigenvalue~$\Lambda(\Diff_p^{\star} + t\delta\Diff)$ remains non-degenerate and isolated for~$|t|$ sufficiently small, and it is possible to choose the eigenvector~$u_{\Diff_p^{\star} + t\delta\Diff}$ associated with this eigenvalue so that~$\|u_{\Diff_p^{\star} + t\delta\Diff}\|_{L^2(\mu)} = 1$ and the mapping~$t\mapsto u_{\Diff_p^{\star} + t\delta\Diff}$ is analytic in an open neighborhood of~$t=0$ (see, e.g., Theorem~II.6.1 and the discussion in Section~VII.3.1 of~\cite{Kato}). The optimal matrix valued function~$\Diff^{\star}_p$ is therefore characterized by the following Euler--Lagrange equation: there exists a Lagrange multiplier~$\gamma \in \R$ such that, for any $\delta \Diff \in L_\mu^{\infty}(\T^\dim,\mathcal{S}_\dim)$,
+  \begin{equation}
+    \label{eq:EL}
+    \frac{d}{dt}{\Lambda}(\Diff_p^\star + t\delta\Diff)\Big|_{t=0} + \gamma \frac{d}{dt}\Phi_p(\Diff_p^\star + t\delta\Diff)\Big|_{t=0} = 0,
+  \end{equation}
+  where~$\Phi_p$ encodes the normalization constraint~\eqref{eq:norm_L^p_mu_matrices}:
+  \[
+  \Phi_p(\Diff) = \int_{\T^\dim} \normF{\Diff(q)}^p \, \rme^{-\beta p V(q)} \,dq.
+  \]
+  Relying on the choice of the Frobenius norm for~$\normF{\cdot}$ to compute the differential of~$\Phi_p$, \eqref{eq:EL} can be rewritten as: for any $\delta \Diff \in L_\mu^{\infty}(\T^\dim,\mathcal{S}_\dim)$,
+\[
+\int_{\T^\dim} \delta\Diff(q) : \left( \nabla u_{\Diff^{\star}_p}\otimes\nabla u_{\Diff^{\star}_p} \right) \mu(q)\,dq = p\gamma\int_{\T^\dim}\normF{\Diff_p^{\star}(q)}^{p-2}\Diff^{\star}_p(q):\delta\Diff(q) \, \rme^{-\beta p V(q)}\,dq,
+\]
+where $:$ and $\otimes$ are respectively the double contraction and outer product operators: for any $M_1,M_2 \in \mathbb{R}^{\dim \times \dim}$ and $\xi,\eta \in \mathbb{R}^\dim$, 
+\[
+M_1:M_2 = \mathrm{Tr}\left(M_1^T M_2\right) = \sum_{i,j=1}^\dim \left[M_1\right]_{i,j} \left[M_2\right]_{j,i},
+\qquad
+\left[\xi \otimes \eta\right]_{i,j} = \xi_i\eta_j.
+\]
+To compute the derivative of~${\Lambda}(\Diff_p^\star + t\delta\Diff)$ around~$t=0$, as in the Hellmann--Feynman theorem of quantum mechanics, we have used that~$d u_{\Diff_p^{\star} + t\delta\Diff}/dt$ is orthogonal to~$u_{\Diff_p^{\star} + t\delta\Diff}$ in~$L^2(\mu)$ (which follows from the normalization condition $\|u_{\Diff_p^{\star} + t\delta\Diff}\|_{L^2(\mu)} = 1$), and the fact
+\begin{equation}
+  \label{eq:eig_value_pbm_optimal_lemEL}
+  \nabla^*(\Diff_p^{\star}\nabla u_{\Diff_p^{\star}}) = \Lambda(\Diff_p^{\star}) u_{\Diff_p^{\star}},
+\end{equation}
+where we recall that~$\nabla^*$ is the adjoint of $\nabla$ on~$L^2(\mu)$. We therefore deduce from the Euler--Lagrange condition~\eqref{eq:EL} that the optimal solution $\Diff^{\star}_p$ satisfies the following equality for a.e.~$q\in\T^\dim$:
+\begin{equation}
+  \label{eq:EL-prop-1}
+  \Diff^{\star}_p(q) = \alpha_p \normF{\Diff^{\star}_p(q)}^{2-p} \rme^{\beta(p-1)V(q)} \nabla u_{\Diff^{\star}_p}(q)\otimes \nabla u_{\Diff^{\star}_p}(q),
+\end{equation}
+where the constant~$\alpha_p > 0$ ensures that~$\Phi_p(\Diff^{\star}_p) = 1$. 
+
+When~$\dim \geq 2$, we immediately obtain a contradiction with the assumption~$\Diff_p^{\star}\geq c \Id_\dim$ since~\eqref{eq:EL-prop-1} implies that~$\Diff^{\star}_p(q)$ is rank deficient (even rank 1) for a.e.~$q\in\T^\dim$; and thus proves the desired result for~$\dim \geq 2$.
+
+When~$\dim=1$, \eqref{eq:EL-prop-1} simplifies (after some straightforward manipulations) as 
+\begin{equation}
+  \label{eq:EL-prop}
+  \Diff^{\star}_p(q) = \widetilde{\alpha}_p \rme^{\beta V(q)} \left| u'_{\Diff^{\star}_p}(q) \right|^{2/(p-1)}, 
+\end{equation}
+where the constant~$\widetilde{\alpha}_p > 0$ ensures that~$\Phi_p(\Diff^{\star}_p) = 1$. We now show that $u'_{\Diff^{\star}_p}$ cancels on~$\T$, thus contradicting the assumption that $\Diff_p^{\star}(q)\geq c > 0$ for all~$q\in\T$ (the inequality is indeed valid for all~$q \in \T$, and not up to a set of Lebesgue measure~0 since~$\Diff^\star_p$ is assumed to be continuous). To do so, we start by noticing that the continuity of $\Diff_p^\star$ implies that the eigenfunction~$u_{\Diff_p^{\star}}$ belongs to~$C^1(\T,\R)$ (see, e.g., \cite[Theorem~2.27]{fernandezregularity} for such a regularity result)\todo{reference plus officielle ?}, so that~$u_{\Diff^{\star}_p}'$ is continuous on~$\T$. Since~$u_{\Diff^{\star}_p}$ is periodic on~$\T$, its derivative~$u_{\Diff^{\star}_p}'$ cancels at least once on~$\T$. In view of~\eqref{eq:EL-prop}, the diffusion~$\Diff^\star_p$ then also vanishes at this point. The contradiction finally allows to conclude to the desired result for~$\dim=1$.
+\end{proof}
+
+The interpretation of Lemma~\ref{lem:EL} is the following: when the second eigenvalue is isolated and non-degenerate (and under some regularity assumptions), the diffusion matrix cannot be uniformly positive definite. On the other hand, since we aim at maximizing the second eigenvalue, we somehow generically expect that it will be degenerate (in essence, we can increase it until it reaches the third eigenvalue). The assumption in Lemma~\ref{lem:EL} is therefore not generic. Our analysis does not inform us on whether the optimal diffusion matrix remains positive definite or cancels at some points. The two situations (uniformly positive definite diffusion matrices or optimal diffusion matrices vanishing at some points) are encountered in the numerical results presented in Section~\ref{subsec:numerical-optim}. Interestingly, the characterization of the optimal diffusion matrix through the Euler--Lagrange equation numerically can still hold when there is a degeneracy of the eigenvalues -- in situations where the optimal diffusion matrix is not uniformly positive definite (see Figure~\ref{fig:res_1}) since, of course, the formula cannot be true when the diffusion matrix is uniformly positive definite.
+
+\begin{remark}
+  \label{rmk:p_laplacian}
+  Let us write more precisely the eigenproblem characterizing the second eigenpair in the exceptional situation when the second eigenvalue is not degenerate. Note first that~\eqref{eq:EL-prop-1} implies that~$\normF{\Diff^\star_p(q)} = a_p \rme^{\beta V(q)}|\nabla u_{\Diff^{\star}_p}|^{2/(p-1)}$ for some parameter~$a_p>0$ determined by the normalization condition, so that~$\Diff^\star_p(q) = a_p \rme^{\beta V(q)} |\nabla u_{\Diff^{\star}_p}|^{-2(p-2)/(p-1)} \nabla u_{\Diff^{\star}_p}(q)\otimes \nabla u_{\Diff^{\star}_p}(q)$. In view of~\eqref{eq:eig_value_pbm_optimal_lemEL} and the equality~$\nabla^* \varphi = -\mu^{-1} \mathrm{div} (\mu \varphi)$ for a vector valued function~$\varphi$, it then follows that
+  \begin{equation}
+    \label{eq:4laplacien}
+    -a_p \operatorname{div}\left(|\nabla u_{\Diff^{\star}_p}|^{2/(p-1)} \nabla u_{\Diff^{\star}_p}\right) = \Lambda(\Diff^{\star}_p)\rme^{-\beta V} u_{\Diff^{\star}_p}.
+  \end{equation}
+  Note that equation~\eqref{eq:4laplacien} is, up to a weight factor on the right hand side, an eigenvalue problem for the~$2p/(p-1)$-Laplacian (see, e.g.~\cite{pLaplacien}). % i.e. 2/(p-1) + 2 
+  Note that equation~\eqref{eq:4laplacien} is non-linear; the existing works on eigenvalue problems for nonlinear operators as the one appearing in~\eqref{eq:4laplacien} suggest that the solutions should be~$C^{1,\alpha}$ (see again~\cite{pLaplacien}). This is in accordance with the numerical results presented in Figure~\ref{fig:res_1}, which suggest the presence of singularities in the derivative of~$\Diff^{\star}_p$ at the points where this matrix is not positive definite. 
+\end{remark}
+%NO LONGER RELEVANT SINCE SITUATION NOT GENERIC: The result above indicates that the optimal diffusion $\Diff^{\star}_m$ takes  values in the space of rank one matrices; this result may be exploited to propose numerical solutions in higher dimensions. 
+
+%-----------------------------------------------------------
+\section{Numerical scheme for optimizing the spectral gap}
+\label{sec:numerical}
+
+To solve the optimization problem~\eqref{eq:maximizer_in_thm} in practice, we introduce two finite-dimensional parameterizations: one for the diffusion~$\Diff$, and one for the eigenfunction~$u$. We consider for simplicity the case of isotropic diffusion matrices
+\begin{equation}
+  \label{eq:scalar_diffusion_for_numerics}
+  \Diff(q) = \Df(q) \Id_\dim.
+\end{equation}
+We introduce a piecewise constant parametrization for~$\Df$ in Section~\ref{subsec:paramD}; and next a $\mathbb{P}_1$ finite element parameterization for the eigenfunctions~$u$ in Section~\ref{subsec:FE}, again in the one dimensional case~$\dim=1$ for simplicity of exposition. The optimization problem then boils down to a constrained generalized eigenvalue problem, for which we describe in Section~\ref{subssec:optim-numeric} a procedure based on Sequential Least Squares Quadratic Programming. Finally, we present some numerical results obtained with our approach in Section~\ref{subsec:numerical-optim}.
+
+%-----------------------------------------------
+\subsection{Finite-dimensional parameterization}
+\label{subsec:paramD}
+
+In practice, we parametrize the scalar valued diffusion~$\Df$ in~\eqref{eq:scalar_diffusion_for_numerics} using a finite-dimensional vector subspace of~$L^p(\T^\dim,\R)$. More precisely, we introduce a set of $N$ non-negative functions $\{\psi_1,\ldots, \psi_N\} \subset L^p(\T^\dim)$, and consider diffusion functions of the generic form
+\begin{equation}
+  \label{eq:Diff_parametrized}
+  \Df_\diff(q) = \sum_{n=1}^N \diff_n \psi_n(q), \qquad (\diff_1,\ldots, \diff_N)\in\R^N.
+\end{equation}
+Nonnegativity conditions for~$\Df_\diff$ may be cumbersome to write when the functions~$\psi_n$ have supports which overlap in a non trivial way, as is the case for instance for (tensor products of) trigonometric functions. This motivates us to choose
+\begin{equation}
+  \label{eq:choice_psi_i}
+  \psi_n(q) = \mathbf{1}_{K_n}(q),
+\end{equation}
+the indicator function of a domain~$K_n \subset \T^p$, with the condition that~$(K_1,\ldots,K_N)$ forms a partition of~$\T^p$ (typically, the sets~$K_n$ are rectangles obtained from a product mesh).
+%For instance, $\{K_n\}_{n=1}^N$ can be a set of regular rectangles on $\T^p$, with $K_n = [k_{n_1}^-,k_{n_1}^+] \times \ldots \times [k_{n_p}^-,k_{n_p}^+]$.
+For the diffusion function~\eqref{eq:Diff_parametrized} to be in the set~\eqref{eq:constrained-set-matriciel} for the choice~\eqref{eq:choice_psi_i}, the coefficients should belong to the set
+\begin{equation}
+  \label{eq:def-Dhat}
+  \diffset_p^{a,b} = \left\{\diff\in \left[a \rme^{\beta V_+(K_1)},\frac{1}{b}\rme^{\beta V_-(K_1)} \right] \times \dots \times \left[a \rme^{\beta V_+(K_N)},\frac{1}{b}\rme^{\beta V_-(K_N)} \right] \, \middle| \, \sum_{n=1}^N \omega_{p,n} D_n^p \leq 1 \right\},
+\end{equation}
+where
+\[
+V_-(E) = \inf_E V, \qquad V_+(E) = \sup_E V, \qquad \omega_{p,n} = \int_{K_n} \rme^{-\beta p V}.
+\]
+We assume in the sequel that the conditions
+\begin{equation}
+  \label{eq:condition_ab_partition}
+  ab \leq \min_{1 \leq n \leq N} \rme^{\beta [V_-(K_n)-V_+(K_n)]}, \qquad a  \leq \left( \sum_{n=1}^N \omega_{p,n} \rme^{\beta p V_+(K_n)} \right)^{-1/p}, 
+\end{equation}
+hold, so that the set~$\diffset_p^{a,b}$ is not empty. These conditions can be ensured by choosing~$a,b \geq 0$ sufficiently small. Note also that, in the limit when the elements of the partition are intervals of vanishing lengths, the compatibility conditions~\eqref{eq:compatibility_conditions_continuous_level} for the continuous model, namely~$ab \leq 1$ and~$a \leq 1$, are recovered since~$\rme^{\beta [V_-(K_n)-V_+(K_n)]} \to 1$ while~$\omega_{p,n} \rme^{\beta p V_+(K_n)} \to |K_n|$.
+
+The maximization problem~\eqref{eq:maximizer_in_thm} is finally approximated by the finite dimensional maximization problem
+\begin{equation}
+  \label{eq:optim-PC}
+  \sup_{\diff\in\diffset_p^{a,b}} \Lambda(\Df_\diff \Id_\dim).
+\end{equation}
+The well-posedness of this optimization problem is guaranteed by the following result. 
+
+\begin{proposition}
+  \label{lem:well-posed-finite-dim}
+  Fix~$N \geq 1$ and~$p\in [1,+\infty)$, and consider a partition~$(K_1,\dots,K_N)$ of~$\T^\dim$ and $a,b \geq 0$ such that~\eqref{eq:condition_ab_partition} holds. There exists $\diff^{\star}_p \in \diffset_p^{a,b}$ such that
+    \[
+    \Lambda(\Df_{\diff_p^\star} \Id_\dim) = \sup_{\diff\in\diffset_p^{a,b}} \Lambda(\Df_\diff \Id_\dim).
+    \]
+\end{proposition}
+
+Note that the value~$b=0$ is allowed for~$N$ finite, in contrast to Theorem~\eqref{thm:well-posedness-1D} (which can intuitively be understood as the limiting case~$N \to +\infty$), since the inequality in~\eqref{eq:def-Dhat} ensures that the coefficients~$(D_n)_{1 \leq n \leq N}$ are uniformly bounded by~$(\min_{1 \leq n \leq N} \omega_{p,n})^{-1/p}$.
+%Note that in this discrete setting the value~$p=1$ is allowed (in contrast to Theorem~\ref{thm:well-posedness-1D}).
+
+\begin{proof}
+The function~$\diff \mapsto \Lambda(\Df_\diff \Id_\dim)$ is upper-semicontinuous on~$\diffset_p^{a,b}$ by arguments similar to the ones used in Appendix~\ref{app:thm:well-posedness-1D}  (and whatever the choice of norms on~$\R^N$). In addition, $\diffset_p^{a,b}$ is closed and bounded, hence compact, which, combined with the upper-semicontinuity of the function to maximize, guarantees the existence of a maximum and thus proves the result.
+\end{proof}
+
+One can moreover prove that any solution~$\diff^{\star}_p$ is positive when the domains~$K_n$ have non empty interiors (see Appendix~\ref{app:prop:well-posec-pwc} for the proof).
+%A ENLEVER JE PENSE The restriction on the shapes of the domains~$K_n$ is considered for simplicity of exposition, see Remark~\ref{rmk:more_general_domains_K_n} for an adaption to more general situations.
+    
+\begin{proposition}
+  \label{prop:well-posed-pwc}
+  Fix~$N \geq 1$ and~$p\in [1,+\infty)$, and consider a partition~$(K_1,\dots,K_N)$ of~$\T^\dim$ for which the domains have non empty interiors. Assume that $a,b \geq 0$ satisfy~\eqref{eq:condition_ab_partition}, and denote by ${\diff}^{\star}_p = (\diff^{\star}_{p,1},\ldots,{\diff}^{\star}_{p,N})\in\diffset_p^{a,b}$ a solution of the maximization problem~\eqref{eq:optim-PC}. Then,
+  \[
+  \forall n\in \{1,\ldots, N\}, \qquad {\diff}^{\star}_{p,n}>0.
+  \]
+\end{proposition}
+
+Note however that this result does not give any information on the behavior of the lower bound on the coefficients of~$D_p^\star$. The numerical results we present (see for instance Figure~\ref{fig:res_1}) show that the lower bound can indeed converge to~0 as~$N \to +\infty$.
+
+%-----------------------------------------
+\subsection{Finite elements approximation}
+\label{subsec:FE}
+
+We discuss in this section how to approximate~$\Lambda(\Diff)$ for a given diffusion matrix~$\Diff$, by reducing the minimization over functions in~$H^1_0(\mu)$ to a minimization over a finite dimensional space obtained through a finite element discretization. For simplicity of exposition, we restrict the presentation to the one dimensional case~$\dim=1$, the extension to higher dimensional situations posing no difficulties in principle (but, for computational reasons, dimensions are restricted in practice to~$\dim \leq 3$).
+
+The finite element discretization is characterized by an integer~$I\geq 1$. Since we consider here~$\mathbb{P}_1$ finite elements on a domain with periodic boundary conditions, $I$ gives the number of mesh points and basis functions. More precisely, we consider the mesh points~ $q_i = i/I$ for $i\in\{0,\ldots,I-1\}$ with $q_{-1} \equiv q_{I-1}$, $q_0 \equiv q_{I}$ and $q_1 \equiv q_{I+1}$ to comply with periodic boundary conditions. The basis functions~$(\varphi_i)_{i=1,\dots,I}$ have support on~$[q_{i-1},q_{i+1}]$ and are piecewise affine:
+\[
+\varphi_i(q) =
+\left\{ \begin{aligned}
+  I(q-q_{i-1}) & \quad \text{for} \ q\in[q_{i-1},q_i], \\
+  I(q_{i+1}-q) & \quad \text{for} \ q\in[q_{i},q_{i+1}].
+\end{aligned} \right.
+\]
+We denote by~$S_I={\rm Span} (\varphi_1, \ldots, \varphi_I)$, and by 
+\[
+S_{I,0} = \left\{u \in S_I \, \middle| \, \int_{\T} u(q) \mu(q)\,dq = 0 \right\}.
+\]
+Note that this definition makes sense since constant functions are in~$S_I$, so that~$S_{I,0}$ is indeed a subspace of~$S_I$. We can then introduce the following mapping, which corresponds to a finite element approximation of test functions in the computation of~$\Lambda(\mathscr{D}_\diff)$:
+\begin{equation}
+  \label{eq:lambda-FE}
+  \lambda_{N,I}(\diff) = \inf_{u \in S_{I,0} \setminus\{0\}} \frac{\dps \int_{\T} \Df_\diff(q) u'(q)^2 \mu(q)\,dq}{\dps \int_{\T} u(q)^2 \mu(q)\,dq}.
+\end{equation}
+The optimization problem~\eqref{eq:optim-continuous-init} is finally approximated by replacing~$\Lambda(\mathscr{D}_\diff)$ in~\eqref{eq:optim-PC} by~$\lambda_{N,I}(\diff)$:
+\begin{equation}
+  \label{eq:optim-FE}
+  \lambda_{N,I}^{\star} = \sup_{\diff\in\diffset_p^{a,b}} \lambda_{N,I}(\diff).
+\end{equation}
+
+Before giving a well posedeness result for~\eqref{eq:optim-FE}, let us next recall the standard approach to solving~\eqref{eq:lambda-FE}. Upon writing $u = \sum_{i=1}^I U_i \varphi_i$, the optimization problem can be rewritten as
+\[
+\inf_{U \in \R^I \setminus \{0\}} \frac{U^\top A(\diff) U}{U^\top B U}, \qquad A(\diff) = \sum_{n=1}^N \diff_n A_n,
+\]
+where the matrices $A_1,\dots,A_n$ and~$B \in \R^{I \times I}$ have entries
+\begin{equation}
+  \label{eq:A-M-mat}
+  [A_n]_{i,j} = \int_{K_n} \varphi_j'(q) \varphi_i'(q) \mu(q)\,dq,
+  \qquad
+  B_{i,j} = \int_{\T} \varphi_j(q) \varphi_i(q) \mu(q)\,dq.
+\end{equation}
+The Euler--Lagrange condition for the minimization problem~\eqref{eq:lambda-FE} is therefore the following finite dimensional eigenvalue problem:
+\begin{equation}
+  \label{eq:disc_ev}
+  A(\diff)U = \sigma B U, \qquad U^\top B U = 1.
+\end{equation}
+Since~$A(\diff)$ and~$B$ are real symmetric matrices and~$B$ is definite positive, the eigenvalue problem~\eqref{eq:disc_ev} admits $0 \leq \sigma_1(\diff)\leq \sigma_2(\diff)\leq\ldots\leq \sigma_{I}(\diff)$ real and nonnegative eigenvalues, with associated $B$-orthonormal eigenvectors~$\{U_1(\diff),U_2(\diff)\ldots, U_{I}(\diff)\}$. In addition, $\sigma_1(\diff) = 0$ and~$U_1(\diff)$ is proportional to~$(1,\dots,1)$. With this parameterization, the optimization problem~\eqref{eq:optim-FE} can be recast as
+\begin{equation}
+  \label{eq:optim-discrete}
+  \lambda_{N,I}^{\star} = \sup_{\diff \in \diffset_p^{a,b}} \sigma_2(\diff),
+\end{equation}
+where $\sigma_2(\diff)$ is the first non zero (second smallest) eigenvalue of the problem~\eqref{eq:disc_ev}. The following proposition guarantees the existence of a minimizer to~\eqref{eq:optim-discrete}, which is moreover positive, provided the meshes for the approximation of the diffusion matrix and the approximation of the eigenfunctions are commensurate, the mesh for the eigenfunctions being finer than the mesh for the diffusion matrix.
+
+\begin{proposition}
+  \label{lem:well-posed-disc}
+  Fix~$p \in [1,+\infty)$. Assume that~$K_n = [(n-1)/N, n/N)$ for~$1 \leq n \leq N$, and that~$I = kN$ for an integer~$k \geq 2$. Consider ~$a,b \geq 0$ such that~\eqref{eq:condition_ab_partition} holds. Then, there exists $\diff_p^{\star}\in \diffset_p^{a,b}$ such that 
+  \[
+  0 < \lambda_{N,I}^{\star} = \sigma_2(\diff^\star_p) = \sup_{\diff \in \diffset_p^{a,b}} \sigma_2(\diff).
+  \]
+  Moreover, any such maximizer satisfies $\dps \min_{1 \leq n \leq N} \diff^\star_{p,n}>0$.
+\end{proposition}
+
+\begin{proof}
+  As already mentioned in the proof of Lemma~\ref{lem:well-posed-finite-dim}, the set $\diffset_p^{a,b}$ is compact. Thus, to prove the existence of a solution, it suffices to show that the application $\diff\mapsto \sigma_1(\diff)$ is upper-semicontinuous; in fact, we prove that it is continuous. Indeed, the application $M\in\mathcal{S}_{I}(\R)\mapsto \sigma_2(M)$ mapping any symmetric matrix to its second smallest eigenvalue is continuous on~$\mathcal{S}_{I}(\R)$ (see, e.g., \cite[Corollary~III.2.6]{Bhatia:2023544}). On the other hand, $\diff \mapsto A(\diff)$ is also continuous. By composition, $\diff \mapsto \sigma_2(\diff)$ is continuous on~$\delta_p^{a,b}$, which proves the existence of a maximizer.
+
+  In addition, the Poincar\'e inequality~\eqref{eq:Poincare} guarantees with the choice $\diff = \alpha_{p,N} \mathbbm{1}_N$ (where $\mathbbm{1}_N$ is the $N$-dimensional vector whose components are all equal to~1, and~$\alpha_{p,N}>0$ is a normalization constant chosen such that~$\|\diff\|_{L^p_\mu} \in (0,1]$) that 
+  \begin{equation}
+    \label{eq:ev_disc-pos-lambda}
+    \lambda_{N,I}^{\star} \geq \sigma_2(\alpha_{p,N} \mathbbm{1}_N) \geq \frac{\alpha_{p,N}}{C_\mu} > 0.
+  \end{equation}
+  To prove that $\diff^{\star}_{p,n}>0$ for all $n\in\{1,\ldots,N\}$, we proceed by contradiction. Assume that there exists $n\in\{1,\ldots,N\}$ such that $\diff^{\star}_{p,n} \leq 0$. Then, as $I = kN$ with $k\geq 2$, there exists $i\in\{1,\ldots, I+1\}$ such that $[q_{i-1}, q_{i+1}]\subset \overline{K_n}$. Setting $\phi_i = \varphi_i - \int_{\T}\varphi_i \, \mu$, we obtain
+  \begin{equation}
+    \sigma_2(\diff^{\star}_p)\leq \frac{\dps \int_{\T} \diff^{\star}_p(q)|\nabla \phi_i(q)|^2\mu(q)\,dq}{\dps \int_{\T}\phi_i(q)^2\mu(q)\,dq} = \diff^{\star}_{p,n}\frac{\dps \int_{K_n} |\nabla \phi_i(q)|^2\mu(q)\,dq}{\dps \int_{\T}\phi_i(q)^2\mu(q)\,dq}\leq 0,
+  \end{equation}
+  which contradicts \eqref{eq:ev_disc-pos-lambda} and thus proves the result.
+\end{proof}
+
+%--------------------------------
+\subsection{Convex optimization}
+\label{subssec:optim-numeric}
+
+We implemented a Sequential Least Squares Quadratic Programming algorithm (SLSQP) to numerically solve the discretized problem~\eqref{eq:optim-discrete}. SLSQP operates through linearization of the optimality conditions; see for instance~\cite[Section 15.1]{Bonnans_optim} for an introduction to such methods. In our numerical study, we resorted to the implementation available in SciPy~\cite{2020SciPy-NMeth}. 
+
+A first task is to approximate the integrals for the matrix elements in~\eqref{eq:A-M-mat} and the weight factors~$\omega_{p,n}$ in~\eqref{eq:def-Dhat} by some quadrature method.\todo{preciser quelle quadrature} To run the SLSQP algorithm, we next need the gradient of the constraint
+\[
+\diff \mapsto \sum_{n=1}^N \omega_{p,n} \diff_n^p,
+\]
+which is readily computed. A more subtle point is to compute the gradient of the target function~$\lambda_{N,I}(\diff) = \sigma_2(\diff)$ with the notation introduced in Section~\ref{subsec:FE}. We assume to this end that the second eigenvalue~$\sigma_2(\diff)$ is simple, which is the generic case before optimization is complete (degeneracy being expected for the optimizer). The expressions of the partial derivatives of~$\sigma_2$ are given by the following classical result.
+
+\begin{lemma}
+  \label{lem:gradient}
+  Consider~$\diff_0 \in \R^N$ such that the second smallest eigenvalue~$\sigma_2(\diff_0)$ of the symmetric positive matrix~$B^{-1/2}A(\diff_0) B^{-1/2}$ is simple. Then, $\diff \mapsto \sigma_2(\diff)$ is differentiable around~$\diff_0$, and the components of its gradient are
+  \begin{equation}
+    \label{eq:dlambda}
+    \forall n \in \{1,\dots,N\}, \qquad \frac{\partial \sigma_2}{\partial \diff_n}(\diff_0) = U(\diff_0)^\top A_n U(\diff_0),
+  \end{equation}
+  where $U(\diff)$ is a normalized eigenvector as in~\eqref{eq:disc_ev}. 
+\end{lemma}
+
+\begin{proof}
+  The proof involves manipulations similar to the ones used to prove Lemma~\ref{lem:EL}. When~$\sigma_2(\diff_0)$ is simple, $\sigma_2$ is smooth in an open neighborhood of~$\diff_0$, and~$D \mapsto U(D)$ can also be constructed to be smooth, so that, by taking the partial derivative with respect to~$\diff_n$ of the first condition in~\eqref{eq:disc_ev},
+  \begin{equation}
+    \label{eq:diff}
+    \frac{\partial A}{\partial \diff_n}(\diff) U(\diff) + A(\diff) \frac{\partial U}{\partial \diff_n}(\diff) = \frac{\partial \sigma_2}{\partial \diff_n}(\diff) B U(\diff) + \sigma_2(\diff) B \frac{\partial U}{\partial \diff_n}(\diff).
+\end{equation}
+  The desired result follows by multiplying this equality by $U(\diff)^\top$ on the left, using the normalization $U^\top B U=1$ (which implies $U^\top (\diff) B \partial_{\diff_n} U(\diff)=0$, and thus also $U^\top (\diff) A(\diff) \partial_{\diff_n} U(\diff)=0$ by~\eqref{eq:disc_ev}).
+\end{proof}
+
+\begin{remark}
+  Lemma~\ref{lem:gradient} provides a formula for the gradient of~$\sigma_2$ around points where this function is differentiable, namely for $\diff \in\R^N$ such that $\sigma_2(\diff)$ is simple. However, formula~\eqref{eq:dlambda} makes sense even if $\sigma_2(\diff)$ is degenerate. In practice, we use this formula for the gradient for any~$\diff$, including if degeneracy happens. The downside is that the convergence may be slower around around points of degeneracy.
+  \todo[inline]{faudrait commenter sur le fait que c'est observe en pratique ou pas ?}
+  \todo[inline]{interessant aussi de voir comment distance 2eme/3eme vp varie ; aussi graphique sur convergence 2eme vp ? A ajouter à la section numérique}
+\end{remark}
+
+In all the numerical results we present, we consider~$a=b=0$ and~$p=2$, and the initial condition for the diffusion matrix is the constant diffusion matrix which saturates the constraint.
+
+%------------------------------- 
+\subsection{Numerical results}
+\label{subsec:numerical-optim}
+
+\todo[inline]{voir les remarques/discussion mail avec G. Robin entre 20 et 22 mars 2022}
+
+We start by applying the optimization procedure described in Section~\ref{subssec:optim-numeric} to a one-dimensional example with a double-well potential on the one-dimensional torus, with a normalization constraint corresponding to~$p=2$, and a mesh characterized by~$N = I = 1000$. We plot in Figure~\ref{fig:res_1} (Left) the target distribution, as well as the optimal diffusion~$\Diff^{\star}_p$ obtained numerically, the constant diffusion $\Diff(q)=a_p$ (with~$a_p$ chosen such that~$\|\Diff\|_{L^p_\mu} = 1$) and the proxy~$\Diff_{\mathrm{hom},p}^\star$ for the optimal diffusion obtained in a periodic homogenization limit (see Theorem~\ref{thm:max-homog} for the analytical expression of this function).
+
+\begin{figure}
+  \centering 
+  \includegraphics[width=0.49\textwidth]{pics/figure1-a.png}
+  \includegraphics[width=0.49\textwidth]{pics/figure1-b.png}
+  \includegraphics[width=0.49\textwidth]{pics/focus_around_zero.pdf}
+  \caption{\label{fig:res_1} (Top left) Results of the optimisation procedure on the one-dimensional double-well potential~$V(q) =  \sin(2\pi q) (2 + \sin(\pi q))$. Dotted-dashed green line: target probability density~$\mu$. Solid red line: optimal diffusion~$\Diff^{\star}_2$. Dashed blue line: theoretical homogenized limit~$\Diff_{\mathrm{hom},2}^\star$. Dotted black line: normalized constant diffusion $\Diff(q)=a_2$. (Top right) Comparison with the Euler--Lagrange equation~\eqref{eq:EL-prop} for the optimal diffusion. Solid red line: optimal diffusion $\Diff^{\star}_2$. Dotted black line: diffusion matrix proportional to~$\rme^{\beta V(q)} u'_{\Diff^{\star}_2}(q)^2$. (Bottom) Zoom on the optimal diffusion matrix for increasing values of~$I$.}
+\end{figure}
+\todo[inline]{ajouter legende sur derniere image de Figure~\ref{fig:res_1}}
+
+We first observe that the optimal diffusion~$\Diff^{\star}_p$ takes larger values in regions where the target distribution is small. It also displays two singularities at points where the diffusion (almost) vanishes, around~$q \approx 0.4$ and~$q \approx 0.9$, in accordance with the discussion in Remark~\ref{rmk:p_laplacian}. The analytical proxy~$\Diff_{\mathrm{hom},p}$ has the same general shape as~$\Diff^{\star}_p$ but displays no singularity, which may have numerical advantages. Concerning the numerical values of the spectral gaps obtained for~$\Diff^{\star}_p$, $\Diff_{\mathrm{hom},p}$ and the constant diffusion, we obtain respectively~??\todo{NEW VALUES NEEDED!!}. This simple example thus demonstrates the improvement obtained by optimizing the diffusion in terms of the spectral gap of the operator, and thus the enhanced convergence rate to equilibrium (further demonstrated by Monte Carlo simulations in Section~\ref{sec:sampling}). It also confirms the relevance of the homogenized proxy~$\Diff_{\mathrm{hom},p}$ derived in Section~\ref{sec:homog}, which can be computed explicitly and yields a spectral gap comparable to the one obtained through the optimization procedure.
+
+We next discuss the relevance of the Euler--Lagrange equation presented in Section~\ref{subsec:euler-lagrange} on this example. The first non zero eigenvalues are~29.9153, 29.9154 and~96.8. This means that the second eigenvalue is effectively degenerate. Figure~\ref{fig:res_1} (Right) displays the optimal diffusion~$\Diff^{\star}_p$ and a numerical approximation of~\eqref{eq:EL-prop}, namely~$\widetilde{\alpha}_p \rme^{\beta V(q)} u'_{\Diff^{\star}_p}(q)^{2/(p-1)}$. The derivative~$u'_{\Diff^{\star}_p}$ is computed numerically by finite differences from the approximation of~$u_{\Diff^{\star}_p}$ obtained by the optimization procedure, and the factor~$\widetilde{\alpha}_p$ is chosen so that the normalization constraint is satisfied. Both curves are exactly superimposed, which confirms numerically our theoretical findings.
+
+We conclude this section by coming back to the results of Section~\ref{subsec:euler-lagrange}. In all the simulations reported in Figure~\ref{fig:cusps} (which correspond to the first picture of Figure~\ref{fig:res_1} for other choices of potential energy function~$V$), the second eigenvalue is degenerate, but the optimal diffusion matrix can either be uniformly positive definite (in which case it is smooth), or vanish at some points (where some singularity of the derivative is observed). We were not able to find criteria on~$V$ allowing to decide a priori when the optimal diffusion matrix is uniformly positive or not.
+
+\todo{changer dans figures -- a confirmer : $\cos(2\pi q)$ à la figure 2.(a). Pour 2.(d), c'est $\sin(8\pi q)(2+\sin(4\pi q))$}
+
+\begin{figure}
+\centering
+\begin{subfigure}[t]{0.49\linewidth}
+\includegraphics[width=\linewidth]{pics/cusps_sinus.png}
+\caption{Potential: $V(q) = \cos(\pi q)$. Second and third smallest eigenvalues: $\sigma_2 = \sigma_3 = 46.7$, while~$\lambda_4 = 175$. The minimum of~$\Diff^{\star}_2$ is~0.69.}
+%Figure 2a \cos(\pi q): min(D) = 0.69; \lambda2 =4.66805557e+01 ; \lambda3 =  4.66805582e+01; lambda4 = 1.75245638e+02
+\label{fig:cusps-a}
+\end{subfigure}
+\hfill
+\begin{subfigure}[t]{0.49\linewidth}
+\includegraphics[width=\linewidth]{pics/cusps_sinus_twice.png}
+\caption{Potential: $V(q) = \cos(4\pi q)$. Second and third smallest eigenvalues: $\sigma_2 = 28.92 \approx \sigma_3 = 28.94$, while~$\lambda_4 = 85.8$. The minimum of~$\Diff^{\star}_2$ is~0.034.}
+%Figure 2b \cos(4\pi q) : min(D) = 0.034; \lambda2 = 2.89210239e+01; \lambda3 = 2.89382297e+01; lambda4 = 8.57814667e+01
+\label{fig:cusps-b}
+\end{subfigure}
+\begin{subfigure}[t]{0.49\linewidth}
+\includegraphics[width=\linewidth]{pics/cusps_sinus3.png}
+\caption{Potential: $V(q) = \sin(\pi/2 + \pi q)^2 + \sin(\pi/2 + 2\pi(q-0.2))^3${\bf IS IT THIS??}. Second and third smallest eigenvalues:  $\sigma_2= \sigma_3 = 46.54$, while~$\lambda_4 = 173$. The minimum of~$\Diff^{\star}_2$ is~0.49.}
+%Figure 2c \sin(\pi/2 + \pi q)^2 + \sin(\pi/2 + 2\pi(q-0.2))^3 : min(D) = 0.49; \lambda2 = 4.65425667e+01; \lambda3 = 4.65425672e+01; lambda4 = 1.72614219e+02
+\label{fig:cusps-c}
+\end{subfigure}
+\hfill
+\begin{subfigure}[t]{0.49\linewidth}
+\includegraphics[width=\linewidth]{pics/cusps_pot1D_twice.png}
+\caption{Potential: $V(q) =  \sin(4\pi q) (2 + \sin(2\pi q))$. Second and third smallest eigenvalues: $\sigma_2 = 29.9 \approx \sigma_3 = 30.0$, while~$\lambda_4 = 72.6$. The minimum of~$\Diff^{\star}_2$ is~0.004.}
+%--> Figure2d \sin(4\pi q)(2+sin(2\pi q)) : min(D) = 0.004; \lambda2 = 2.99115520e+01; \lambda3 = 3.00397149e+01 ; lambda4 = 7.26189633e+01
+\label{fig:cusps-d}
+\end{subfigure}
+\caption{Results of the optimisation procedure on four different one-dimensional potentials. Dotted-dashed green line: target probability $\mu$. Solid red line: optimal diffusion. Dashed blue line: theoretical homogenized limit. Dotted black line: constant diffusion. The second smallest eigenvalue is degenerate in all cases. On the right (Figures~\ref{fig:cusps-b} and~\ref{fig:cusps-d}), the optimal diffusion vanishes at two points on~$\T$.}
+\label{fig:cusps}
+\end{figure}
+
+%------------------ Homogenization --------------------
+\section{Optimal diffusion in the homogenized limit}
+\label{sec:homog}
+
+A drawback of the optimization method described in~\Cref{sec:numerical} is the computational burden associated with the calculation of the optimal diffusion in practice, which requires solving a high-dimensional eigenvalue problem. To obtain an approximation of the optimal diffusion, which can be used for instance as a good initial guess to the optimization procedure, we propose a simple model for the effective diffusion of the optimized overdamped Langevin dynamics. This model is obtained by studying the asymptotic behaviour of the optimal diffusion function in the homogenized limit of periodic potentials with infinitely small spatial periods. The limit is explicit either for linear constraints, or for generic~$L^p_\mu$ constraints in the one dimensional case~$\dim=1$, and displays a simple dependency on the target density~$\mu$. The form of this dependency is backed up by prior results in the literature~\cite{RobertsStramer}. 
+
+In order to present our results, we start by introducing in Section~\ref{subsec:homog-compact} the setting of homogenization theory, in particular the notion of~$H$-convergence, and give some useful and standard results, adapted to our framework of periodic boundary conditions. Next, in Section~\ref{subsec:per-homog}, we study the homogenized limit of the diffusion tensors and then explicitly optimize the spectral gap of the homogenized limit for one-dimensional systems or linear constraints. Finally, in Section~\ref{subsec:optim-homog}, we study the commutation of the homogenization and optimization procedures, by showing that the diffusion matrix obtained by optimizing first and then taking the homogenized limit coincides with the diffusion matrix optimal for the homogenized problem.
+
+%----------------------------------------------
+\subsection{Definitions and compactness results}
+\label{subsec:homog-compact}
+
+We present in this section compactness results for sequences of matrices~$(\A^k)_{k\geq 1} \subset L^{\infty}(\T^p, \mathcal{M}_{a,b})$. Let us emphasize that we restrict ourselves to~$a,b>0$ in all this section. We start by recalling the notion of $H$-convergence in the setting of~$\mathbb{Z}^\dim$-periodic functions. Compared to the classical $H$-convergence presented in the literature (see for instance~\cite[Chapter~1]{allaire_homogeneisation} and references therein), the main difference is that we use periodic boundary conditions rather than Dirichlet boundary conditions. 
+
+\begin{definition}[$H$-convergence]
+  \label{def:Hcvg}
+  Fix~$a,b>0$, and consider a sequence $(\A^k)_{k\geq 1} \subset L^{\infty}(\T^\dim, \mathcal{M}_{a,b})$. The sequence~$(\A^k)_{k\geq 1}$ is said to $H$-converge to~$\overline{\A} \in L^{\infty}(\T^\dim, \mathcal{M}_{a,b})$ (denoted by $\A^k\xrightarrow{H}\overline \A$) if, for any $f\in H^{-1}(\T^\dim)$ such that~$\langle f, \mathbf{1}\rangle_{H^{-1}(\T^\dim),H^1(\T^\dim)}=0$, the sequence~$(u^k)_{k\geq 1} \subset H^1(\T^\dim)$ of solutions to
+\begin{equation}
+\label{eq:periodic-boundary}
+\left\{\begin{aligned}
+&-\operatorname{div}\left(\A^k\nabla u^k\right)= f& \text{ on }\T^\dim,
+\\ 
+& \int_{\T^\dim}u^k(q)\, dq = 0, &
+\end{aligned}\right.
+\end{equation}
+satisfies, in the limit $k \to \infty$,
+\begin{equation}
+\left\{\begin{aligned}
+u^k & \rightharpoonup u \text{ weakly in }H^1(\T^\dim), \\ 
+\A^k\nabla u^k & \rightharpoonup \overline \A\nabla u  \text{ weakly in }L^2(\T^\dim)^\dim,
+\end{aligned}\right.
+\end{equation}
+where~$u \in H^1(\T^\dim)$ is the solution of the homogenized problem 
+\begin{equation}\label{eq:Abaru}
+\left\{\begin{aligned}
+&-\operatorname{div}\left(\overline \A\nabla u\right)= f & \text{ on }\T^\dim,
+\\ 
+&\int_{\T^\dim}u(q) \, dq=0.&
+\end{aligned}\right.
+\end{equation}
+\end{definition}
+
+Notice that the functions~$u^k$ in~\eqref{eq:periodic-boundary} and~$u$ in~\eqref{eq:Abaru} are indeed well defined since~$\langle f, \mathbf{1}\rangle_{H^{-1}(\T^\dim),H^1(\T^\dim)}=0$ (in application of the Lax--Milgram theorem, see for instance~\cite[Lemma~1.3.21]{allaire_homogeneisation}). Note also that we center the functions~$u^k$ and~$u$ with respect to the Lebesgue measure, and not with respect to the Boltzmann--Gibbs measure~\eqref{eq:mu} since the potential~$V$ which appears in the expression of the Boltzmann--Gibbs measure will not be fixed in the homogenization procedure. The next theorem, proved for completeness in Appendix~\ref{app:thm:Hcvg-compact}, states a compactness result for sequences of periodic functions.
+
+\begin{theorem}[Murat-Tartar]
+  \label{thm:Hcvg-compact}
+  Fix~$a,b>0$, and let $(\A^k)_{k\geq 1} \subset L^{\infty}(\T^\dim,\mathcal{M}_{a,b})$ be a sequence of $\Z^\dim$-periodic functions.\todo[inline]{ce serait mieux d'enlever tous les $\Z^\dim$ periodic si c'est bien clair que c'est a valeur depuis le tore. Ecire ca au tout debut, la premiere fois qu'on voit ces fonctions, en disant que functions sur $\T^\dim$ peuvent etre identifiees a des fonctions de $\R^\dim$ qui sont $\Z^\dim$ periodiques} Up to extraction of a subsequence, $(\A^k)_{k \ge 1}$ $H$-converges to a matrix $\overline{\A}\in L^{\infty}(\T^\dim,\mathcal{M}_{a,b})$ (non constant in general). 
+\end{theorem}
+
+The following theorem, adapted from~\cite[Theorem~1.3.18]{allaire_homogeneisation} (and proved for completeness in Appendix~\ref{app:thm:Hcvg}), states an $H$-convergence result for sequences of matrices defined through periodic homogenization. It is a particular case of Theorem~\ref{thm:Hcvg-compact} specific to periodic functions defined through periodic homogenization.
+
+\begin{theorem}
+  \label{thm:Hcvg}
+  Fix~$a,b>0$, and let $\A\in L^{\infty}(\T^\dim,\mathcal{M}_{a,b})$ be a $\Z^\dim$-periodic function. For~$k\geq 1$, consider the sequence~$(\A_{\#,k})_{k \ge 1}$ defined as
+  \[
+  \forall q \in \T^\dim, \qquad \A_{\#,k}(q)=\A(kq).
+  \]
+  The sequence~$(\A_{\#,k})_{k \ge 1}$ $H$-converges to the constant matrix~$\overline{\mathcal{A}}\in\mathcal{M}_{a,b}$ with entries 
+  \begin{equation}
+    \label{eq:Abar1}
+    \forall 1\leq i,j\leq \dim, \qquad \overline{\A}_{ij} = \int_{\T^\dim} (e_i + \nabla w_i(q))^\top \A(q) (e_i + \nabla w_i(q)) \, dq,
+  \end{equation}
+  where $(e_1,\ldots , e_\dim)$ is the canonical basis of~$\R^\dim$ and $\{w_i\}_{1\leq i\leq \dim} \subset H^1(\T^\dim)$ is the family of unique solutions to the problems
+  \begin{equation}\label{eq:Abar2}
+    \left\{\begin{aligned}
+    &-\operatorname{div} \left( \A(e_i+\nabla w_i) \right) = 0, \\ 
+    &\int_{\T^\dim}w_i(q) \, dq =  0.
+    \end{aligned}\right.
+  \end{equation}
+\end{theorem}
+
+The last theorem, proved in Appendix~\ref{app:thm:Hcvg-spectral} by a straightforward adaptation of~\cite[Theorem~1.3.16]{allaire_homogeneisation}, states that $H$-convergence implies the convergence of the sequence of spectral gaps.
+
+\begin{theorem}
+\label{thm:Hcvg-spectral}
+Fix~$a,b>0$ and let $(\A^k)_{k\geq 1}\subset L^{\infty}(\T^\dim,\mathcal{M}_{a,b})$ be a sequence $H$-converging to an homogenized matrix~$\overline{\mathcal{A}} \in L^{\infty}(\T^\dim,\mathcal{M}_{a,b})$. Let $(\rho^k)_{k\geq 1} \subset L^{\infty}(\T^\dim)$ be a sequence of positive functions converging weakly-$*$ in~$L^{\infty}(\T^\dim)$ to a limiting function~$\rho$, and such that there exists~$\rho_-,\rho_+>0$ for which $0<\rho_{-}\leq \rho^k(q)\leq \rho_+<+\infty$ for all~$k\geq 1$ and for almost all~$q\in\T^\dim$. Let~$\lambda^k$ be the smallest non-zero eigenvalue and~$u^k$ an associated normalized eigenvector of the spectral problem
+\begin{equation}
+\label{eq:spectral-homog}
+\left\{\begin{aligned}
+& -\operatorname{div}\left(\A^k(q)\nabla u^k(q)\right) = \lambda^k\rho^k(q)u^k(q),\\
+& \int_{\T^\dim} u^k(q)^2 \, dq = 1,
+\end{aligned}\right.
+\end{equation}
+Then, 
+\begin{equation}
+\label{eq:cvg-spectral}
+\lim_{k\rightarrow +\infty}\lambda^k = \overline{\lambda},
+\end{equation}
+and, up to a subsequence, $(u^k)_{k\geq 1}$ converges weakly in~$H^1(\T^\dim)$ to~$u$, a normalized eigenvector associated to~$\overline{\lambda}$, solution to the homogenized eigenvalue problem
+\begin{equation}
+  \label{eq:spectral-homog-lim}
+  \left\{\begin{aligned}
+  & -\operatorname{div}\left(\overline{\mathcal{A}}\nabla u(q)\right) = \overline{\lambda}\rho(q)u(q),\\
+  & \int_{\T^\dim} u(q)^2 \, dq = 1,
+\end{aligned}\right.
+\end{equation}
+and $\overline{\lambda}$ is the smallest non-zero eigenvalue.
+%(\emph{i.e.} the second smallest eigenvalue) of problem~\eqref{eq:spectral-homog-lim}.
+\end{theorem}
+
+%-------------------------------------------------------------
+\subsection{Optimization of the periodic homogenization limit}
+\label{subsec:per-homog}
+
+We still fix~$a,b>0$, and apply the results of Section~\ref{subsec:homog-compact} to a particular class of sequences of $(\A_{\#,k})_{k\geq 1}$, defined for $\Diff\in\Diffset_p^{a,b}$ by decreasing the period of the $\mathbb{Z}^\dim$-periodic matrix
+\begin{equation}
+  \label{eq:def_A_from_D}
+  \A(q) = \Diff(q) \exp(-\beta V(q))
+\end{equation}
+as
+\begin{equation}
+  \label{eq:A_sharp_k}
+  \A_{\#,k}(q) = \Diff(kq)\exp(-\beta V(kq)).
+\end{equation}
+Note that~$\mathcal{A}^k\in\mathcal{M}_{a,b}$ for all $k\geq 1$.
+The periodization procedure~\eqref{eq:A_sharp_k} allows us to prove in Section~\ref{sec:periodic_homog_on_A} the $H$-convergence of the sequence of matrices, and the convergence of the associated eigenvalues and eigenvectors (see Corollary~\ref{cor:Hcvg-spectral}). We then provide in Section~\ref{sec:optimization_homog_lim} explicit expressions for diffusion functions~$\Diff$ which maximize the spectral gap of the homogenized problem; see in particular Theorem~\ref{thm:max-homog} for the one dimensional case~$\dim = 1$. 
+
+\subsubsection{Periodic homogenization of the spectral gap problem}
+\label{sec:periodic_homog_on_A}
+
+For $k\in\N_+$ and $\Diff\in \Diffset_p^{a,b}$, we define the $(\Z/k)^\dim$-periodic functions~$V_{\#,k}(q) = V(kq)$ and~$\Diff_{\#,k}(q) = \Diff(kq)$. We consider the process $(q^k_t)_{t \geq 0}$ defined on $\T^\dim$ by the dynamics
+\begin{equation}
+\label{eq:dynamics-periodic}
+dq^k_t = \left[-\Diff_{\#,k}(q^k_t)\nabla V_{\#,k}(q^k_t) + \frac{1}{\beta}\operatorname{div}(\Diff_{\#,k})(q^k_t)\right]dt+\sqrt{\frac{2}{\beta}}\Diff_{\#,k}(q^k_t)^{1/2}\,dW_t.
+\end{equation}
+The generator associated to the dynamics acts on test functions~$u:\T^\dim \to \R$ as
+\[
+\mathcal{L}_k u = \frac{1}{\beta} \exp\left(\beta V_{\#,k}\right) \operatorname{div}\left[\Diff_{\#,k}\exp\left(-\beta V_{\#,k}\right)\nabla u\right].
+\]
+Since the eigenfunctions associated with the first eigenvalue~0 are constant functions, the Rayleigh--Ritz principle implies that the spectral gap of~$\mathcal{L}_k$ writes, up to a factor $\beta$ (and recalling the notation~\eqref{eq:A_sharp_k}):
+\begin{equation}
+  \label{eq:lambda_per_k}
+  \Lambda_{\#,k}(\Diff) = \min_{u\in H^1(\T^\dim) \setminus\{0\}} \left\{ \frac{\dps \int_{\T^\dim}\nabla u(q)^\top \A_{\#,k}(q)\nabla u(q) \, dq}{\dps \int_{\T^\dim} u^2(q) \, \rme^{-\beta V_{\#,k}(q)} \, dq} \ \middle| \ \int_{\T^\dim} u \, \rme^{-\beta V_{\#,k}} = 0 \right\}.
+\end{equation}
+Let us emphasize that the test functions to find the minimum on the right-hand side of the previous equality are $\Z^\dim$-periodic, while the diffusion and the potential are $(\Z/k)^\dim$-periodic. Note also that the minimization over the functions~$u$ is performed on~$H^1(\T^\dim)$, which is equivalent in fact to the functional space~$H^1(Z^{-1} \rme^{-\beta V_{\#,k}})$ since we consider on a compact domain and~$V$ is smooth. This allows to work with a fixed functional space for the test functions~$u$ as~$k \to +\infty$.
+
+The spectral gap $\Lambda_{\#,k}(\Diff)$ is the smallest non-zero solution of the following eigenvalue problem posed on~$\T^\dim$:
+\[
+-\operatorname{div}\left[\Diff_{\#,k}\exp\left(-\beta V_{\#,k}\right)\nabla u^k\right]= \lambda^k \exp\left(-\beta V_{\#,k}\right)u^k.
+\]
+By applying Theorem~\ref{thm:Hcvg-spectral} to the sequence~$(\mathcal{A}_{\#,k})_{k\geq 1}$, we therefore obtain the following result on the convergence of the sequence of spectral gaps $\left(\Lambda_{\#,k}(\Diff)\right)_{k\geq 1}$ for a given diffusion $\Diff\in \Diffset_p^{a,b}$. To state the result, recall that~$Z$ is defined in~\eqref{eq:mu}.
+
+\begin{corollary}
+  \label{cor:Hcvg-spectral}
+  Fix~$p \in [1,+\infty)$, $a,b>0$ satisfying~\eqref{eq:compatibility_conditions_continuous_level} and~$\Diff\in \Diffset_p^{a,b}$. Then, $\mathcal{A}_{\#,k} \xrightarrow{H} \overline{\mathcal{A}}$ with~$\overline{\A}$ defined in~\eqref{eq:Abar2}. Defining $\overline{\Diff} = Z^{-1}\overline{\A}$, the sequence $\left(\Lambda_{\#,k}(\Diff)\right)_{k\geq 1}$ converges as $k\to \infty$ towards 
+  \[
+  \Lambda_{\mathrm{hom}}(\Diff) : = \inf_{u\in H^1_0(\T^\dim) \setminus\{0\}}\frac{\dps \int_{\T^\dim} \nabla u(q)^\top \overline{\Diff}\nabla u(q) \, dq}{\dps \int_{\T^\dim}u^2(q) \, dq}.
+  \]
+\end{corollary}
+
+In the next section, we seek to maximize the spectral gap $\Lambda_{\mathrm{hom}}(\Diff)$ with respect to the baseline diffusion~$\Diff$ from which~$\overline{\Diff}$ arises as the $H$-limit of~$\Diff_{\#,k}(q)\exp[-\beta V_{\#,k}(q)]/Z$. There is of course a huge body of literature on optimizing the homogenized coefficients, although this is usually done in the context of shape optimization of materials, typically by considering laminated structures which would correspond here to situations where the diffusion can only take two values; see for instance~\cite{Sigmund94,HD95,BT10,AGDP19} and~\cite[Chapter~10]{Henrot}.
+
+It is useful to provide a more explicit expression of the limiting matrix~$\overline{\Diff}$ in order to maximize~$\Lambda_{\mathrm{hom}}(\Diff)$. Consider~$\xi = \xi_1e_1 + \dots + \xi_\dim e_\dim \in\R^\dim$ and note that
+\[
+\xi^{\top} \overline{\Diff}\xi = Z^{-1} \int_{\T^\dim} (\xi + \nabla w_{\xi}(q))^\top \A(q)(\xi + \nabla w_{\xi}(q)) \, dq,
+\]
+where $w_{\xi} = \xi_1 w_1 + \dots + \xi_\dim w_\dim$ and the family~$(w_i)_{1 \leq i \leq \dim}$ is defined in~\eqref{eq:Abar2}. Recalling~\eqref{eq:def_A_from_D}, it follows that
+\begin{align}
+  \xi^{\top} \overline{\Diff}\xi & = \int_{\T^\dim} \left(\xi+\nabla w_\xi(q)\right)^{\top} \Diff(q) \left(\xi+\nabla w_\xi(q)\right) \, \mu(q) \, dq \notag \\
+  & = \int_{\T^\dim}\left(\xi^{\top} \Diff(q)\xi  + 2 \xi^{\top}\Diff(q)\nabla w_\xi(q)+ \nabla w_\xi(q)^{\top} \Diff(q) \nabla w_\xi(q) \right)\mu(q) \, dq. \label{eq:optim-homog-3}
+\end{align}
+By the weak formulation of~\eqref{eq:Abar2}, it holds, for any~$v \in H^1(\T^\dim)$,
+\begin{equation}
+  \label{eq:FV_def_mat_homog}
+  \int_{\T^\dim}\xi^{\top} \Diff(q)\nabla v(q) \, \mu(q) \, dq = -\int_{\T^\dim}\nabla w_\xi(q)^{\top} \Diff(q)\nabla v(q) \, \mu(q) \, dq.
+\end{equation}
+Upon replacing~$v$ by~$w_\xi$, we obtain with~\eqref{eq:optim-homog-3} that
+\begin{equation}
+  \label{eq:optim-homog-4}
+  \xi^{\top} \overline{\Diff}\xi  = \xi^\top \left( \int_{\T^\dim} \Diff(q)\, \mu(q)\, dq \right)\xi - \int_{\T^\dim}\nabla w_\xi(q)^{\top} \Diff(q) \nabla w_\xi(q) \, \mu(q) \, dq.
+\end{equation}
+
+\subsubsection{Optimization of the homogenized limit} 
+\label{sec:optimization_homog_lim}
+
+We now focus on the optimization with respect to~$\Diff \in \Diffset_p^{a,b}$ of the homogenized limit~$\Lambda_{\mathrm{hom}}({\Diff})$ given in Corollary~\ref{cor:Hcvg-spectral}, under some normalization constraint:
+\begin{equation}
+  \label{eq:optim-homog-def}
+  \Lambda_{\mathrm{hom}}^\star = \sup_{\Diff \in \Diffset_p^{a,b}}\Lambda_{\mathrm{hom}}(\Diff).
+\end{equation}
+This optimization problem is well posed by arguments similar to the ones used in Section~\ref{subsec:well-posedness}. In the most general case, one of the difficulties is to understand how the constraint $\Diff \in \Diffset_p^{a,b}$ homogenizes into a constraint on $\overline{\Diff}$. We start by analyzing a special example of constrained set with linear constraints, which is not the constraint $\| \Diff \|_{L^1_\mu} \leq 1$ with the norm defined in~\eqref{eq:norm_L^p_mu_matrices}. The interest of the linear constraint we consider is that the optimization problem becomes trivial. We next derive a similar result for the constraint~$\| \Diff \|_{L^p_\mu} \leq 1$, but for the one-dimensional case~$\dim=1$. Both results hold provided~$a,b>0$ are sufficiently small so that the optimal diffusion automatically satisfies the pointwise lower and upper bounds involving~$a$ and~$b$.
+
+\paragraph{Linear constraint.} We start by considering the following constraint on~$\Diff$, for a given constant matrix $M\in\mathcal{S}_\dim^{++}$, the set of real, symmetric, positive, definite matrices of size~$\dim \times \dim$:
+\begin{equation}
+  \label{eq:linear-constraint}
+  \int_{\T^\dim}\Diff(q) \, \mu(q) \, dq = M.
+\end{equation}
+
+\begin{lemma}
+  Consider~$M\in\mathcal{S}_\dim^{++}$, with~$M_-,M_+ > 0$ such that~$M_- \Id_\dim \leq M \leq M_+^{-1} \Id_\dim$. Fix~$a,b > 0$ such that
+  \begin{equation}
+    \label{eq:bounds_a_b_linear_constraint}
+    0 < a \leq M_- Z, \qquad 0 < b \leq \frac{1}{M_+ Z}.
+  \end{equation}
+  Then, the diffusion $\Diff^\star_\mathrm{hom}(q) = M/\mu(q)$ is a solution to the optimization problem
+  \[
+  \max \left\{ \overline{\Lambda}_{\rm{hom}}(\Diff)\, \middle| \, \Diff\in L_\mu^{\infty}(\T^\dim,\mathcal{M}_{a,b}), \ \ \int_{\T^\dim}\Diff(q) \, \mu(q) \, dq = M \right\}.
+  \]
+\end{lemma}
+
+\begin{proof}
+  In view of~\eqref{eq:optim-homog-4}, for any $\Diff \in L_\mu^{\infty}(\T^\dim,\mathcal{M}_{a,b})$ satisfying~\eqref{eq:linear-constraint}, it holds
+  \[
+  \forall \xi\in\R^\dim, \qquad \xi^{\top}\overline \Diff\xi \leq \xi^{\top}\left(\int_{\T^\dim}\Diff(q) \, \mu(q) \, dq\right) \xi = \xi^{\top}M\xi.
+  \]
+  Thus, for any $\Diff\in L_\mu^{\infty}(\T^\dim,\mathcal{M}_{a,b})$ satisfying the constraint~\eqref{eq:linear-constraint},
+  \[
+  \inf_{u\in H^1_0(\T^\dim) \setminus\{0\}}\frac{\dps \int_{\T^\dim} \nabla u(q)^\top \overline{\Diff} \nabla u(q)\, dq}{\dps \int_{\T^\dim} u^2(q) \, dq} \leq \inf_{u\in H^1_0(\T^\dim) \setminus\{0\}}\frac{\dps \int_{\T^\dim} \nabla u(q)^\top M\nabla u(q) \, dq}{\dps \int_{\T^\dim}u^2(q) \, dq}.
+  \]
+  Now, note that~$\Diff(q) = M/\mu(q)$ belongs to~$L_\mu^{\infty}(\T^\dim,\mathcal{M}_{a,b})$ in view of the choice~\eqref{eq:bounds_a_b_linear_constraint}, and satisfies~$\overline{\Diff} = M$. This diffusion matrix therefore maximizes the limiting spectral gap in view of the above inequality, which allows to conclude. 
+\end{proof}
+
+\paragraph{$L^p_\mu$ constraint in the one-dimensional case.}
+We now restrict ourselves to the case where~$\dim=1$. In this situation, $\Lambda_{\mathrm{hom}}(\Diff)$ is proportional to the nonnegative real number~$\overline{\Diff}$. Thus, maximizing~$\Lambda_{\mathrm{hom}}(\Diff)$ boils down to maximizing~$\overline{\Diff} \geq 0$. In the one-dimensional case, denoting~$w_\xi$ as~$w_\Diff$ (we omit the irrelevant parameter~$\xi$, but make the dependence on~$\Diff$ explicit), equation~\eqref{eq:Abar2} on~$w_{\Diff}$ can rewritten as
+\begin{equation}
+  \label{eq:eq_w_D_1D}
+  \left[\rme^{-\beta V}\Diff(1+w_\Diff')\right]' = 0,
+\end{equation}
+and the expression~\eqref{eq:optim-homog-4} simplifies as
+\begin{equation}
+  \label{eq:optim-homog-1D}
+  \overline{\Diff} = \int_{\T^\dim} \Diff(q)\left( 1-w'_\Diff(q)^2 \right) \mu(q) \, dq,
+\end{equation}
+while the normalization constraint~$\| \Diff \|_{L^p_\mu} \leq 1$ simply reads
+\[
+\int_{\T^\dim}\Diff(q)^p \rme^{-\beta p V(q)} \, dq \leq 1.
+\]
+The optimization problem~\eqref{eq:optim-homog-def} is therefore equivalent to 
+\begin{equation}
+  \label{eq:optim_1D_Lp_norm}
+  \max_{\Diff \in L^p_\mu(\T,\R_+)} \left\{\int_{\T^\dim} \Diff(q)\left( 1-w'_\Diff(q)^2 \right) \mu(q) \, dq \ \middle| \ a \leq \Diff \rme^{-\beta V} \leq b^{-1}, \ \int_{\T^\dim}\Diff(q)^p \,\rme^{-\beta p V(q)}\,dq \leq 1 \right\}.
+\end{equation}
+This optimization problem admits an explicit solution provided~$a,b>0$ are sufficiently small, as made precise in the following result.
+
+\begin{theorem}
+  \label{thm:max-homog}
+  Fix~$p \in [1,+\infty)$, and consider~$a,b \in (0,1]$. Then, a maximizer for the spectral gap in the homogenized limit~\eqref{eq:optim-homog-def} is
+  \[
+  \Diff^\star_{\mathrm{hom}}(q) = \rme^{\beta V(q)}.
+  \]
+\end{theorem}
+
+Note that the maximizer~$\Diff^\star_{\mathrm{hom}}$ is independent of~$p$ due to our specific choice of normalization, and that no extra normalization factor is needed. 
+
+\begin{proof}
+  Equation~\eqref{eq:eq_w_D_1D} can be integrated as~$w_{\Diff}' + 1 = K \Diff^{-1} \rme^{\beta V}$ for some constant~$K \in \R$, so that (up to an unimportant additive constant, set to~0 for simplicity)
+\[
+w_{\Diff}(q) = -q + K \int_0^q \frac{\rme^{\beta V}}{\Diff}.
+\]
+The constant~$K$ is chosen so as to ensure the periodicity of the function:
+\[
+w_{\Diff}(q) = -q +  \left(\int_{\T} \frac{\rme^{\beta V}}{\Diff} \right)^{-1} \int_0^q \frac{\rme^{\beta V}}{\Diff}, % = \left(\int_{\T} \frac{\rme^{\beta V}}{\Diff} \right)^{-1}\int_0^q\left[ \frac{\rme^{\beta V}}{\Diff} - \left(\int_0^q \frac{\rme^{\beta V}}{\Diff} \right)\right]
+\]
+so that, by~\eqref{eq:optim-homog-4} and~\eqref{eq:FV_def_mat_homog} (with~$\xi=1$ in this one-dimensional context),
+\[
+\overline{\Diff} = \int_{\T}  \Diff \left[ 1 - \left(w_{\Diff}'\right)^2 \right] d\mu = \int_\T \Diff\left(1 + w'_{\Diff}\right) \mu = \left(\int_\T \rme^{-\beta V}\right)^{-1}\left(\int_\T \Diff^{-1} \, \rme^{\beta V}\right)^{-1}.
+\]
+The maximization of the effective diffusion~$\overline{\Diff}$ with respect to~$\Diff$ therefore amounts to solving the following optimization problem:
+\[
+\min\left\{ \int_{\T} \Diff^{-1} \rme^{\beta V} \ \middle| \ a \leq \Diff \rme^{-\beta V} \leq b^{-1}, \ \int_{\T} \Diff(q)^p \, \rme^{-\beta p V(q)} \, dq \leq 1 \right\}. 
+\]
+The Euler--Lagrange equation associated with the minimization problem with the normalization constraint only (forgetting the pointwise upper and lower bounds), assuming that the constraint is saturated at its value~1, implies that $\Diff^{-2} \rme^{\beta V}$ is proportional to~$\Diff^{p-1} \rme^{-\beta p V}$, \emph{i.e.} $\Diff$ is proportional to~$\rme^{\beta V}$; and in fact equal to the latter function in view of the normalization constraint. The pointwise upper and lower bounds are then automatically satisfied given our choice for~$a,b$, which allows to conclude the proof.
+\end{proof}
+
+The extension of this result to the multi-dimensional case~$\dim \geq 1$ is not as clear beyond the isotropic case~$\Diff(q) = \Df(q) \Id_\dim$ considered in~\eqref{eq:scalar_diffusion_for_numerics} because of the matrix norm~$\normF{\cdot}$ in~\eqref{eq:norm_L^p_mu_matrices}. We therefore leave this open question for future work.
+
+%---------------------------------------------------
+\subsection{Homogenization of the optimal diffusion}
+\label{subsec:optim-homog}
+
+We consider in this section the $H$-limit of diffusion matrices which maximize the spectral gap for potentials with decreasing spatial periodicity. This corresponds to first performing optimization of the spectral gap, then homogenization of the associated maximizers; whereas the analysis of Section~\ref{sec:periodic_homog_on_A} relied on first homogenizing the spectral gap problem, then optimizing it in Section~\ref{sec:optimization_homog_lim}. 
+
+For $k\geq 1$, define the constrained set associated with the oscillating potential~$V_{\#,k}$:
+\[
+\Diffset_{\#,k,p}^{a,b} = \left\{\Diff\in L^{\infty}_{\mu}(\T^\dim,\mathcal{M}_{a,b}) \,\middle|\, \int_{\T^\dim}\normF{\Diff(q)}^p \, \frac{\rme^{-\beta V_{\#,k}(q)}}{Z} \, dq \leq 1 \right\}.
+\]
+Note that, if~$\Diff \in \Diffset_{p}^{a,b}$, then~$\Diff_{\#,k} \in \Diffset_{\#,k,p}^{a,b}$, where we recall that~$\Diff_{\#,k}$ is the periodized diffusion~$\Diff_{\#,k}(q) = \Diff(k q)$. Of course, the set~$\Diffset_{\#,k,p}^{a,b}$ contains more functions than those obtained by periodization. Let us indeed emphasize that the diffusion matrices in~$\Diffset_{\#,k,p}^{a,b}$ are a priori only $\mathbb{Z}^\dim$-periodic. For $\Diff\in\Diffset_{\#,k,p}^{a,b}$ a $\mathbb{Z}^\dim$-periodic diffusion, consider the spectral gap (up to a factor~$\beta$) associated with the oscillating potential~$V_{\#,k}$:
+\begin{equation}
+  \label{eq:lambda-periodic-def}
+  \Lambda^k(\Diff) = \min_{u \in H^1(\T^\dim) \setminus\{0\}} \left\{ \frac{\dps \int_{\T^\dim} \nabla u(q)^\top \Diff(q)\nabla u(q)\, \rme^{-\beta V_{\#,k}(q)}\, dq}{\dps \int_{\T^\dim} u^2(q) \, \rme^{-\beta V_{\#,k}(q)} \, dq} \ \middle| \ \int_{\T^\dim} u \, \rme^{-\beta V_{\#,k}} = 0 \right\}.
+\end{equation}
+The optimal diffusion corresponding to~\eqref{eq:lambda-periodic-def} satisfies the following optimization problem:
+\begin{equation}
+  \label{eq:lambda-periodic-optim}
+  \Lambda^{k,\star} = \max_{\Diff \in \Diffset_{\#,k,p}^{a,b}} \Lambda^k(\Diff).
+\end{equation}
+Note that the minimization problem in~\eqref{eq:lambda-periodic-def} is different from the one in~\eqref{eq:lambda_per_k} since the diffusion~$\Diff$ is not $(\mathbb{Z}/k)^\dim$-periodic, but only $\mathbb{Z}^\dim$-periodic a priori. It turns out however that the optimization problem~\eqref{eq:lambda-periodic-optim} admits a $(\Z/k)^\dim$-periodic solution, as made precise in the following lemma, proved in Appendix~\ref{app:lem:periodicity}.
+
+\begin{lemma}
+  \label{lem:periodicity}
+  Fix~$p \in [1,+\infty)$ and consider~$a \in [0,a_\mathrm{max}]$ and~$b > 0$ such that~$ab \leq 1$. For $k\in \N_+$, there exists $\Diff^{k,\star} \in \Diffset_{p}^{a,b}$ such that, denoting by~$\Diff_{\#,k}^{k,\star}(q) = \Diff^{k,\star}(kq)$, 
+  \[
+  \Lambda^k(\Diff_{\#,k}^{k,\star}) = \Lambda^{k,\star}.
+  \]
+\end{lemma}
+
+Lemma~\ref{lem:periodicity} shows that, while solving the optimization problem~\eqref{eq:lambda-periodic-optim} (well posed in application of Theorem~\ref{thm:well-posedness-1D}), we may restrict ourselves to  $(\Z/k)^\dim$-periodic diffusion functions. Theorem~\ref{thm:commutation} below, proved in Appendix~\ref{app:thm:commutation}, states that the limit $\overline{\Lambda}^\star$ of the sequence~$(\Lambda^{k,\star})_{k \geq 1}$ is in fact equal to the limit~$\Lambda^\star_{\mathrm{hom}}$ defined in~\eqref{eq:optim-homog-def}, showing the commutation of homogenization and optimization procedures. For technical reasons, we require the finite dimensional norm on matrices to be compatible with the order on symmetric positive matrices, \emph{i.e.}~$\normF{M_1} \leq \normF{M_2}$ when~$0 \leq M_1 \leq M_2$ in the sense of symmetric matrices. One such norm is the Frobenius norm.
+
+\begin{theorem}
+  \label{thm:commutation}
+  Consider a norm~$\normF{\cdot}$ compatible with the order on symmetric positive matrices.
+  Fix~$p \in [1,+\infty)$ and consider~$a \in [0,a_\mathrm{max}]$ and~$b > 0$ such that~$ab \leq 1$.
+    The sequence~$\left(\Lambda^{k,\star} \right)_{k\geq 1}$ converges to~$\Lambda^\star_{\mathrm{hom}}$ as $k\to \infty$.
+\end{theorem}
+
+Theorem~\ref{thm:commutation} suggests that, in the homogenized limit, the optimal diffusion yields the same spectral gap as its proxy obtained by solving~\eqref{eq:optim-homog-def} -- which, we recall, can be analytically written out in the simple cases discussed in Section~\ref{sec:optimization_homog_lim}. This is illustrated in Figure~\ref{fig:homogenization-pic}, \todo{montrer la convergence des valeurs propres, deja !!}... We also represent an optimal diffusion~$\Diff^{k,\star}$ as given by Lemma~\ref{lem:periodicity} for increasing values of~$k$, along with the diffusion~$\Diff^\star_\mathrm{hom}$ optimal for the periodic homogenization limit.
+\todo[inline]{unicite du minimiseur pas evidente, deja a cause non unicite pbm minimisation a priori ; mettre une phrase qui dit que numeriquement on n'a pas observe de souci à ce niveau cela dit}
+The mesh size used to obtain these results is refined as~$k$ increases, using~$N = I = 200k$. We observe that, for these simple one-dimensional examples, the two diffusions coincide almost perfectly for relatively small values, namely already for~$k=3$. We also observe that the optimal diffusion displays more regularity for~$k \geq 2$: it cancels at two points for $k=1$ where the derivative has a singularity, but remains uniformly positive and smooth for $k \geq 2$.\todo{a confirmer par Genevieve avec un zoom sur les points qui posent souci}
+\todo[inline]{confirmer aussi si le minimiseur est bien spontanement periodique de la petite periode, histoire que le trace d'une seule sous periode fasse sens}
+
+\begin{figure}
+\centering
+\begin{subfigure}[t]{0.49\linewidth}
+\includegraphics[width=\linewidth]{pics/Figure3a.pdf}
+\caption{Potential: $V(q) =   \sin(2\pi q) (2 + \sin(\pi q))$.}
+\label{fig:homog-a}
+\end{subfigure}
+\hfill
+\begin{subfigure}[t]{0.49\linewidth}
+\includegraphics[width=\linewidth]{pics/Figure3b.pdf}
+\caption{Potential: $V(q) =   \cos(2\pi q)$. }
+\label{fig:homog-b}
+\end{subfigure}
+\caption{Comparison of the homogenisation and optimisation procedure on two different one-dimensional potentials and for increasing values of the periodicity $k$. Solid red line: theoretical homogenized limit; Solid black line: optimal diffusion for $k=1$; Dotted black line: optimal diffusion for $k=2$; Dashed black line: optimal diffusion for $k=5$. The left and right figures correspond to two different target distributions.}
+\label{fig:homogenization-pic}
+\end{figure}
+
+%----------------------------------------------
+\section{Application to sampling algorithms}
+\label{sec:sampling}
+
+In this section, we present an application of the optimal diffusion procedure to accelerate sampling algorithms. We focus on the Random Walk Metropolis--Hastings (RWMH) algorithm~\cite{metropolis,hastings} to unbiasedly sample from a Boltzmann--Gibbs target distribution. As we show in Section~\ref{subsec:Donsker}, this algorithm provides a consistent discretization of the continuous dynamics~\eqref{eq:dynamics_mult}. We consider a simple Random-Walk algorithm with moves of size~$\mathrm{O}(\sqrt{\Delta t})$ and not a Metropolization of a Euler--Maruyama discretization of the overdamped Langevin dynamics (the SmartMC method~\cite{RDF78} in molecular dynamics, known as MALA~\cite{RobertsTweedie1996} in computational statistics) since the latter dynamics has a rejection rate of order~$\Delta t^{3/2}$ for constant diffusion matrices, but a much larger rejection rate of order~$\sqrt{\Delta t}$ for genuinely position dependent diffusion matrices~\cite{FS17}; whereas the rejection rate is of order~$\sqrt{\Delta t}$ in all cases for Random Walk Metropolis--Hastings. We therefore choose RWMH in order to have algorithms with rejection rates of the same order of magnitude, which allows for a more fair comparison of the dynamics. Work is in progress in order to construct numerical schemes leading to a rejection rate scaling as~$\Delta t^{3/2}$ for Metropolizations of dynamics with position dependent diffusions~\cite{LSS22}.  
+
+We numerically compare three variants of RWMH corresponding to three different choices for the proposal variance. The first variant is a simple RWMH algorithm with constant proposal variance; the two others have a space-dependent proposal variance~$\Delta t \, \Diff$, with~$\Diff$ given by (i) the pre-computed optimal diffusion and (ii) the explicit homogenized limit of Section~\ref{sec:optimization_homog_lim}. In \Cref{subsec:Donsker}, we start by showing that the RWMH with proposals constructed using a space dependent diffusion converges, in the limit~$\Delta t \to 0$, to a Langevin diffusion with space dependent diffusion determined by the proposal variance. We next present in \Cref{subsec:sampling} numerical experiments demonstrating that optimizing the diffusion leads to a more efficient sampling of the target measure.
+
+%-------------------- Limite diffusive -----------------------
+\subsection{Consistency of the Random Walk Metropolis--Hastings algorithm}
+\label{subsec:Donsker}
+
+We describe in this section the RWMH algorithm we consider, and then provide consistency results of the method in the limit~$\Delta t \to 0$.
+
+\paragraph{Description of the Metropolis algorithm.}
+The Random Walk Metropolis--Hastings algorithm~\cite{metropolis,hastings} is obtained by first proposing moves constructed from the current configuration by adding a Gaussian increment, and then accepting or rejecting the proposal move according to a Metropolis criterion. More precisely, starting from the current configuration~$q^i_{\Delta t}$ for~$i \geq 0$ and using a discretization time step~$\Delta t>0$, a new configuration is proposed as 
+\begin{equation}
+  \label{eq:proposal_move_RWMH}
+  \widetilde{q}^{i+1}_{\Delta t} = q^i_{\Delta t} + \sqrt{\frac{2\Delta t}{\beta}}\Diff(q^i_{\Delta t})^{1/2}G^{i+1},
+\end{equation}
+where~$(G^i)_{i\geq 1}$ is a sequence of independent and identically distributed (i.i.d.) normal random variables. The transition kernel~$\mathscr{T}(q^i_{\Delta t},q^{i+1}_{\Delta t})$ associated with this transition has density
+\[
+\mathscr{T}(q,q') = \left(\frac{\beta}{4\pi\Delta t}\right)^{\dim/2}\operatorname{det}\Diff(q)^{-1/2} \exp\left(-\frac{\beta}{4\Delta t} (q'-q)^\top \Diff(q)^{-1} (q'-q)\right).
+\]
+Note that the reverse move associated with the proposal~\eqref{eq:proposal_move_RWMH} is
+\[
+q^i_{\Delta t} = \widetilde{q}^{i+1}_{\Delta t} - \sqrt{\frac{2\Delta t}{\beta}}\Diff(\widetilde{q}^{i+1}_{\Delta t})^{1/2} \widetilde{G}^{i+1},
+\qquad
+\widetilde{G}^{i+1} = \Diff^{-1/2}(\widetilde q^{i+1}_{\Delta t})\Diff^{1/2}(q^i_{\Delta t})G^{i+1}.
+\]
+This allows to compute the Metropolis ratio as
+\begin{equation}
+  \label{eq:def_R_dt}
+\begin{aligned}
+  R_{\Delta t}(q^i_{\Delta t},G^{i+1}) & = \min\left\{ 1, \frac{\mu(\widetilde{q}^{i+1}_{\Delta t})\mathscr{T}(\widetilde{q}^{i+1}_{\Delta t},q^i_{\Delta t})}{\mu(q^i_{\Delta t})\mathscr{T}(q^i_{\Delta t},\widetilde{q}^{i+1}_{\Delta t})} \right\}\\
+  & = \min\left\{1,\left(\frac{\operatorname{det} \Diff(q^i_{\Delta t})}{\operatorname{det} \Diff(\widetilde q^{i+1}_{\Delta t})}\right)^{1/2} \mathrm{e}^{- \beta [ V(\widetilde q^{i+1}_{\Delta t})-V(q^i_{\Delta t})] - (|\widetilde G^{i+1}|^2-|G^{i+1}|^2)/2} \right\}.
+  \end{aligned}
+\end{equation}
+Accepting the proposal with probability~$R_{\Delta t}(q^i_{\Delta t},G^{i+1})$ using a sequence of i.i.d. random variables~$(U^i)_{i\geq 1}$ with uniform law on $[0,1]$, independent from $(G^i)_{i\geq 1}$, then leads to setting the new configuration as 
+\begin{equation}
+  \label{eq:RWMH-variance}
+  q^{i+1}_{\Delta t} = q^i_{\Delta t} + \sqrt{\frac{2\Delta t}{\beta}}\Diff(q^i_{\Delta t})^{1/2}G^{i+1}\mathbbm{1}_{\{U^{i+1}\leq R^n(q^i_{\Delta t},G^{i+1})\}}.
+\end{equation}
+
+\paragraph{Weak error estimates and pathwise weak convergence.}
+The following result, similar to~\cite[Lemma~4]{FS17}, implies that the numerical scheme~\eqref{eq:RWMH-variance} is weakly consistent. The proof is omitted since it exactly follows the proof of~\cite[Lemma~4]{FS17}. % suffit de considerer F=0 dans la preuve en fait, rien a faire !! 
+
+\begin{lemma}
+  For any~$\varphi \in C^\infty(\T^\dim)$, there exists~$K \in \mathbb{R}_+$ and~$\Delta t^\ast > 0$ such that 
+  \[
+  \mathbb{E}_q\left( \varphi(q_{\Delta t}^1) \right) = \varphi(q) + \Delta t \cLD \varphi(q) + \Delta t^{3/2} r_{\varphi,\Delta t}(q),
+  \]
+  with $\sup_{q \in \T^\dim} |r_{\varphi,\Delta t}(q)| \leq K$ for any~$0 < \Delta t \leq \Delta t^\ast$.
+\end{lemma}
+
+We next state a weak consistency result of the Metropolis scheme with the baseline continuous dynamics~\eqref{eq:dynamics_mult} at the level of the paths of the process. Define the rescaled, linearly interpolated continuous-time process $(Q^{\Delta t}_t)_{t \geq 0}$ by
+\begin{equation}
+\label{eq:process}
+Q^{\Delta t}_t =\left (\left \lceil \frac{t}{\Delta t} \right \rceil - \frac{t}{\Delta t}\right)q_{\Delta t}^{\left \lfloor \frac{t}{\Delta t} \right \rfloor} + \left(\frac{t}{\Delta t} - \left \lfloor \frac{t}{\Delta t} \right \rfloor\right)q_{\Delta t}^{\left \lceil \frac{t}{\Delta t} \right \rceil},
+\end{equation}
+with~$Q_0^{\Delta t} = q_0$ given. We can then state the following pathwise consistency result, proved in Appendix~\ref{app:thm:Donsker}.
+
+\begin{theorem}
+  \label{thm:Donsker}
+  Assume that~$\Diff\in C^2(\T^\dim,\mathcal{S}_\dim^{+})$,\todo{je pense qu'il faut prendre a valeurs dans~$\mathcal{S}_\dim^{++}$, cf. Lemma~\ref{lem:acceptance-rate-DL} avec $\Diff^{-1}$} and denote by~$P_{\Delta t}$ the law of the process~$(Q^{\Delta t}_t)_{t \geq 0}$ on~$C([0,\infty), \T^\dim)$, starting from a given initial condition~$Q_0^{\Delta t} = q_0$. Then, $P_{\Delta t}$ converges weakly to~$P$ as $\Delta t \to 0$, where~$P$ is the law of the unique solution to the stochastic differential equation 
+    \begin{equation}
+      \label{eq:dynamics_donsker}
+      dQ_t = \left(- \Diff(Q_t)\nabla V(Q_t) + \frac1\beta \mathrm{div}\Diff(Q_t) \right) dt + \sqrt{\frac2\beta} \Diff^{1/2}(Q_t) \, dW_t,
+    \end{equation}
+where $(W_t)_{t \geq 0}$ is a standard $\dim$-dimensional Brownian motion. 
+\end{theorem}
+
+\subsection{Sampling experiments}
+\label{subsec:sampling}
+
+\todo[inline]{Ecrire texte et donner resultats sur temps de sortie (cf. elements caches dans tex)}
+%Potentiel V = \sin(4\pi q)*(2+\sin(2\pi q)), time step dt = 1e-3
+% D constante : 226 transitions sur 1e6 pas de temps : temps de transition moyen 4.42s / D optimale : 582 transitions sur 1e6 pas de temps : temps de transition moyen 1.72s / D homogénéisée : 495 transitions sur 1e6 pas de temps : temps de transition moyen 2.02s.
+
+
+\todo[inline]{preciser potentiel dans Figure~\ref{fig:MC_samples}}
+
+\begin{figure}
+\begin{center}
+\begin{subfigure}[t]{0.45\textwidth}
+\centering \includegraphics[width=\linewidth]{pics/Figure5a.pdf}
+\caption{Constant diffusion matrix.}\label{fig:rw_cst_fused}
+\end{subfigure}
+\begin{subfigure}[t]{0.45\textwidth}
+\centering \includegraphics[width=\linewidth]{pics/Figure5b.pdf}
+\caption{Optimal diffusion matrix.}\label{fig:rw_opt_fused}
+\end{subfigure}
+\hfill
+\begin{subfigure}[t]{0.45\textwidth}
+\centering \includegraphics[width=\linewidth]{pics/Figure5c.pdf}
+\caption{Homogenized diffusion matrix.}\label{fig:rw_hom_fused}
+\end{subfigure}
+\caption{\label{fig:MC_samples} Example of trajectories of the RWMH algorithm for a periodic, one-dimensional potential with double well. Top: constant diffusion ($D(q) = 1$ for all~$q\in\T$). Bottom left: optimized diffusion. Bottom right: homogenized limit.}
+\end{center}
+\end{figure}
+
+
+% ----------- Biblio --------------
+
+\appendix
+
+%-------------- preuves optimisation ------------------------
+\section{Proof of optimization results}
+
+%--------------------------------------------------------
+\subsection{Proof of Theorem~\ref{thm:well-posedness-1D}}
+\label{app:thm:well-posedness-1D}
+
+The fact that the optimization problem is well posed follows by a straightforward adaptation of~\cite[Theorem~10.3.1]{Henrot}. Recall that, by Lemma~\ref{lem:concave-mat}, the application $\Diff \mapsto\Lambda(\Diff)$ is concave. Moreover, the function~$\Lambda$ is upper-semicontinuous for the weak-* $L^\infty_\mu$ on~$\Diffset_p^{a,b}$ for any~$a \geq 0$, $b>0$ and~$p\geq 1$ since it is defined in~\eqref{eq:lambdaD-init} as the infimum over~$u \in H^1_0(\mu) \setminus\{0\}$ of the functions
+\[
+\Diff \mapsto \frac{\dps \int_{\T^\dim} \nabla u (q)^{\top}\Diff(q) \nabla u (q) \, \mu(q)\,dq}{\dps \int_{\T^\dim} u(q)^2 \mu(q)\,dq},
+\]
+which are continuous for the weak-* $L^\infty_\mu$ topology. We finally note that the set~$\Diffset_p^{a,b}$ is compact for the weak-* $L^\infty_\mu$ topology. This already shows that~\eqref{eq:maximizer_in_thm} holds true. Note that the~$L^p_\mu$ norm in item~(ii) of Theorem~\ref{thm:well-posedness-1D} is necessarily saturated for the maximizer in view of~\eqref{eq:t_Lambda_scaling}.
+
+To prove item~(i), we rely on the following lemma, which shows that the optimal diffusion~$\Diff^{\star}_p(q)$ cannot be degenerate on an open set when~$a=0$ (for~$a>0$, the diffusion is of course non degenerate).
+
+\begin{lemma}
+  \label{lem:D-positive-on-open-set}
+  Fix~$a=0$. For any open set $\Omega \subset \T^\dim$, there exists $q\in\Omega$ such that~$\Diff^{\star}_p(q)\neq 0$.
+\end{lemma}
+
+\begin{proof}
+  We proceed by contradiction. Note first that $\Diff(q) = c_{p,b}\Id_\dim$ is in the constrained set~$\Diffset_p^{0,b}$ for
+  \[
+  c_{p,b} = \min\left[  \frac{1}{\normF{\Id_\dim}} \left(\int_{\T^\dim} \rme^{-\beta p V(q)} \, dq\right)^{-1/p}, \frac1b\right].
+  \]
+  Then, for all $u\in H^1_0(\T^\dim)$ (and recalling the constant~$C_\mu$ in~\eqref{eq:Poincare}), 
+  \begin{equation}
+    \label{eq:positive-lambda}
+    \Lambda(\Diff^{\star}_p) \geq \Lambda\left(c_{p,b} \Id_\dim\right) = c_{p,b} \frac{\dps \int_{\T^\dim}|\nabla u(q)|^2 \mu(q) \, dq}{\dps \int_{\T^\dim} u(q)^2 \mu(q) \, dq} \geq \frac{c_{p,b}}{C_{\mu}}>0. 
+  \end{equation}
+  Assume that there exists an open set $\Omega\subset \T^\dim$ such that $\Diff^{\star}_p(q) = 0$ for all~$q\in\Omega$. We can then construct a function $u_{\Omega}\in C^{\infty}(\T^\dim)$ such that~$\operatorname{supp}(u_{\Omega})\subset \Omega$, which leads to  
+  \[
+  0 \leq \Lambda(\Diff^{\star}_p)\leq \frac{\dps \int_{\T^\dim} \nabla u_{\Omega}(q)^\top \Diff^{\star}_p(q)\nabla u_{\Omega}(q) \, \mu(q) \, dq}{\dps \int_{\T^\dim} u_{\Omega}(q)^2 \mu(q) \, dq} = 0.
+  \]
+  The latter equality contradicts~\eqref{eq:positive-lambda} and thus provides the desired result.
+\end{proof}
+
+%----------------------------------------------------------
+\subsection{Proof of Proposition~\ref{prop:well-posed-pwc}}
+\label{app:prop:well-posec-pwc}
+
+There exists~$\alpha_{p,N} > 0$ such that $\alpha_{p,N} \mathbbm{1}_N\in\diffset_p^{a,b}$ (where~$\mathbbm{1}_N$ is defined in the proof of Proposition~\ref{lem:well-posed-disc}), and thus, since~$\Df_{\mathbbm{1}_N}(q) = 1$ for any~$q \in \T^\dim$, and in view of the Poincar\'e inequality~\eqref{eq:Poincare},
+\begin{equation}
+  \label{eq:lower-lambda}
+  \Lambda(\Df_{\diff^{\star}_p} \Id_\dim) \geq \alpha_{p,N}\Lambda(\Df_{\mathbbm{1}_N} \Id_\dim) \geq \frac{\alpha_{p,N}}{C_{\mu}}.
+\end{equation}
+Consider $n \in \operatorname{argmin}_{m \in \{1,\ldots,N\}} \diff^{\star}_{p,m}$.
+%Since the probability density~$\mu$ is smooth and bounded on the bounded, connected and open set~$K_n$, the restricted probability measure~$\mu \mathbf{1}_{K_n} / Z_n$ (with~$Z_n$ a normalization factor) satisfies a Poincaré inequality: There exists~$C_{\mu, n}>0$ such that, for any~$v\in H^1(K_n)$, 
+%\[
+%\int_{K_n}v(q)^2\mu(q)\,dq \leq C_{\mu, n}\int_{K_n}|\nabla v(q)|^2\mu(q)\,dq + \left(\int_{K_n}v(q)\mu(q)\,dq\right)^2.
+%\]
+Since~$K_n$ has a non empty interior, there exists an open ball~$\mathscr{B}_n$ such that~$\overline{\mathscr{B}_n} \subset K_n$. We consider the function~$v_n$ defined on~$\mathscr{B}_n$ as a normalized eigenfunction associated with the first eigenvalue of the Laplace problem with Dirichlet boundary conditions:
+\begin{equation}
+  \label{eq:def_v_n_prop_well_posed_pwc}
+  -\Delta v_n = \lambda_{1,n} v_n \ \mathrm{on} \ \mathscr{B}_n, \qquad v_n = 0 \ \mathrm{on} \ \partial \mathscr{B}_n, \qquad \int_{\mathscr{B}_n} v_n^2 = 1. 
+\end{equation}
+Note that~$\lambda_{1,n} > 0$. The function~$v_n$ is then extended by~0 on~$\T^\dim \setminus \mathscr{B}_n$. It is easy to check that~$v_n \in H^1(\mu)$. We finally define~$u_n \in H^1_0(\mu)$ as
+\[
+u_n = v_n - \int_{\mathscr{B}_n} v_n \, \mu.
+\]
+In view of~\eqref{eq:def_v_n_prop_well_posed_pwc}, and denoting by~$\mu_+ = \max_{\T^\dim} \mu < +\infty$,
+\[
+\int_{\T^\dim} \Df_{\diff^{\star}_p} |\nabla u_n|^2 \mu = \diff^\star_n \int_{\mathscr{B}_n} |\nabla u_n|^2 \mu \leq \mu_+ \diff^\star_n \int_{\mathscr{B}_n} |\nabla v_n|^2 = \mu_+ \lambda_{1,n} \diff^\star_n.
+\]
+Therefore, since $\|u_n\|^2_{L^2(\mu)} > 0$ (otherwise~$v_n$ would be constant on~$\mathscr{B}_n$, which is impossible by~\eqref{eq:def_v_n_prop_well_posed_pwc}),
+\begin{equation}
+  \begin{aligned}
+    \Lambda(\Df_{\diff^{\star}_p}\Id_\dim) &= \inf_{u\in H^1_0(\T^\dim) \setminus\{0\}}\frac{\dps \int_{\T^\dim}\Df_{\diff^{\star}_p}(q)|\nabla u(q)|^2\mu(q)\,dq}{\dps\int_{\T^\dim}u(q)^2\mu(q)\,dq} \leq \frac{\dps \int_{\T^\dim}\Df_{\diff^{\star}_p}(q)|\nabla u_n(q)|^2\mu(q)\,dq}{\dps\int_{\T^\dim}u_n(q)^2\mu(q)\,dq} \leq \frac{\mu_+\lambda_{1,n} \diff^\star_n }{\|u_n\|^2_{L^2(\mu)}} .
+  \end{aligned}
+\end{equation}
+This allows to conclude that~$\diff^{\star}_n\geq \alpha_{p,N}\|u_n\|^2_{L^2(\mu)} / (\mu_+ \lambda_{1,n}C_{\mu}) > 0$, which leads to the claimed result. 
+
+%--------------------------------------------
+\section{Proof of homogenization results}
+
+We fix~$a,b>0$ in all this section. The proofs of the results in Sections~\ref{app:thm:Hcvg-compact} to~\ref{app:thm:Hcvg-spectral} are given for completeness, as they are obtained by straightforward modifications of standard results of the literature on homogenization problems with Dirichlet boundary conditions.
+
+%---------------------------------------------------
+\subsection{Proof of Theorem~\ref{thm:Hcvg-compact}}
+\label{app:thm:Hcvg-compact}
+
+The proof boils down to adapting the proof of~\cite[Theorem~1.2.16]{allaire_homogeneisation}, which states a similar compactness result for equations with Dirichlet boundary conditions, to our case with periodic boundary conditions. To do so, we start by considering a modified problem on an extended domain with Dirichlet boundary conditions, and apply~\cite[Theorem 1.2.16]{allaire_homogeneisation} to obtain the $H$-convergence of this modified problem. We then use a result on the independence of $H$-convergence on boundary conditions, stated e.g. in~\cite[Proposition~1.2.19]{allaire_homogeneisation}, to obtain the $H$-convergence in the case of periodic boundary conditions.
+
+Fix~$f\in H^{-1}(\T^\dim)$ such that~$\langle f,\mathbf{1}\rangle_{H^{-1}(\T^\dim),H^1(\T^\dim)} = 0$. Consider the open set $\Omega = (-1,2)^\dim$ and denote by~$\widetilde{\A}^k$ and~$\widetilde{f}$ the extensions to~$\Omega$ of~$\A^k$ and~$f$ obtained by periodicity. Consider $\widetilde u_0^k\in H^1(\Omega)$ the solution to
+\begin{equation}
+\left\{\begin{aligned}
+-\operatorname{div}\left(\widetilde \A^k\nabla \widetilde u_0^k\right) = \widetilde  f & \quad \text{ on }\Omega, \\ 
+\widetilde u_0^k = 0 & \quad \text{ on }\partial\Omega.
+\end{aligned}\right.
+\end{equation}
+In view of~\cite[Theorem 1.2.16]{allaire_homogeneisation}, and upon extraction of a subsequence (not explicitly indicated), there exists~$\widehat{\mathcal{A}}\in L^{\infty}(\Omega,\mathcal{M}_{a,b})$ such that
+\[
+\left\{\begin{aligned}
+\widetilde u^k_0 & \rightharpoonup \widetilde u_0 & \text{   weakly in }H^1(\Omega), \\ 
+\widetilde \A^k\nabla \widetilde u^k_0 & \rightharpoonup \widehat{\A} \nabla \widetilde u_0 & \text{   weakly in }L^2(\Omega)^\dim,
+\end{aligned}\right.
+\]
+where $\widetilde u_0$ is the solution of the homogenized problem 
+\begin{equation}
+\left\{\begin{aligned}
+-\operatorname{div}\left(\widehat{\A} \nabla \widetilde u_0\right) = \widetilde f & \quad \text{ on }\Omega, \\ 
+ \widetilde u_0 = 0 & \quad \text{ on }\partial\Omega.
+\end{aligned}\right.
+\end{equation}
+
+We now turn back to our original problem with periodic boundary conditions. Denote by~$u^k\in H^1(\T^\dim)$ the unique solution to 
+\begin{equation}
+  \label{eq:periodic-bnd-pbm}
+  \left\{\begin{aligned}
+  -\operatorname{div}\left(\A^k\nabla u^k\right) = f & \quad \text{ on }\T^\dim, \\ 
+  \int_{\T^\dim}u^k(q) \, dq = 0.&
+  \end{aligned}\right.
+\end{equation}
+Since~$\A^k \in L^\infty(\T^\dim,\mathcal{M}_{a,b})$ and~$u^k$ has average~0 with respect to the Lebesgue measure on~$\T^\dim$, standard estimates based on the Poincar\'e--Wirtinger inequality show that the sequence $(u^k)_{k\geq 1}$ is uniformly bounded in~$H^1(\T^\dim)$, hence weakly converges in~$H^1(\T^\dim)$ to a function~$u$, up to the extraction of a subsequence. This extracted subsequence also converges strongly in~$L^2(\T^\dim)$. In fact, as made precise at the end of the proof, we will prove that the whole sequence converges. With some abuse of notation, we therefore still denote the extracted subsequence as~$(u^k)_{k\geq 1}$.
+%Using equation~\eqref{eq:periodic-bnd-pbm}, we obtain that
+%$$\int_{\T^\dim}\A_{\#,k}(q)\nabla u^k(q)\cdot\nabla u^k(q)dq = \int_{\T^\dim}f(q)u^k(q)dq.$$
+%Using the fact that $\A_{\#,k}(q)\in \mathcal{M}_{a,b}$ to lower bound the left hand side, the Cauchy--Schwarz inequality to upper bound the right hand side, and the Poincaré--Wirtinger we obtain that, for some constant $C_{\rm{PW}}>0$
+%$$a \left\|\nabla u^k \right\|_{L^2(\T^\dim)}\leq C_{\rm{PW}}\left\|f \right\|_{L^2(\T^\dim)}\left\|\nabla u^k \right\|_{L^2(\T^\dim)}\text{, i.e., }\left\|\nabla u^k \right\|_{L^2(\T^\dim)}\leq \frac{C_{\rm{PW}}}{a}\left\|f \right\|_{L^2(\T^\dim)}.$$
+%The Poincaré--Wirtinger inequality also gives that $\left\|u^k \right\|_{L^2(\T^\dim)} \leq C_{\rm{PW}} \left\|\nabla u^k \right\|_{L^2(\T^\dim)}$, and finally we obtain 
+%$$\left\|\nabla u^k \right\|_{L^2(\T^\dim)} +  \left\|u^k \right\|_{L^2(\T^\dim)}  \leq \frac{(1+C_{\rm{PW}})C_{\rm{PW}}}{a}\left\|f \right\|_{L^2(\T^\dim)}.$$
+%Thus, we can extract a subsequence, still denoted by $k$, such that
+%\begin{equation}
+%\label{eq:uk-weak-cvg}
+%u^k\rightharpoonup u \text{ weakly in } H^1(\T^\dim) \text{ (and strongly in }L^2(\T^\dim)\text{)}.
+%\end{equation}
+Note that, in particular, $\int_{\T^\dim}u(q) \, dq = 0$ by the strong $L^2$ convergence. 
+
+Denoting by $\widetilde{u}^k,\widetilde{u}$ the extensions to~$\Omega$ of $u^k,u$ obtained by periodicity, we claim that 
+\begin{equation}
+  \label{eq:ccl_Prop1.2.19_for_Thm2}
+  \widetilde \A^k \nabla \widetilde{u}^k \rightharpoonup \widehat{\A} \nabla \widetilde u \quad \text{ weakly in }L^2_{\rm loc}(\Omega)^\dim.
+\end{equation}
+In view of~\cite[Proposition 1.2.19]{allaire_homogeneisation}, it suffices to this end to check that $\widetilde u^k \rightharpoonup \widetilde u$ weakly in $H^1_{\rm loc}(\Omega)$ and $-\operatorname{div}\left(\widetilde \A^k \nabla \widetilde{u}^k\right) = \widetilde{f} \in H^{-1}_{\rm loc}(\Omega)$. To prove the first statement, we combine the weak convergence of~$(u^k)_{k \geq 1}$ in~$H^1(\T^\dim)$ with an argument based on a partition of unity. Fix~$\widetilde\phi\in H^{-1}(\Omega)$ with compact support~$K$ in $\Omega$. Thanks to the compactness of the support and for~$\varepsilon \in (0,1/3)$ fixed, there exists a finite number~$L$ of points $(x_\ell)_{1\leq \ell\leq L}$ such that $K \subset \bigcup_{\ell=1}^L \mathcal{B}(x_{\ell},\varepsilon)$, where $\mathcal{B}(x_{\ell},\varepsilon)$ denotes the open ball of radius~$\varepsilon$ centered at~$x_{\ell}$. Upon reducing~$\varepsilon$, it can be assumed that~$\overline{\mathcal{B}(x_{\ell},\varepsilon)} \subset \Omega$ for all $\ell\in \{1,\ldots, L\}$. Note that, for all $\ell\in \{1,\ldots, L\}$, the mapping $i_\ell : \mathcal{B}(x_{\ell},\varepsilon)\to \T^\dim$ defined as~$i_\ell(x) = x \text{ mod. } \Z^\dim$ is injective. In addition, there exists an associated partition of unity, namely a family of nonnegative smooth functions~$(\chi_{\ell})_{1\leq \ell\leq L}$ such that~$\operatorname{Supp}(\chi_{\ell})\subset \overline{\mathcal{B}(x_{\ell},\varepsilon)}$ for all $\ell\in \{1,\ldots, L\}$, and~$\sum_{\ell=1}^L\chi_{\ell} = 1$ on $K$. We use the decomposition $\widetilde\phi = \sum_{\ell = 1}^L\widetilde\phi_{\ell}$, where~$\widetilde\phi_{\ell} = \widetilde\phi\chi_{\ell}$ has support on~$\overline{\mathcal{B}(x_{\ell}, \varepsilon)}$. In particular, for all $k\geq 1$,
+\[
+\left\langle \widetilde{\phi} , \widetilde{u}^k \right\rangle_{H^{-1}(\Omega),H^{1}(\Omega)} = \sum_{\ell=1}^L \left\langle \widetilde{\phi}_{\ell}, \widetilde{u}^k \right\rangle_{H^{-1}(\Omega),H^{1}(\Omega)}.
+\]
+Define next~$\phi_{\ell} \in H^{-1}(\T^\dim)$ from~$\widetilde{\phi}_{\ell}$ as
+\[
+\forall v \in H^1(\T^\dim), \qquad \left\langle \phi_{\ell}, v \right\rangle_{H^{-1}(\T^\dim),H^{1}(\T^\dim)} = \left\langle \widetilde{\phi}, \chi_\ell (v \circ i_\ell) \right\rangle_{H^{-1}(\Omega),H^{1}(\Omega)}.
+\]
+In particular, $\langle \widetilde{\phi}_{\ell}, \widetilde{u}^k\rangle_{H^{-1}(\Omega),H^{1}(\Omega)} = \langle \phi_{\ell}, u^k \rangle_{H^{-1}(\T^\dim),H^{1}(\T^\dim)}$ for all $k\geq 1$ and $\langle \widetilde{\phi}_{\ell}, \widetilde{u}\rangle_{H^{-1}(\Omega),H^{1}(\Omega)} = \langle \phi_{\ell}, u \rangle_{H^{-1}(\T^\dim),H^{1}(\T^\dim)}$, so that
+\[
+\begin{aligned}
+  & \left\langle \widetilde{\phi} , \widetilde{u}^k \right\rangle_{H^{-1}(\Omega),H^{1}(\Omega)} =  \sum_{\ell=1}^L \left\langle \phi_{\ell}, u^k \right\rangle_{H^{-1}(\T^\dim),H^{1}(\T^\dim)} \\
+  & \qquad\qquad \xrightarrow[k\to+\infty]{} \sum_{\ell=1}^L \left\langle \phi_{\ell}, u\right\rangle_{H^{-1}(\T^\dim),H^{1}(\T^\dim)} = \sum_{\ell=1}^L \left\langle \widetilde{\phi}_{\ell}, \widetilde{u} \right\rangle_{H^{-1}(\Omega),H^{1}(\Omega)} = \left\langle \widetilde{\phi} , \widetilde{u} \right\rangle_{H^{-1}(\Omega),H^{1}(\Omega)}, 
+\end{aligned}
+\]
+which allows to conclude that~$\widetilde u^k \rightharpoonup \widetilde u$ weakly in $H^1_{\rm loc}(\Omega)$. A similar argument, with the same partition of unity, can be used to prove that~$-\operatorname{div}\left(\widetilde \A^k\nabla \widetilde u^k\right) = \widetilde f$ in~$H^{-1}_{\rm loc}(\Omega)$ for all~$k \ge 1$.
+% use <-div(...),\varphi_\ell>_{H^{-1},H^1} = <f,\varphi_\ell> with \varphi \in H^1
+
+For any $\Phi \in L^2(\T^\dim)^\dim$, define the function~$\Phi^\dagger:\Omega \to \R$ obtained by extending~$\Phi$ by~0 outside of the set~$(0,1)^\dim$ identified with~$\T^\dim$. More precisely, $\Phi^\dagger(q) = \mathbf{1}_{(0,1)^\dim}(q) \Phi(i(q))$, where $i:(0,1)^\dim \to \T^\dim$ is the canonical injection. Note that~$\Phi^\dagger\in L^2(\Omega)^\dim$ has compact support in~$\Omega$, and, using~\eqref{eq:ccl_Prop1.2.19_for_Thm2}, 
+\begin{equation}
+  \begin{aligned}
+    \label{eq:H-cvg-fin2}
+    \int_{\T^\dim} \Phi(q)^\top \A^k(q)\nabla {u}^k(q) \, dq & = \int_{\Omega} \Phi^\dagger(q)^\top \widetilde \A^k(q)\nabla \widetilde{u}^k(q)\, dq\\ \xrightarrow[k\rightarrow +\infty]{} & \int_{\Omega} \Phi^\dagger(q)^\top \widehat{\A}(q) \nabla \widetilde{u}(q)\, dq = \int_{\T^\dim} \Phi(q)^\top \overline{\A}(q) \nabla {u}(q) \, dq,
+  \end{aligned}
+\end{equation}
+where~$\overline{\A} = \widehat{\A} \circ i^{-1}$.\todo{cette definition vous convient ?} This shows that $\A^k\nabla {u}^k$ weakly converges to $\overline{\A} \nabla {u}$ in $L^2(\T^\dim)^\dim$. In view of~\eqref{eq:periodic-bnd-pbm}, 
+\begin{equation}
+  \label{eq:H-cvg-fin1}
+  \left\{\begin{aligned}
+  -\operatorname{div}\left(\overline \A\nabla u\right) = f & \quad \text{ in } H^{-1}(\T^\dim), \\ 
+   \int_{\T^\dim}u(q) \, dq = 0.&
+\end{aligned}\right. 
+\end{equation}
+Thus, $u$ is uniquely defined, and the whole sequences~$(u^k)_{k \geq 1}$ and~$(\A^k \nabla u^k)_{k \geq 1}$ weakly converge respectively to~$u$ in~$H^1(\T^\dim)$ and~$\overline{\A} \nabla {u}$ in~$L^2(\T^\dim)^\dim$, which provides the desired convergence in the sense of Definition~\ref{def:Hcvg}.
+
+%------------------------------------------
+\subsection{Proof of Theorem~\ref{thm:Hcvg}}
+\label{app:thm:Hcvg}
+
+The proof boils down to adapting~\cite[Theorem~1.3.18]{allaire_homogeneisation}, which states a similar $H$-convergence result in the case of Dirichlet boundary conditions, to the case of periodic boundary conditions. We do not precisely write the proof, since it is very similar to the proof of Theorem~\ref{thm:Hcvg-compact}, \emph{i.e.}, we consider a modified problem on an extended domain with Dirichlet boundary conditions, apply \cite[Theorem~1.3.18]{allaire_homogeneisation}, and use again a result on the independence of $H$-convergence on boundary conditions (such as~\cite[Proposition~1.2.19]{allaire_homogeneisation}) to obtain the desired $H$-convergence to a constant diffusion matrix, whose expression~\eqref{eq:Abar1} is the same as for periodic homogenization with Dirichlet boundary conditions. 
+
+%-----------------------------------------------------
+\subsection{Proof of Theorem~\ref{thm:Hcvg-spectral}}
+\label{app:thm:Hcvg-spectral}
+
+The proof of Theorem~\ref{thm:Hcvg-spectral} is an adaptation of the proof of~\cite[Theorem~1.3.16]{allaire_homogeneisation}. The first step is to show that~$(u^k)_{k \geq 1}$ and $(\lambda^k)_{k \geq 1}$ converge respectively (up to extraction) to an eigenvector and eigenvalue of the problem
+\begin{equation}
+  \label{eq:1219-2}
+  \left\{\begin{aligned}
+  -\operatorname{div}\left(\overline{\mathcal{A}}\nabla u(q)\right) & = \overline{\lambda}\rho(q)u(q) \quad \text{ on } \T^\dim,\\
+  \int_{\T^\dim} u(q)^2 \, dq & = 1. 
+  \end{aligned}\right.
+\end{equation}
+The second step is to prove that~$\overline{\lambda}$ is indeed the smallest non-zero eigenvalue of~\eqref{eq:1219-2}.
+
+\paragraph{Convergence to a solution of the problem~\eqref{eq:1219-2}.}
+Let us first prove that, up to the extraction of a subsequence, the sequences $(\lambda^k)_{k \geq 1}$ and $(u^k)_{k \geq 1}$ respectively converge in~$\R_+$ and weakly in~$H^1(\T^\dim)$. By the min-max principle, using the fact that the eigenfunctions of the operator~$-\div(\A^k\nabla \cdot)$ associated with the eigenvalue~0 are constant functions, 
+%(upon considering the space~$L^2(\rho^k)$, and the symmetric operator~$\nabla^*(\A^k (\nabla \cdot)/\rho^k)$ on this space, with~$\nabla^*$ the adjoint of~$\nabla$ on~$L^2(\rho^k)$),
+the second smallest eigenvalue~$\lambda^k$ satisfies
+\[
+\lambda^k = \min_{v \in H^1(\T^\dim) \setminus \{0\}} \left\{ \frac{\dps \int_{\T^\dim} \nabla v(q)^\top \A^k(q)\nabla v(q) \, dq}{\dps \int_{\T^\dim}v^2(q) \rho^k(q) \, dq} \ \middle| \ \int_{\T^\dim} v \rho^k = 0 \right\}.
+\]
+By assumption, $0 \leq \A^k \leq b^{-1} \Id_\dim$ and $\rho^k \geq \rho_- >0$, so that, for all $v\in H^1(\T^\dim)$, 
+\[
+0 \leq \frac{\dps \int_{\T^\dim} \nabla v(q)^\top \A^k(q)\nabla v(q)\,dq}{\dps \int_{\T^\dim}\rho^k(q)v^2(q)\,dq} \leq \frac{1}{b \rho_-} \frac{\dps \int_{\T^\dim} |\nabla v(q)|^2 \, dq}{\dps \int_{\T^\dim} v^2(q) \, dq},
+\]
+which implies $0 \leq \lambda^k \leq 4\pi^2/ (b \rho_-)$ since the first non-zero eigenvalue of the operator~$-\Delta$ on~$\T^\dim$ is~$4\pi^2$. This also implies
+\[
+a \left\|\nabla u^k \right\|_{L^2(\T^\dim)}^2 \leq \int_{\T^\dim} \nabla u^k(q)^\top \A^k(q)\nabla u^k(q)\,dq = \lambda^k \int_{\T^\dim} \rho^k(q) u^k(q)^2 \, dq \leq \frac{4\pi^2 \rho_+}{b \rho_-},
+\]
+since~$u^k$ is normalized in~$L^2(\T^\dim)$. The sequences~$(\lambda^k)_{k \geq 1}$ and~$(u^k)_{k\geq 1}$ are therefore bounded respectively in~$\R_+$ and~$H^1(\T^\dim)$. Upon extraction (not indicated explicitly in the notation), there exists a subsequence such that $\lambda^k \to \overline{\lambda}$, $u^k \rightharpoonup u$ weakly in $H^1(\T^\dim)$ and $u^k \to u$ strongly in $L^2(\T^\dim)$. In particular, $\left\| u \right\|_{L^2(\T^\dim)} = 1$. Since $\lambda^k \rho^k u^k$ is the product of two converging subsequences, respectively for the $L^{\infty}$ weak-$*$ topology and for the strong $L^2$ topology, it converges to~$\overline{\lambda}\rho u$ weakly in $L^2(\T^\dim)$, and thus strongly in $H^{-1}(\T^\dim)$. Equation~\eqref{eq:1219-2} then follows by~\cite[Proposition 1.2.19]{allaire_homogeneisation} and the definition of $H$-convergence in our context (recall Definition~\ref{def:Hcvg}).
+\todo[inline]{On aimerait eviter d'utiliser~\cite[Proposition 1.2.19]{allaire_homogeneisation} qui est fondé sur notion $H$-convergence usuelle. Ca doit etre possible et voici quelques elements pour ce faire.
+
+  (i) la $H$-convergence est definie pour des fonctions a moyenne nulle, ce qui n'est pas le cas des fonctions propres considerees ici. Je pense donc qu'il faut regarder la suite $\widehat{u}^k = u^k - c^k$ avec $c^k = \int_{\T^\dim} u^k$ qui satisfait $-\operatorname{div}\left(\mathcal{A}^k \nabla \widehat{u}^k\right) = \lambda^k \rho^k (\widehat{u}^k + c^k)$. On peut faire $H$-convergence avec limite forte $H^{-1}$ du membre de droite, vers équation limite  $-\operatorname{div}\left(\overline{\mathcal{A}} \nabla \widehat{u}\right) = \overline{\lambda} \rho (\widehat{u} + c)$. La constante~$c$ est forcement $-\int \rho \widehat{u}/ \int \rho$, i.e. ce qu'il faut pour passer de la normalisation $\|u\|_{L^2} = 1$ a la condition $\int \widehat{u} = 0$ [utiliser $1 = \|u^k\|^2_{L^2} = \|\widehat{u}^k\|^2_{L^2} + (c^k)^2$ pour obtenir la meme egalite a la limite]
+
+  (ii) il y avait un argument avec partitions unite, etc, pour conclure, mais il me semble qu'il n'est en fait pas necessaire = a rediscuter. Je pense qu'on n'utilise de Prop 1.2.19 que le fait que le membre de droite n'est pas constant mais converge dans $H^{-1}$, mais ça on doit pouvoir le faire ``directement'' en considérant $-\operatorname{div}\left(\mathcal{A}^k \nabla u^k\right) = \lambda^k \rho^k u^k$ et $-\operatorname{div}\left(\mathcal{A}^k \nabla v^k\right) = \overline{\lambda} \rho u$ (en fait, comme ci-dessus, les versions avec fonctions de moyenne nulle + constante ; sauf qu'en fait on a $\int \rho u = 0$ car $\int \rho^k u^k = 0$ + integrale = limite faible contre fct constante) et en voyant que $u^k-v^k + {\rm cst}^k \to 0$ dans~$H^1$ car $-\operatorname{div}\left(\mathcal{A}^k \nabla (u^k-v^k)\right) = \lambda^k \rho^k u^k-\overline{\lambda} \rho u \to 0$ dans $H^{-1}$).}
+ 
+%-------- THIS DOES NOT SEEM USEFUL... -----------
+%To do so, we apply~\cite[Proposition~1.2.19]{allaire_homogeneisation}. As in Section~\ref{app:thm:Hcvg-compact}, consider the open set $\Omega = (-1,2)^\dim$ and denote by~$\widetilde{\A}^k$ the extension of~$\A^k$ to~$\Omega$ obtained by periodicity. Introduce a solution~$\widetilde u_0^k\in H^1(\Omega)$ to
+%\begin{equation}
+%  \label{eq:1219-1}
+%  \left\{\begin{aligned}
+%  -\operatorname{div}\left( \widetilde \A^k\nabla \widetilde u_0^k \right) = \widetilde \lambda^k\rho^k\widetilde u_0^k & \quad \text{ on }\Omega, \\ 
+%  \widetilde u_0^k = 0 & \quad \text{ on }\partial\Omega.
+%  \end{aligned}\right.
+%\end{equation}
+%By~\cite[Theorem~1.3.16]{allaire_homogeneisation}, there exists $\widehat{\mathcal{A}}\in L^{\infty}(\Omega,\mathcal{M}_{a,b})$ such that, up to extraction of a subsequence (which we do not explicitly indicate),
+%\[
+%\left\{\begin{aligned}
+%\widetilde u^k_0 \rightharpoonup \widetilde u_0 & \quad \text{ weakly in }H^1(\Omega), \\ 
+%\widetilde \A^k\nabla \widetilde u^k_0 \rightharpoonup \widehat{\A} \nabla \widetilde u_0 & \quad \text{ weakly in }L^2(\Omega)^\dim,
+%\end{aligned}\right.
+%\]
+%where $\widetilde u_0$ is a solution of the homogenized problem 
+%\begin{equation}
+%  \left\{\begin{aligned}
+%  -\operatorname{div}\left( \widehat{\A} \nabla \widetilde u_0 \right) = \widetilde{\lambda} \rho \widetilde{u}_0  & \quad \text{ on }\Omega, \\ 
+%  \widetilde u_0 = 0 & \quad \text{ on }\partial\Omega.
+%  \end{aligned}\right.
+%\end{equation}
+%We now turn back to our original problem with periodic boundary conditions.
+
+%Denote by $\widetilde{u}^k$, $\widetilde{u}$, $\widetilde{\rho}^k$ and $\widetilde{\rho}$ the extensions to~$\Omega$ of $u^k$, $u$, $\rho^k$ and $\rho$ obtained by periodicity. We first prove that~$\widetilde{\A}^k\nabla\widetilde{u}^k \rightharpoonup \overline{\A}\nabla\widetilde{u}$ weakly in~$L^2_{\rm loc}(\Omega)^\dim$ by applying~\cite[Proposition 1.2.19]{allaire_homogeneisation}. To use this result, we show that~$\widetilde u^k \rightharpoonup \widetilde u$ weakly in $H^1_{\rm loc}(\Omega)$ and $\lambda^k\rho^ku^k\rightarrow \overline{\lambda}\rho u$ strongly in $H^{-1}_{\rm loc}(\Omega)$, by combining the weak convergence of~$u^k$ in~$H^1(\T^\dim)$ and the strong convergence of $\lambda^k \rho^k u^k$ in~$H^{-1}(\T^\dim)$ with an argument based on a partition of unity as in Section~\ref{app:thm:Hcvg-compact}. Reusing the arguments in~\eqref{eq:H-cvg-fin2} and~\eqref{eq:H-cvg-fin1}, we finally obtain that~$\A^k \nabla u^k \rightharpoonup \overline{A}\nabla u$~weakly in~$L^2_{\rm loc}(\T^\dim)^\dim$. Combined with~\eqref{eq:spectral-homog}, we can conclude that...~\eqref{eq:1219-2}.
+
+\paragraph{Proving that~$\overline{\lambda}$ is the smallest non-zero eigenvalue.}
+To conclude the proof, we show that~$\overline{\lambda}$ is the smallest non-zero eigenvalue of~\eqref{eq:1219-2}, proceeding by contradiction. Assume that there exist $0<\widehat{\lambda}<\overline{\lambda}$ and $\widehat{u}\in H^1(\T^\dim)$ such that 
+\begin{equation}
+\left\{\begin{aligned}
+-\operatorname{div}\left(\overline{\mathcal{A}}(q)\nabla \widehat{u}(q)\right) & = \widehat{\lambda}\rho(q)\widehat{u}(q)  \quad \text{ on } \T^\dim,\\
+\int_{\T^\dim} \widehat{u}(q)^2 \, dq & = 1.
+\end{aligned}\right.
+\end{equation} 
+For~$k \geq 1$, define $w^k \in H^1(\T^\dim)$ as the unique solution to\todo{verifier condition normalisation}
+\begin{equation}
+  \label{eq:wk-sequence-spectral}
+  -\operatorname{div}(\mathcal{A}^k\nabla w^k) = \widehat{\lambda} \rho \widehat{u}, \qquad \int_{\T^\dim} w^k = 0.
+\end{equation}
+The sequence~$(w^k)_{k \geq 1}$ is easily seen to be bounded in~$H^1(\T^\dim)$, and hence weakly converges in~$H^1(\T^\dim)$ and strongly converges in~$L^2(\T^\dim)$ up to extraction of a subsequence (not explicitly indicated). The limit is necessarily~$\widehat{u}$ by definition of $H$-convergence. Then, by definition of~$\lambda^k$, and using~\eqref{eq:wk-sequence-spectral},
+\[
+\begin{aligned}
+  \lambda^k & \leq \frac{\dps \int_{\T^\dim}\nabla w^k(q)^\top \A^k(q)\nabla w^k(q)\,dq}{\dps \int_{\T^\dim} w^k(q)^2 \rho^k(q) \, dq} = \widehat{\lambda} \frac{\dps \int_{\T^\dim} w^k(q)\widehat{u}(q) \rho(q)\, dq}{\dps \int_{\T^\dim} w^k(q)^2 \rho^k(q) \, dq} \xrightarrow[k \to +\infty]{} \widehat{\lambda} \frac{\dps \int_{\T^\dim} \widehat{u}(q)^2 \rho(q) \, dq}{\dps \int_{\T^\dim} \widehat{u}(q)^2\rho(q) \, dq} = \widehat{\lambda},
+\end{aligned}
+\]
+Upon further extracting a subsequence, we obtain that $\overline{\lambda} \leq \widehat{\lambda}$, which contradicts the assumption. The argument above can in fact be applied to any converging subsequence, henceforth leading to the uniqueness of the limit and the convergence of the whole sequence~$(\lambda^k)_{k \geq 1}$, which completes the proof.
+ 
+%----------------------------------------------------
+\subsection{Proof of Theorem~\ref{thm:commutation}}
+\label{app:thm:commutation}
+
+\todo[inline]{the result in this section and the following are less standard, and should probably be separated from the other results in this section}
+
+The following lemma, proved in~\Cref{subsec:proof-Hcvg-constant}, shows that in the particular case where one considers a sequence of diffusion matrices~$(\A^k)_{k \geq 1}$ which are~$(\Z/k)^\dim$-periodic, their $H$-limit~$\overline{\A}$ is in fact a constant matrix. This result is an adaptation to the case of periodic boundary conditions of a standard result for divergence operators with Dirichlet boundary conditions.
+
+\begin{lemma}
+  \label{lem:Hcvg-constant}
+  Let $a,b>0$ and $(\A^k)_{k\geq 1} \subset L^\infty(\mathbb{T}^\dim,\mathcal{M}_{a,b})$ be a sequence of $(\Z/k)^\dim$-periodic diffusion matrices. Then, $(\A^k)_{k\geq 1}$ $H$-converges (up to extraction a subsequence) to a constant matrix~$\overline{\A}\in \mathcal{M}_{a,b}$.\todo{confirmer que l'extraction est necessaire}
+\end{lemma}
+
+For fixed $k\geq 1$, recalling the notation~$\Diff_{\#,k}(q) = \Diff(kq)$ for any $\Diff \in \Diffset_p^{a,b}$, we obtain by the definition of the diffusion matrix~$\Diff^{k,\star}$ in Lemma~\ref{lem:periodicity} that
+\begin{equation}
+  \label{eq:commut-1}
+  \Lambda^k(\Diff_{\#,k}^{k,\star})\geq \Lambda^k(\Diff_{\#,k}).
+\end{equation}
+Introduce the sequences $(\A^{k,\star})_{k\geq 1}$ and $(\A^k)_{k\geq 1}$ defined as
+\[
+\A^{k,\star}(q) = \Diff_{\#,k}^{k,\star} \rme^{-\beta V_{\#,k}},
+\qquad
+\A^k = \Diff_{\#,k} \rme^{-\beta V_{\#,k}}.
+\]
+By \Cref{lem:Hcvg-constant}, upon extracting a subsequence (still indexed by~$k$ with some abuse of notation), the sequence~$(\A^{k,\star})_{k\geq 1}$ $H$-converges to a constant homogenized matrix~$\overline\A^\star\in \mathcal{M}_{a,b}$. By Theorem~\ref{thm:Hcvg}, the sequence~$(\A^k)_{k\geq 1}$ also $H$-converges to a constant matrix~$\overline{\A}\in\mathcal{M}_{a,b}$. In addition, in view of the definitions~\eqref{eq:lambda_per_k} and~\eqref{eq:lambda-periodic-def},
+\[
+\Lambda^k(\Diff_{\#,k}^{k,\star}) = \Lambda_{\#,k}(\Diff^{k,\star}),
+\qquad
+\Lambda^k(\Diff_{\#,k})  = \Lambda_{\#,k}(\Diff).
+\]
+Yet, by Theorem~\ref{thm:Hcvg-spectral} and Corollary~\ref{cor:Hcvg-spectral}, $H$-convergence implies convergences of the associated spectral gaps, \emph{i.e.}
+\[
+\Lambda_{\#,k}(\Diff^{k,\star})\xrightarrow[k\to+\infty]{} \overline \Lambda^\star = \min_{u \in H^1_0(\T^\dim) \setminus\{0\}} \frac{\dps \int_{\T^\dim} \nabla u^\top \overline{\A}^\star \nabla u}{\dps \int_{\T^\dim} u^2 \int_{\T^\dim} \rme^{-\beta V}}, \qquad\qquad \Lambda_{\#,k}(\Diff) \xrightarrow[k\to+\infty]{} \Lambda_{\mathrm{hom}}(\Diff).
+\]
+Thus, passing to the limit $k\to \infty$ in~\eqref{eq:commut-1}, we obtain that~$\overline \Lambda^\star \geq \Lambda_{\mathrm{hom}}(\Diff)$. Since this result holds for any initial diffusion $\Diff$, we finally obtain that 
+\[
+\overline \Lambda^\star \geq \max_{\Diff \in \Diffset_p^{a,b}}\Lambda_{\mathrm{hom}}(\Diff) = \Lambda_{\mathrm{hom}}^\star.
+\]
+
+To obtain the equality~$\overline \Lambda^\star = \max_{\Diff \in \Diffset_p^{a,b}}\Lambda_{\mathrm{hom}}(\Diff)$, it therefore suffices to find a diffusion function~$\widehat{\Diff}$ such that~$\Lambda_{\mathrm{hom}}(\widehat{\Diff}) = \overline \Lambda^\star$. The natural candidate diffusion is $\widehat{\Diff}(q) = \mathrm{e}^{\beta V(q)}\overline{\A}^\star$. To conclude the proof, it then suffices to verify that $\widehat{\Diff}\in\Diffset_p^{a,b}$. Note first that, since~$\Diff^{k,\star} \in \Diffset_p^{a,b}$, it holds for any~$\xi \in \R^\dim$ and almost all~$q \in \T^\dim$, 
+\[
+a |\xi|^2 \leq \mathrm{e}^{-\beta V_{\#,k}(q)} \xi^{\top}\Diff_{\#,k}^{k,\star}(q)\xi \leq \frac1b |\xi|^2.
+\]
+By~\cite[Lemma 1.3.13]{allaire_homogeneisation}, the above inequality passes to the $H$-limit, so that, for any~$\xi \in \R^\dim$ and almost all~$q \in \T^\dim$,
+\[
+a |\xi|^2 \leq \xi^{\top}\overline{\A}^{\star}\xi \leq \frac1b |\xi|^2.
+\]
+Plugging $\widehat{\Diff}(q) =\mathrm{e}^{\beta V(q)}\overline{\mathcal{A}}^\star$ in the last inequality allows to conclude that~$\widehat{\Diff}\in L^{\infty}_{\mu}(\T^\dim,\mathcal{M}_{a,b})$. Let us next check that
+\[
+\left\|\widehat{\Diff}\right\|_{L^p_\mu}^p = \int_{\T^\dim} \normF{\widehat\Diff(q)}^p \rme^{-\beta p V(q)} \, dq \leq 1.
+\]
+In view of~\cite[Theorem~1.3.14]{allaire_homogeneisation}, $0 \leq \overline{\A}^\star \leq \A_{\rm weak}$ in the sense of symmetric matrices for any weak-* limit~$\A_{\rm weak}$ of (a subsequence of)~$(\A^{k,\star})_{k \geq 1}$. By lower semicontinuity of the norm, and since the norm~$\normF{\cdot}$ is compatible with the order on symmetric positive matrices and weak-* $L^\infty$ convergence implies weak~$L^p$ convergence, \todo{BIEN VERIFIER CES ARGUMENTS} % il me semble que c'est OK car si suite (A^k) cv *-faible L^\infty, alors \int A^k f \to \int \overline{A} f pour tout f \in L^1 ; ca implique la cv faible L^p : prendre g \in L^{p'} \subset L^1 car domaine compact, et alors on a bien \int A^k g \to \int \overline{A} g.
+\[
+\left\|\widehat{\Diff}\right\|_{L^p_\mu}^p = \normF{\overline{\A}^\star}^p \leq \int_{\T^\dim} \normF{\A_{\rm weak}(q)}^p \, dq \leq \liminf_{k \to +\infty} \int_{\T^\dim} \normF{\mathcal{A}^{k,\star}(q)}^p \, dq = \liminf_{k \to +\infty} \left\|\Diff^{k,\star}\right\|_{L^p_\mu}^p \leq 1,
+\]
+which gives the claimed bound and completes the proof.
+
+%-------------------------------------------------
+\subsubsection{Proof of~\Cref{lem:Hcvg-constant}}
+\label{subsec:proof-Hcvg-constant}
+
+\Cref{thm:Hcvg-compact} guarantees the $H$-convergence of~$(\A^k)_{k\geq 1}$, up to extraction of a subsequence, towards a general diffusion function~$\overline{\A}\in L^\infty(\mathbb{T}^p,\mathcal{M}_{a,b})$. Thus, we only need to show that $\overline{\A}$ is constant. To do so, we follow the proof of~\cite[Theorem~1.3.18]{allaire_homogeneisation}. Since $\A^k$ is $(\mathbb{Z}/k)^\dim$-periodic, there exists a $\mathbb{Z}^\dim$-periodic matrix-valued function $\mathfrak{A}^k \in L^\infty(\mathbb{T}^\dim,\mathcal{M}_{a,b})$ such that~$\A^k(q) = \mathfrak{A}^k(kq)$. Consider the sequence of oscillating test functions (with $1 \leq i \leq \dim$ indexing the dimension)
+\[
+w_i^k(q) = q_i + \frac1k \widetilde{w}_i^k(kq), 
+\]
+where $\widetilde{w}_i^k \in H^1(\T^\dim)$ is the periodic function uniquely defined up to an additive constant by the following equation on~$\mathbb{T}^\dim$:
+\[
+-\mathrm{div}\left(\mathfrak{A}^k (e_i + \nabla \widetilde{w}_i^k)\right) = 0, \qquad \int_{\T^\dim} \widetilde{w}_i^k = 0.
+\]
+We make three observations at this stage:
+\begin{enumerate}[(i)]
+\item by construction, it holds $-\mathrm{div}\left(\A^k \nabla w_i^k \right) = 0$ in~$H^{-1}_{\rm loc}(\R^\dim)$. 
+\item the sequence~$(w_i^k)_{k \geq 1}$ converges weakly in~$H^1_{\rm loc}(\R^\dim)$ to the function~$q \mapsto q_i$. Indeed, the sequence~$(\widetilde{w}_i^k)_{k \geq 1}$ is easily seen to be bounded in~$H^1(\T^\dim)$ by the Lax--Milgram lemma, and the weak convergence of~$\nabla \widetilde{w}_i^k(k \cdot)$ to~0 in~$L^2(\T^\dim)$ hence~$L^2_{\rm loc}(\R^\dim)$ follows from Lemma~\ref{lem:homog_lim} in Section~\ref{sec:lemma_avg} below since the integral of~$\nabla \widetilde{w}_i^k$ over~$\T^\dim$ vanishes.
+\item since the sequence $(\mathfrak{A}^k (e_i+\nabla \widetilde{w}_i^k))_{k \geq 1}$ is uniformly bounded in $L^2(\mathbb{T}^\dim)$, it weakly converges in~$L^2(\mathbb{T}^\dim)$, up to extraction, to a limit denoted by~$\mathfrak{F}_i$. By Lemma~\ref{lem:homog_lim}, the following weak convergence holds in~$L^2(\T^\dim)$ hence in~$L^2_{\rm loc}(\R^\dim)$:
+\[
+\A^k \nabla w_i^k = \mathfrak{A}^k(k \cdot) \left(e_i+\nabla \widetilde{w}_i^k\right)(k \cdot) \rightharpoonup \int_{\T^\dim} \mathfrak{F}_i := \mathfrak{F} e_i,
+\]
+where the matrix~$\mathfrak{F}$ has columns~$\mathfrak{F}_i$.
+\end{enumerate}
+Since the sequence~$(\A^k)_{k \geq 1}$ $H$-converges up to extraction, the above facts and~\cite[Proposition~1.2.19]{allaire_homogeneisation} allow to conclude that the $H$-limit~$\overline{\A} = \mathfrak{F}$ obtained by extraction is a constant matrix.
+
+\subsubsection{A technical result of periodic averaging}
+\label{sec:lemma_avg}
+
+We conclude this section by stating and proving the following technical result, obtained by a simple adaptation of~\cite[Lemma~1.3.19]{allaire_homogeneisation}.
+
+\begin{lemma}
+  \label{lem:homog_lim}
+  Consider a sequence of~$\Z^\dim$-periodic functions~$(a_k)_{k \geq 1} \subset L^2(\T^\dim)$ such that
+  \[
+  \int_{\T^\dim} a_k \xrightarrow[k \to +\infty]{} \varrho \in \mathbb{R}, 
+  \qquad 
+  \sup_{k \geq 1} \int_{\T^\dim} |a_k| < +\infty.
+  \]
+  Then the sequence of~$\Z^\dim$-periodic functions~$(a_k(k\cdot))_{k \geq 1}$ weakly converges in~$L^2(\T^\dim)$ to the constant function~$\varrho$.
+\end{lemma}
+
+\begin{proof}
+The proof is a simple extension of~\cite[Lemma~1.3.19]{allaire_homogeneisation}. Consider~$\phi\in C^0(\T^\dim)$. We decompose~$\T^\dim$ as the union of~$k^\dim$ cubes $q_i^k + (\T/k)^\dim$ for~$1 \leq i \leq k^\dim$, so that
+\[
+\int_{\T^\dim} a_k(kq) \phi(q) \, dq = \sum_{i=1}^{k^\dim} \int_{(\T/k)^\dim} a_k\left(k(q_i^k+Q)\right) \phi\left(q_i^k+Q\right) dQ.
+\]
+For a given $1 \leq i \leq k^\dim$, by the periodicity of~$a_k$,
+\[
+\begin{aligned}
+& \left|\int_{(\T/k)^\dim} a_k(k(q_i^k+Q)) \phi(q_i^k+Q) \, dQ - \frac{1}{k^\dim} \phi(q_i^k) \int_{\T^\dim} a_k \right| \\
+& \qquad\qquad\qquad\leq \int_{(\T/k)^\dim} \left|a_k(k(q_i^k+Q))\right| \, \left|\phi(q_i^k+Q)-\phi(q_i^k)\right| dQ \\
+& \qquad\qquad\qquad \leq \frac{1}{k^\dim} \left(\int_{\T^\dim} |a_k|\right)\max_{|q-q'|_\infty \leq 1/k}|\phi(q')-\phi(q)|.
+\end{aligned}
+\]
+Therefore, 
+\[
+\left| \int_{\T^\dim} a_k(kq) \phi(q) \, dq - \sum_{i=1}^{k^\dim} \frac{1}{k^\dim} \phi(q_i^k) \int_{\T^\dim} a_k \right| \leq \left(\int_{\T^\dim} |a_k|\right)\max_{|q-q'|_\infty \leq 1/k}|\phi(q')-\phi(q)|,
+\]
+the right-hand side of the above inequality going to~0 as $k \to +\infty$ since~$\phi$ is continuous on the compact set~$\T^\dim$, hence uniformly continuous. Moreover, 
+\[
+\sum_{i=1}^{k^\dim} \frac{1}{k^\dim} \phi(q_i^k) \int_{\T^\dim} a_k \xrightarrow[k \to +\infty]{} \varrho \int_{\T^\dim} \phi
+\]
+by results on the convergence of Riemann sums. This shows finally that
+\[
+\int_{T^\dim} a_k(kq) \phi(q) \, dq \xrightarrow[k \to +\infty]{} \varrho \int_{\T^\dim} \phi.
+\]
+The claimed result follows by the density of~$C^0(\T^\dim)$ in~$L^2(\T^\dim)$.
+\end{proof}
+
+%---------------------------------------------------
+\subsection{Proof of Lemma~\ref{lem:periodicity}}
+\label{app:lem:periodicity}
+
+Consider a maximizer~$\Diff_0 \in \Diffset_{\#,k,p}^{a,b}$ of~\eqref{eq:lambda-periodic-optim} (which indeed exists in view of Theorem~\ref{thm:well-posedness-1D}), and~$u_0 \in H^1(\T^\dim) \setminus \{0\}$ a minimizer associated with~$\Lambda(\Diff_0)$ in~\eqref{eq:lambda-periodic-def}. For $\ell=(\ell_1,\dots,\ell_\dim) \in \{0,\dots,k-1\}^\dim$, introduce
+\[
+\Diff_\ell(q) = \Diff_0\left(q+\frac{\ell}{k}\right), \qquad u_\ell(q) = u_0\left(q+\frac{\ell}{k}\right).
+\]
+For these two functions we have, using the change of variable $Q = q + \ell/k$ and the $\mathbb{Z}^\dim$-periodicity of~$V$,
+\begin{align}
+\frac{\dps \int_{\T^\dim}\nabla u_\ell(q)^\top\Diff_\ell(q)\nabla u_\ell(q)\, \rme^{-\beta V_{\#,k}(q)} \, dq}{\dps \int_{\T^\dim} u_\ell(q)^2 \, \rme^{-\beta V_{\#,k}(q)} \, dq} & = \frac{\dps \int_{\T^\dim}\nabla u_0\left(q+\frac{\ell}{k}\right)^\top \Diff_0\left(q+\frac{\ell}{k}\right)\nabla  u_0\left(q+\frac{\ell}{k}\right)\,\rme^{-\beta V(kq)}\,dq}{\dps \int_{\T^\dim}  u_0\left(q+\frac{\ell}{k}\right)^2 \, \rme^{-\beta V(kq)}\,dq} \\
+& = \frac{\dps \int_{\T^\dim}\nabla u_0(Q)^\top\Diff_0(Q)\nabla  u_0(Q)\,\rme^{-\beta V(kQ-\ell)} \, dQ}{\dps \int_{\T^\dim}  u_0(Q)^2 \rme^{-\beta V(kQ-\ell)} \, dQ} = \Lambda^k(\Diff_0).
+\end{align}
+Thus, for all $\ell \in \{0,\dots,k-1\}^\dim$, the function~$\mathcal{D}_\ell$ also satisfies $\Lambda^k(\Diff_\ell) = \Lambda^{k,\star}$. Define now the diffusion function
+\[
+\Diff_0^k(q) = \frac{1}{k^\dim}\sum_{\ell_1=0}^{k-1}\dots \sum_{\ell_\dim=0}^{k-1}\Diff_\ell(q).
+\]
+By concavity of the application $\Diff\mapsto\Lambda(\Diff)$ (see Lemma~\ref{lem:concave-mat}),
+\[
+\Lambda(\Diff_0^k)\geq \frac{1}{k^\dim}\sum_{\ell_1=0}^{k-1}\dots \sum_{\ell_\dim=0}^{k-1}\Lambda(\Diff_\ell) = \Lambda^{k,\star}.
+\]
+Thus, $\Diff_0^k$ also satisfies $\Lambda^k(\Diff_0^k) = \Lambda^{k,\star}$. In addition, $\Diff_0^k$ is $(\Z/k)^\dim$-periodic by construction, and~$\Diff_0^k \in\Diffset_{\#,k,p}^{a,b}$ by the triangle inequality. There exists therefore~$\Diff^{k,\star} \in \Diffset_{p}^{a,b}$ such that~$\Diff_0^k(q) = \Diff^{k,\star}(kq)$, which concludes the proof. 
+
+%------------------- DIFFUSION LIMIT --------------------
+\section{Proof of~\Cref{thm:Donsker}}
+\label{app:thm:Donsker}
+
+The proof consists of three main steps. For the ease of the presentation, we consider the specific case of a processes associated with a sequence of timesteps~$(\Delta t_n)_{n \geq 1}$, which we further assume to be~$\Delta t_n = 1/n$ in all this section, the proof in the general case following by straightforward modifications.\todo{CHANGER PARTOUT $P_n$ en $P_{1/n}$}
+
+We first show in Proposition~\ref{prop:tightness} that the sequence $\{P_n\}_{n\in\mathbb{N}}$ is tight; by Prokhorov's theorem, $\{P_n\}_{n\in\mathbb{N}}$ then admits a weakly convergent subsequence. We next show that the weak limit solves the martingale problem for the limiting diffusion process. Finally, the uniqueness of the martingale problem implies that the weak limit is the law of the solution of the SDE defined in~\eqref{eq:RWMH-variance}. 
+
+Let us now state more precisely the above results, starting with the tightness of the sequence~$\{P_n\}_{n\in\N}$ (proved in Section~\ref{sec:proof_prop:tightness}, with some technical results postponed to Section~\ref{sec:technical_lemmas_pathwise_cv}).
+
+\begin{proposition}[Tightness]
+  \label{prop:tightness}
+  The sequence $\{P_n\}_{n\in\N}$ is tight.
+\end{proposition}
+
+Proposition~\ref{prop:tightness} and Prokhorov's theorem guarantee that~$\{P_n\}_{n\in\N}$ admits a weakly converging subsequence~$P_\star$. The associated limiting process is denoted by~$(Q^\star_t)_{t\geq 0}$. To conclude the proof, we identify~$P_\star$ as the law of the solution to the SDE~\eqref{eq:dynamics_donsker}, with generator~\eqref{eq:generator_cLD}, by considering the martingale problem.
+
+\begin{proposition}[Limit martingale problem]
+  \label{prop:limit-martingale}
+  For all $\varphi\in C^3(\T^\dim)$,\todo[inline]{je pense qu'il faut $C^3$ pour preuve, et pas $C^2$ comme initialement indiqué... sauf evt si on passe a la limite sur la formule finale, auquel cas il faut le commenter ; cf. preuve Section~\ref{sec:convergence_generator_Ln}}
+  \[
+  \varphi(Q^\star_t) - \varphi(Q^\star_0) - \int_{0}^t (\cLD\varphi)(Q^\star_s) \, ds
+  \]
+  is a martingale process.
+\end{proposition}
+
+The proof of this result can be read in Section~\ref{sec:proof_prop:limit-martingale} (with, again, some technical results postponed to Section~\ref{sec:technical_lemmas_pathwise_cv}). The uniqueness of the martingale process then implies that~$P_\star$ is the law of the process~\eqref{eq:dynamics_donsker}.
+
+To prove the results, we use the following notation. For~$q\in\T^\dim$, $G$~a standard normal random variable and~$U$ a uniform random variable on~$[0,1]$ independent of $G$, we say that the random variable~$f(q,G,U)$ satisfies $f(q,G,U) = \mathrm{O}(n^{-a})$ for some~$a \geq 0$ if there exists an integer~$k_f \in\N$ such that, for any~$b \in \mathbb{N}$, there is~$K_{b,f} \in \mathbb{R}_+$ for which 
+\begin{equation}
+  \label{eq:bound_remainder_f_b}
+  \forall (q,G) \in \T^\dim \times \R^\dim, \qquad \E_U\left( |f(q,G,U)|^b \right) \leq \frac{K_{b,f}}{n^{ab}} \left(1+|G|^{k_f}\right)^b,
+\end{equation}
+where~$\E_U$ indicates that the expectation is taken only with respect to realizations of~$U$. In particular, $f(q,G,U) = \mathrm{O}(n^{-a})$ implies that, for all $b \in \mathbb{N}$, there exists a constant $C_{f,b} > 0$ such that
+\[
+\E_{G,U}\left(|f(q,G,U)|^b\right) \leq \frac{C_{f,b}}{n^{ab}},
+\]
+where the expectation~$\E_{G,U}$ is taken with respect to realizations of both~$U$ and~$G$.
+
+%-----------------------------------------------------
+\subsection{Proof of Proposition~\ref{prop:tightness}}
+\label{sec:proof_prop:tightness}
+
+Recall that, by definition, the sequence~$\{P_n\}_{n\in\N}$ is tight if, for any $\varepsilon>0$, there exists a relatively compact set~$K\subseteq C([0,\infty), \T^\dim)$ such that $\sup_{n\in\N} P_n(K^c)\leq \varepsilon$ (see, e.g.,~\cite[Section~5]{billing}). The characterization of relatively compact subsets of~$C([0,\infty), \T^\dim)$ by the Arzelà--Ascoli theorem (see, e.g. \cite[Theorem~7.2]{billing}) allows to derive sufficient conditions for the tightness of~$\{P_n\}_{n\in\N}$  (see \cite[Theorem~7.3]{billing}). We consider the following two sufficient conditions:
+\begin{enumerate}[(i)]
+\item For any~$\varepsilon>0$, there exists a compact set~$\mathscr{K}\subseteq \T^\dim$ such that
+  \[
+  \limsup_{n\in\N} P_n\left(Q_0^{1/n}\notin \mathscr{K}\right)\leq \varepsilon.
+  \]
+ \item For any $T\in\R_+$ and $\varepsilon>0$,
+   \[
+   \lim_{\delta\to 0}\limsup_{n\in\N}P_n\left(\sup_{\substack{s,t\in[0,T]\\|s-t|\leq \delta}}\left|Q^{1/n}_s-Q^{1/n}_t\right|\geq \varepsilon\right)=0.
+   \]
+\end{enumerate}
+The first condition holds trivially since the initial condition~$Q_0^{1/n} = q_0$ is fixed. To prove the second condition, we start by observing that, for all $n\in\N$, 
+\[
+\sup_{\substack{s,t\in[0,T]\\|s-t|\leq \delta}}\left|Q^{1/n}_s-Q^{1/n}_t\right| \leq 3\max_{0\leq k \leq \lfloor T/\delta \rfloor}\sup_{t\in[0,\delta]}\left|Q^{1/n}_{k\delta +t}-Q^{1/n}_{k\delta}\right|.
+\]
+Yet, by \Cref{lem:tightness-subres-1} in Section~\ref{sec:technical_lemmas_pathwise_cv}, for any $k\leq \lfloor T/\delta \rfloor$,
+\[
+\begin{aligned}
+& \sup_{\substack{s,t\in[0,T]\\|s-t|\leq \delta}}\left|Q^{1/n}_s-Q^{1/n}_t\right| \\
+%\leq3\max_{0\leq k \leq \lfloor T/\delta \rfloor}\left\{\max\left(\max_{\lfloor nk\delta \rfloor \leq \ell\leq \lceil n(k+1)\delta \rceil} |q_{1/n}^\ell - q_{1/n}^{\lfloor nk\delta \rfloor}|,\max_{\lceil nk\delta \rceil \leq \ell\leq \lceil n(k+1)\delta \rceil} |q_{1/n}^\ell - q_{1/n}^{\lceil nk\delta \rceil}|\right)\right\}\\
+& \quad \leq
+3\max\left(\max_{0\leq k \leq \lfloor T/\delta \rfloor}\max_{\lfloor nk\delta \rfloor \leq \ell\leq \lceil n(k+1)\delta \rceil} \left|q_{1/n}^\ell - q_{1/n}^{\lfloor nk\delta \rfloor}\right|,\max_{0\leq k \leq \lfloor T/\delta \rfloor}\max_{\lceil nk\delta \rceil \leq \ell\leq \lceil n(k+1)\delta \rceil} \left|q_{1/n}^\ell - q_{1/n}^{\lceil nk\delta \rceil}\right|\right).
+\end{aligned}
+\]
+Thus,
+\begin{equation}
+  \label{eq:decomposition_a_b_tightness}
+  \begin{aligned}
+    \P \left( \sup_{\substack{s,t\in[0,T]\\|s-t|\leq \delta}}\left|Q^{1/n}_s-Q^{1/n}_t\right|\geq \varepsilon\right)
+    & \leq \underbrace{\P \left(\max_{0\leq k \leq \lfloor T/\delta \rfloor}\max_{\lfloor nk\delta \rfloor \leq \ell\leq \lceil n(k+1)\delta \rceil} \left|q_{1/n}^\ell - q_{1/n}^{\lfloor nk\delta \rfloor}\right| \geq\frac{\varepsilon}{3}\right)}_{(a)} \\
+    & \ \ +  \underbrace{\P \left(\max_{0\leq k \leq \lfloor T/\delta \rfloor}\max_{\lceil nk\delta \rceil \leq \ell\leq \lceil n(k+1)\delta \rceil} \left|q_{1/n}^\ell - q_{1/n}^{\lceil nk\delta \rceil}\right| \geq\frac{\varepsilon}{3}\right)}_{(b)}.
+  \end{aligned}
+\end{equation}
+The two terms $(a)$ and $(b)$ are controlled using similar arguments; for simplicity we make precise only the control of~$(a)$.  We start by writing, for~$\ell \geq \lfloor nk\delta \rfloor$, 
+\begin{equation}
+\label{eq:sum-increment}
+q_{1/n}^\ell - q_{1/n}^{\lfloor nk\delta \rfloor} =\sum_{i = \lfloor nk\delta \rfloor}^{\ell - 1}\Delta_n(q^i_{1/n}, G^{i+1}, U^{i+1}) ,
+\end{equation}
+where (in view of~\eqref{eq:RWMH-variance} and recalling the notation~$R_{\Delta t}$ from~\eqref{eq:def_R_dt})
+\begin{equation}
+  \label{eq:increment}
+\Delta_n(q, G, U) = \sqrt{\frac{2}{\beta n}}\Diff(q)^{1/2}G\mathbbm{1}_{\{U\leq R_{1/n}(q,G)\}}.
+\end{equation}
+By Lemma~\ref{lem:martingale-part} in Section~\ref{sec:technical_lemmas_pathwise_cv}, the following decomposition holds:
+\begin{equation}
+  \label{eq:decomposition_q}
+  q_{1/n}^\ell - q_{1/n}^{\lfloor nk\delta \rfloor} =\sum_{i = \lfloor nk\delta \rfloor}^{\ell - 1}M_n(q^i_{1/n}, G^{i+1}, U^{i+1})+\sum_{i = \lfloor nk\delta \rfloor}^{\ell - 1}F_n(q^i_{1/n}),
+\end{equation}
+with $(M_n(q^i_{1/n}, G^{i+1}, U^{i+1}))_{i\geq 0}$ a martingale sequence satisfying $M_n(q, G, U) = \mathrm{O}(n^{-1/2})$ and $F_n(q) = \mathrm{O}(n^{-1})$. Explicit expressions for $M_n(q^i_{1/n}, G^{i+1}, U^{i+1})$ and~$F_n(q^i_{1/n})$ are given in Lemma~\ref{lem:martingale-part}. From~\eqref{eq:decomposition_q}, we obtain
+\[
+\begin{aligned}
+  & \max_{0\leq k \leq \lfloor T/\delta \rfloor}\max_{\lfloor nk\delta \rfloor \leq \ell\leq \lceil n(k+1)\delta \rceil} \left|q_{1/n}^\ell - q_{1/n}^{\lfloor nk\delta \rfloor} \right| \\
+  & \qquad\qquad \leq \max_{0\leq k \leq \lfloor T/\delta \rfloor}\max_{\lfloor nk\delta \rfloor \leq \ell\leq \lceil n(k+1)\delta \rceil}\left|\sum_{i = \lfloor nk\delta \rfloor}^{\ell - 1}M_n(q^i_{1/n}, G^{i+1}, U^{i+1}) \right| \\
+  & \qquad\qquad \ \ + \max_{0\leq k \leq \lfloor T/\delta \rfloor}\max_{\lfloor nk\delta \rfloor \leq \ell\leq \lceil n(k+1)\delta \rceil}\left |\sum_{i = \lfloor nk\delta \rfloor}^{\ell - 1}F_n(q^i_{1/n}) \right|,
+\end{aligned}
+\]
+so that % for nonnegative random variables Z = X+Y, the event { Z \geq a } is contained in {X \geq a/2} \cup {Y \geq a/2} + use union bound
+\[
+\begin{aligned}
+& \P \left( \max_{0\leq k \leq \lfloor T/\delta \rfloor}\max_{\lfloor nk\delta \rfloor \leq \ell\leq \lceil n(k+1)\delta \rceil} \left|q_{1/n}^\ell - q_{1/n}^{\lfloor nk\delta \rfloor}\right|\geq \frac{\varepsilon}{3} \right)\\
+& \qquad\qquad \leq  \underbrace{\P \left(\max_{0\leq k \leq \lfloor T/\delta \rfloor}\max_{\lfloor nk\delta \rfloor \leq \ell\leq \lceil n(k+1)\delta \rceil}\left|\sum_{i = \lfloor nk\delta \rfloor}^{\ell - 1}M_n(q^i_{1/n}, G^{i+1}, U^{i+1}) \right| \geq\frac{\varepsilon}{6}\right)}_{I} \\
+& \qquad\qquad \ \ + \underbrace{\P \left( \max_{0\leq k \leq \lfloor T/\delta \rfloor}\max_{\lfloor nk\delta \rfloor \leq \ell\leq \lceil n(k+1)\delta \rceil}\left |\sum_{i = \lfloor nk\delta \rfloor}^{\ell - 1}F_n(q^i_{1/n}) \right| \geq\frac{\varepsilon}{6}\right)}_{II}.
+\end{aligned}
+\]
+We next bound each of the terms on the right hand side of the above inequality. We use $C$ to denote an absolute constant which can change values from line to line. 
+
+\paragraph{Control of~$I$.} The term~$I$ is a sum of martingale increments, and can therefore be bounded using martingale inequalities. Consider to this end the sequence~$(S^k_\ell)_{\ell\geq 0}$ for $0\leq k \leq \left\lfloor T/\delta\right\rfloor$, defined as~$S^k_0 = 0$ and
+\[
+\forall 1\leq \ell\leq \lceil n(k+1)\delta \rceil-\lfloor nk\delta \rfloor, \qquad S^k_\ell=\sum_{i = \lfloor nk\delta \rfloor}^{\lfloor nk\delta \rfloor+\ell-1 }M_n(q^i_{1/n}, G^{i+1}, U^{i+1}).
+\]
+For $\ell>\lceil n(k+1)\delta\rceil-\lfloor nk\delta \rfloor$, we set the increments to $0$, which yields $S^k_\ell=S^k_{\lceil n(k+1)\delta\rceil-\lfloor nk\delta \rfloor}$. The sequence $(S^k_\ell)_{\ell\geq 1}$ is a martingale. We start by applying the union bound and Markov's inequality, which yields
+\begin{equation}
+  \label{eq:proba-martingale}
+  \begin{aligned}
+    & \P\left(\max_{0\leq k \leq \lfloor T/\delta \rfloor}\max_{\ell\geq 1}\left |S^k_\ell\right|  \geq \frac{\varepsilon}{6}\right) = \P\left(\max_{0\leq k \leq \lfloor T/\delta \rfloor}\max_{\ell \geq 1}\left |S^k_\ell\right|^4  \geq \frac{\varepsilon^4}{6^4}\right)  \\
+    & \qquad\qquad\qquad\qquad \leq \sum_{k=0}^{\lfloor T/\delta\rfloor} \P\left(\max_{\ell \geq 1}|S^k_\ell|^4  \geq \frac{\varepsilon^4}{6^4}\right)\leq \frac{6^4}{\varepsilon^4}\sum_{k=0}^{\lfloor T/\delta\rfloor} \E\left(\max_{\ell \geq 1}|S^k_\ell|^4 \right).
+  \end{aligned}
+\end{equation}
+We are then in position to resort to the martingale inequality from~\cite[Theorem 1.1]{burkholder1972integral}, recalled here for convenience. 
+
+\begin{theorem}[Theorem~1.1 in~\cite{burkholder1972integral}]
+\label{thm:bounds-moments-martingale}
+Suppose that $X=(X_1,X_2,\ldots)$ is a martingale, and introduce
+\begin{equation}
+  X_n = \sum_{k=1}^n \mathscr{X}_k,
+  \qquad
+  X^* = \sup_{n \geq 1} |X_n|,
+  \qquad
+  S(X) = \left(\sum_{k=1}^{+\infty} \mathscr{X}_k^2\right)^{1/2}.
+\end{equation}
+Consider a convex function~$\Phi : [0,\infty) \to [0,\infty)$ such that~$\Phi(0)=0$, satisfying the following growth condition: There exists~$c \in \mathbb{R}_+$ such that
+\[
+\forall u > 0, \qquad \Phi(2u)\leq c\Phi(u).
+\]
+Set $\Phi(\infty) = \lim_{u\to \infty} \Phi(u)$. Then there exists~$C_-,C_+ \in \mathbb{R}_+$ such that
+\[
+C_- \E\left[ \Phi(S(X))\right]\leq \E\left[\Phi(X^*)\right] \leq C_+ \E\left[\Phi(S(X))\right].
+\]
+\todo[inline]{$C_-$ était $c$, mais ce n'est pas le même que dans la condition de croissance je pense, notamment qui prete à confusion dans~\cite{burkholder1972integral}} 
+\end{theorem}
+
+Applying Theorem~\ref{thm:bounds-moments-martingale} to the sequence~$(S^k_\ell)_{\ell \geq 0}$ with~$\Phi(u) = u^4$,
+\begin{equation}
+  \label{eq:moment-4}
+  \begin{aligned}
+    \E\left(\max_{\ell\geq 1}|S^k_\ell|^4 \right) & \leq C_+ \E\left[ \left(\sum_{j=\lfloor nk\delta \rfloor}^{\lceil n(k+1)\delta \rceil-1}\left|M_n\left(q_{1/n}^{j}, G^{j+1},U^{j+1}\right)\right|^2\right)^2\right] \\
+    & \leq C_+(n\delta+1) \sum_{j=\lfloor nk\delta \rfloor}^{\lceil n(k+1)\delta \rceil-1} \E\left[\left|M_n\left(q_{1/n}^j, G^{j+1},U^{j+1}\right)\right|^4\right].
+  \end{aligned}
+\end{equation}
+Since $M_n\left(q_{1/n}^{j}, G^{j+1},U^{j+1}\right) = \mathrm{O}(n^{-1/2})$ with bounds uniform in~$j$, it follows that
+\begin{equation}
+  \label{eq:moment-4-bis}
+  \forall 0\leq k \leq \lfloor T/\delta \rfloor,
+  \qquad
+  \E\left(\max_{0 \leq \ell\leq \lceil n\delta \rceil}|S^k_\ell|^4 \right)\leq C \frac{(n\delta + 1)^2}{n^2}.
+\end{equation}
+Combining the latter inequality with~\eqref{eq:proba-martingale}, we finally obtain that
+\[
+\P\left(\max_{0\leq k \leq \lfloor T/\delta \rfloor}\max_{0 \leq \ell\leq \lceil n\delta \rceil}\left |S_\ell\right|  \geq \frac{\varepsilon}{6}\right) \leq C \left(\frac{T}{\delta}+1\right)\frac{(n\delta + 1)^2}{n^2 \varepsilon^4}.
+\]
+The control of $I$ is concluded by noticing that~$\dps \lim_{\delta\to 0}\limsup_{n\to+\infty} \left(T/\delta+1\right)(n\delta + 1)^2 n^{-2} = 0$.
+
+\paragraph{Control of $II$.} Using Markov's inequality, then a Cauchy--Schwarz inequality,
+\begin{align}
+& \P \left( \max_{0\leq k \leq \lfloor T/\delta \rfloor}\max_{\lfloor nk\delta \rfloor \leq \ell\leq \lceil n(k+1)\delta \rceil}\left |\sum_{i = \lfloor nk\delta \rfloor}^{\ell - 1}F_n(q^i_{1/n}) \right| \geq\frac{\varepsilon}{6}\right)\\
+& \qquad\qquad\qquad\qquad \leq \frac{36}{\varepsilon^2}\E\left[\max_{0\leq k \leq \lfloor T/\delta \rfloor}\max_{\lfloor nk\delta \rfloor \leq \ell\leq \lceil n(k+1)\delta \rceil}\left |\sum_{i = \lfloor nk\delta \rfloor}^{\ell - 1}F_n(q^i_{1/n}) \right|^2 \right]\\
+& \qquad\qquad\qquad\qquad \leq \frac{36 (n \delta+1)}{\varepsilon^2}\E\left[\max_{0\leq k \leq \lfloor T/\delta \rfloor}\max_{\lfloor nk\delta \rfloor \leq \ell\leq \lceil n(k+1)\delta \rceil} \sum_{i = \lfloor nk\delta \rfloor}^{\ell - 1}\left|F_n(q^i_{1/n}) \right|^2 \right]\\
+& \qquad\qquad\qquad\qquad \leq\frac{36 (n \delta+1)}{\varepsilon^2}\E\left[\max_{0\leq k \leq \lfloor T/\delta \rfloor}\sum_{i = \lfloor nk\delta \rfloor}^{\lceil n(k+1)\delta\rceil- 1}\left|F_n(q^i_{1/n}) \right|^2 \right]\\
+& \qquad\qquad\qquad\qquad \leq \frac{36 (n \delta+1)}{\varepsilon^2}\sum_{k=0}^{\lfloor T/\delta \rfloor}\sum_{i = \lfloor nk\delta \rfloor}^{\lceil n(k+1)\delta\rceil- 1}\E\left[\left|F_n(q^i_{1/n}) \right|^2 \right]. \label{eq:tight-F}
+\end{align}
+Yet, by Lemma~\ref{lem:martingale-part}, $F_n(q^i_{1/n}) = \mathrm{O}(n^{-1})$ uniformly in~$i$, so that
+\[
+\sum_{i = \lfloor nk\delta \rfloor}^{\lceil n(k+1)\delta\rceil- 1}\E\left[\left|F_n(q^i_{1/n}) \right|^2 \right] \leq \frac{C(n\delta +1)}{n^2} .
+\]
+Plugging the last inequality in~\eqref{eq:tight-F}, we obtain that
+\[
+\P \left( \max_{0\leq k \leq \lfloor T/\delta \rfloor}\max_{\lfloor nk\delta \rfloor \leq \ell\leq \lceil n(k+1)\delta \rceil}\left |\sum_{i = \lfloor nk\delta \rfloor}^{\ell - 1}F_n(q^i_{1/n}) \right| \geq\frac{\varepsilon}{6}\right) \leq C\left(\frac{T}{\delta}+1\right) \frac{(n\delta+1)^2}{n^{2} \varepsilon^{2}}.
+\]
+The control of $II$ is concluded by noticing that $\dps \lim_{\delta\to 0}\limsup_{n\to\infty} C(T/\delta+1) (n\delta+1)^2 n^{-2} =0$.
+
+\paragraph{Conclusion of the proof.} Combining the control of the two terms $I$ and $II$, we conclude that
+\[
+\lim_{\delta\to 0}\limsup_{n\to +\infty}\P \left( \max_{0\leq k \leq \lfloor T/\delta \rfloor}\max_{\lfloor nk\delta \rfloor \leq \ell\leq \lceil n(k+1)\delta \rceil}\left|q_{1/n}^\ell - q_{1/n}^{\lfloor nk\delta \rfloor}\right|\geq \frac{\varepsilon}{3} \right) = 0.
+\]
+It can similarly be proved that
+\[
+\lim_{\delta\to 0}\limsup_{n\to +\infty} \P \left( \max_{0\leq k \leq \lfloor T/\delta \rfloor}\max_{\lceil nk\delta \rceil \leq \ell\leq \lceil n(k+1)\delta \rceil}\left|q_{1/n}^\ell - q_{1/n}^{\lfloor nk\delta \rfloor}\right|\geq \frac{\varepsilon}{3} \right) = 0.
+\]
+In view of~\eqref{eq:decomposition_a_b_tightness}, we finally obtain that
+\[
+\lim_{\delta\to 0}\limsup_{n\to \infty} \P\left(\sup_{\substack{s,t\in[0,T]\\|s-t|\leq \delta}}  \left|Q^{1/n}_s-Q^{1/n}_t\right|\right) = 0,
+\]
+which concludes the proof of Proposition~\ref{prop:tightness}.
+
+%------------------------------------------------------------
+\subsection{Proof of Proposition~\ref{prop:limit-martingale}}
+\label{sec:proof_prop:limit-martingale}
+
+For $n\in\N$, we denote by~$\mathcal{L}^{n}$ denote the generator of the Markov chain~$(q_{1/n}^i)_{i \geq 1}$, namely, for a given bounded measurable function~$\phi : \T^\dim \to \mathbb{R}$, 
+\begin{equation}
+  \label{eq:def_Ln_varphi}
+  (\mathcal{L}^n \phi)(q) = \mathbb{E}\left[ \phi(q_{1/n}^{1}) \, \middle| \, q_{1/n}^0 = q\right] - \phi(q).
+\end{equation}
+For a given function~$\varphi \in C^3(\T^d)$, we start by showing in Section~\ref{sec:convergence_generator_Ln} that the sequence of functions~$(n\mathcal{L}^{n}\varphi)_{n\geq 1}$ converges uniformly towards~$\cLD\varphi$ as $n\to\infty$, in the sense of uniform convergence of continuous functions over the compact set~$\T^d$. We then write the martingale problem associated to~$\mathcal{L}^n$ in Section~\ref{sec:limit_martingale_pbm}, and prove that the limit~$P_\infty$ solves the martingale problem for the limit generator~$\cLD$.
+
+\subsubsection{Convergence of the sequence of functions~$(n\mathcal{L}^{n}\varphi)_{n\geq 1}$}
+\label{sec:convergence_generator_Ln}
+
+In order to determine the limit of the sequence of functions~$(n\mathcal{L}^{n}\varphi)_{n\geq 1}$, we work out a Taylor expansion of the function~\eqref{eq:def_Ln_varphi}. We expand to this end~$\varphi(q_{1/n}^{1})$ at second order around~$q$, seeing~$q^1_{1/n}-q$ as a perturbation along the direction~$\Diff(q)^{1/2}G^1$ with step size $\sqrt{2/(\beta n)}\mathbbm{1}_{\{U^1\leq R_{1/n}(q,G^1)\}} = \mathrm{O}(n^{-1/2})$. Writing~$G,U$ instead of~$G^1,U^1$ to alleviate the notation, 
+\[
+\begin{aligned}
+  \varphi\left(q+\sqrt{\frac{2}{\beta n}}\mathbbm{1}_{\{U\leq R_{1/n}(q,G)\}}\Diff(q)^{1/2}G\right) = \varphi(q)  + \sqrt{\frac{2}{\beta n}}\mathbbm{1}_{\{U\leq R_{1/n}(q,G)\}}\nabla\varphi(q)^\top\Diff(q)^{1/2}G & \\
++ \frac{1}{\beta n}\mathbbm{1}_{\{U\leq R_{1/n}(q,G)\}} G^\top \Diff(q)^{1/2} \nabla^2\varphi(q)\Diff(q)^{1/2}G + \mathrm{O}(n^{-3/2}), &
+\end{aligned}
+\]
+where the remainder (obtained for instance with a Taylor expansion with exact remainder) is uniformly controlled using derivatives of~$\varphi$ of order at most~3, by which we mean that the remainder satisfies an inequality such as~\eqref{eq:bound_remainder_f_b}, with a bound~$K_{b,f} \leq c \|\varphi\|_{C^3(\T^\dim)}$. Subtracting~$\varphi(q)$ and taking the expectation with respect to~$U$,
+\[
+\begin{aligned}
+\E_U\left[\varphi\left(q+\sqrt{\frac{2}{\beta n}}\mathbbm{1}_{\{U\leq R_{1/n}(q,G)\}}\Diff(q)^{1/2}G\right)\right]-\varphi(q) = \sqrt{\frac{2}{\beta n}} R_{1/n}(q,G)\nabla\varphi(q)^\top\Diff(q)^{1/2}G & \\
++ \frac{1}{\beta n}R_{1/n}(q,G)G^\top \Diff(q)^{1/2} \nabla^2\varphi(q)\Diff(q)^{1/2}G + \mathrm{O}(n^{-3/2}). &
+\end{aligned}
+\]
+In view of the expansion of the acceptance rate provided by Lemma~\ref{lem:acceptance-rate-DL} (with the analytical expression~\eqref{eq:zeta-def} for~$\zeta(q,G)$), and further taking the expectation with respect to~$G$, we obtain
+\[
+(\mathcal{L}^n \varphi)(q) =
+%\underbrace{-\frac{2}{\beta n} \nabla\varphi(q)^\top\Diff(q)^{1/2}\E_G[G\min\left(0,\zeta(q,G)\right)]}_{I} + \underbrace{\frac{1}{\beta n}\E_G[ G^\top \Diff(q)^{1/2} \nabla^2\varphi(q)\Diff(q)^{1/2}G]}_{II} + \mathrm{O}(n^{-3/2}).
+-\frac{2}{\beta n} \nabla\varphi(q)^\top\Diff(q)^{1/2}\E_G[G\min\left(0,\zeta(q,G)\right)] + \frac{1}{\beta n} \Diff(q) : \nabla^2\varphi(q) + \mathrm{O}(n^{-3/2}),
+\]
+with a remainder term which is uniformly bounded in~$q \in \T^\dim$.
+A simple expression for the expectation
+\[
+\E_G[G\min\left(0,\zeta(q,G)\right)] = \int_{\R^\dim}g\min\left(0,\zeta(q,g)\right)\frac{\mathrm{e}^{-g^2/2}}{(2\pi)^{\dim/2}} \, dg
+\]
+can be derived as in~\cite{FS17} using the anti-symmetry of the function $\zeta$. Indeed, for all $q\in\T^\dim$ and for all $g\in\R^\dim$, a direct inspection of~\eqref{eq:zeta-def} reveals that~$\zeta(q,g) = -\zeta(q,-g)$, so that~$g\zeta(q,g) = -g\zeta(q,-g)$. Therefore, using~\cite[Lemma~10]{FS17} to obtain the second line,
+% In [FS17], \xi_{1/2} = \xi here + extra term
+\[
+\begin{aligned}
+  \E_G[G\min\left(0,\zeta(q,G)\right)] & = \int_{\{g\in\R^d \, | \, \zeta(q,g)\leq 0\}} g\zeta(q,g)\frac{\mathrm{e}^{-g^2/2}}{(2\pi)^{\dim/2}} \, dg =  \frac{1}{2}\int_{\R^\dim}g\zeta(q,g)\frac{\mathrm{e}^{-g^2/2}}{(2\pi)^{\dim/2}}\, dg \\
+  & = \frac12 \left[ \beta \Diff(q)^{1/2}\nabla V(q) -\Diff(q)^{-1/2}\operatorname{div}(\Diff)(q) \right].
+\end{aligned}
+\]
+We conclude that
+\begin{equation}
+  \label{eq:term-I}
+  \frac2\beta \nabla\varphi(q)^\top\Diff(q)^{1/2}\E_G[G\min\left(0,\zeta(q,G)\right)] =  \left(\Diff(q)\nabla V(q) - \frac{1}{\beta}\operatorname{div}(\Diff)(q)\right)^\top \nabla\phi(q).
+\end{equation}
+This ensures finally that $n(\mathcal{L}^n\varphi)(q) \to (\cLD\varphi)(q)$ uniformly in~$q \in \T^\dim$ as~$n\to +\infty$.
+
+\subsubsection{Limit martingale problem}
+\label{sec:limit_martingale_pbm}
+
+\todo[inline]{en fait le vrai travail est celui de la section precedente ; ici conclure comme dans Stroock/Varadhan, ``Multidimensional Diffusion Processes'', Section 11.2 ; cite par Theorem 5.8 de Comets/Maire, a voir ; songer a ne conserver que section precedente et citer resultats ici}
+
+For any $n\geq 0$ and any test function~$\varphi\in C^3(\T^\dim)$, the definition of~$\mathcal{L}^n$ ensures that
+\[
+\varphi(q^{k}_{1/n}) - \varphi(q^0_{1/n}) - \frac1n \sum_{i=1}^{k-1} (n\mathcal{L}^n\varphi)(q^{i}_{1/n}) 
+\]
+is a martingale with respect to $P_n$. Now, using the definition~\eqref{eq:process},
+\[
+\begin{aligned}
+  \varphi(q^{k}_{1/n}) & - \varphi(q^0_{1/n}) - \frac1n \sum_{i=1}^{k-1} (n\mathcal{L}^n\varphi)(q^{i}_{1/n}) \\
+  & = \varphi\left(Q^{1/n}_{k/n}\right)-\varphi\left(Q^{1/n}_{0}\right) - \frac1n \sum_{i=1}^{k-1} (n\mathcal{L}^n\varphi)\left(Q^{1/n}_{i/n}\right) \\
+   & = \varphi\left(Q^{1/n}_{k/n}\right)-\varphi\left(Q^{1/n}_{0}\right) - \frac1n \sum_{i=1}^{k-1} (\mathcal{L}_\Diff \varphi)\left(Q^{1/n}_{i/n}\right) + \frac1n \sum_{i=1}^{k-1} (n\mathcal{L}^n\varphi - \mathcal{L}_\Diff \varphi)\left(Q^{1/n}_{i/n}\right).
+\end{aligned}
+\]
+The last term converges to~0 as~$n \to +\infty$ in view of the uniform convergence~$n(\mathcal{L}^n\varphi)(q) \to (\cLD\varphi)(q)$. The first sum can be rewritten as\todo{PAS SUR DE L'ARGUMENT USUEL ICI}
+\[
+\begin{aligned}
+  \frac1n \sum_{i=1}^{k-1} (\mathcal{L}_\Diff \varphi)\left(Q^{1/n}_{i/n}\right) & = \sum_{i=1}^{k-1} \int_{i/n}^{(i+1)/n} (\mathcal{L}_\Diff \varphi)\left(Q^{1/n}_{i/n}\right) dt \\
+  & = \int_{1/n}^{k/n} (\mathcal{L}_\Diff \varphi)\left(Q^{1/n}_t\right) dt + ...
+\end{aligned}
+\]
+For~$t > 0$ fixed, we conclude by letting~$n\to \infty$ with~$k = \lfloor nt \rfloor$ that 
+\[
+\varphi(Q_t^\star) - \varphi(Q_0^\star) - \int_{0}^t(\mathcal{L}_\mathcal{D}\varphi)(Q_s^\star)
+\]
+is a martingale process for any weak limit $P_\ast$ of~$\{P_n\}_{n \geq 1}$, which concludes the proof.
+
+%----------------------------
+\subsection{Technical results}
+\label{sec:technical_lemmas_pathwise_cv}
+
+We gather in this section some technical results used in Sections~\ref{sec:proof_prop:tightness} and~\ref{sec:proof_prop:limit-martingale}.
+
+\begin{lemma}
+\label{lem:tightness-subres-1}
+For any~$T\in\R_+$, $\delta>0$ and~$k\in\Z_+$ such that $k\delta \leq T$, it holds\todo{on pourrait formuler sans $T \in \R_+$, non ?}
+\[
+\begin{aligned}
+& \sup_{t\in[0,\delta]} \left|Q^{1/n}_{k\delta +t}-Q^{1/n}_{k\delta}\right| \\
+& \qquad \leq \max\left\{\max_{\lfloor nk\delta \rfloor \leq \ell\leq \lceil n(k+1)\delta \rceil} \left|q_{1/n}^\ell - q_{1/n}^{\lfloor nk\delta \rfloor}\right|,\max_{\lceil nk\delta \rceil \leq \ell\leq \lceil n(k+1)\delta \rceil} \left|q_{1/n}^\ell - q_{1/n}^{\lceil nk\delta \rceil}\right|\right\}.
+\end{aligned}
+\]
+\end{lemma}
+
+\begin{proof}
+  Note first that, since~$Q^{1/n}_{k\delta}$ linearly interpolates between~$q_{1/n}^{\lfloor nk\delta \rfloor}$ and~$q_{1/n}^{\lceil nk\delta \rceil}$, 
+  \begin{equation}
+    \label{eq:sup_Q_to_be_bounded}
+  \sup_{t\in[0,\delta]} \left|Q^{1/n}_{k\delta +t}-Q^{1/n}_{k\delta}\right| \leq \max \left\{ \sup_{s\in[k\delta,(k+1)\delta]} \left|Q^{1/n}_{s}-q_{1/n}^{\lfloor nk\delta \rfloor}\right|, \sup_{s\in[k\delta,(k+1)\delta]} \left|Q^{1/n}_{s}-q_{1/n}^{\lceil nk\delta \rceil}\right|\right\}.
+  \end{equation}
+  We next decompose the supremums over~$s \in [k\delta,(k+1)\delta]$ into supremums over intervals of length~$1/n$, by noting that
+  \[
+  [k\delta,(k+1)\delta] \subset \bigcup_{\ell = \lfloor nk\delta \rfloor}^{\lceil n(k+1)\delta \rceil-1} \left[ \frac{\ell}{n},\frac{\ell+1}{n}\right].
+  \]
+  For instance,
+  \[
+  \sup_{s\in[k\delta,(k+1)\delta]} \left|Q^{1/n}_{s}-q_{1/n}^{\lfloor nk\delta \rfloor}\right| \leq \max_{\lfloor nk\delta \rfloor \leq \ell\leq \lceil n(k+1)\delta \rceil-1} \sup_{\tau\in[0,1/n]} \left|Q^{1/n}_{\ell/n+\tau}-q_{1/n}^{\lfloor nk\delta \rfloor}\right|.
+  \]
+  Since~$Q^{1/n}_{\ell/n+\tau}$ linearly interpolates between~$q_{1/n}^\ell$ and~$q_{1/n}^{\ell+1}$, it holds
+  \[
+  \sup_{\tau\in[0,1/n]} \left|Q^{1/n}_{\ell/n+\tau}-q_{1/n}^{\lfloor nk\delta \rfloor}\right| \leq \max \left\{ \left|q_{1/n}^\ell-q_{1/n}^{\lfloor nk\delta \rfloor}\right|, \left|q_{1/n}^{\ell+1}-q_{1/n}^{\lfloor nk\delta \rfloor}\right|\right\}. 
+  \]
+  The claimed conclusion then follows from a similar bound for the second maximum over~$s$ on the right hand side of~\eqref{eq:sup_Q_to_be_bounded}.
+\end{proof}
+
+The following lemma provides an expansion of the acceptance rate in inverse powers of~$n$. 
+
+\begin{lemma}[Expansion of $R_{1/n}(q, G)$]
+  \label{lem:acceptance-rate-DL}
+  For any~$q \in \mathbb{T}^\dim$ and~$G \in \mathbb{R}^\dim$, it holds
+  \[
+  R_{1/n}(q, G) = 1-\sqrt{\frac{2}{\beta n}}\min(0,\zeta(q, G) ) + \mathrm{O}(n^{-1}),
+  \]
+  with
+  \begin{equation}
+    \label{eq:zeta-def}
+    \begin{aligned}
+      \zeta(q, G) = \beta\nabla V(q)^{\top}\Diff(q)^{1/2}G & + \frac{1}{2}\operatorname{Tr}\left(\Diff(q)^{-1}\left[\textsf{D}\Diff(q)\cdot\Diff(q)^{1/2}G\right]\right) \\
+      & -\frac{1}{2}G^{\top}\Diff(q)^{-1/2}\left[\textsf{D}\Diff(q)\cdot\Diff(q)^{1/2}G\right]\Diff(q)^{-1/2}G,
+    \end{aligned}
+  \end{equation}
+  where~$\textsf{D}\Diff(q)$ is the differential matrix of~$q\mapsto\Diff(q)$, \emph{i.e.} $\textsf{D}\Diff(q) \cdot h$ for~$h \in \R^\dim$ is the matrix with entries~$\nabla \Diff_{ij}(q)^\top h$. 
+\end{lemma}
+
+\begin{proof}
+  The computations are similar to the ones in~\cite[Section~4.7]{FS17}. % it suffices to set F=0 there to obtain this result...
+  To control remainder terms, we use the fact that the functions at hand are sufficiently smooth, and the domain~$\T^\dim$ is compact. The magnitude of the acceptance probability in the Metropolis algorithm reads
+\[
+R_{1/n}(q, G) = \min \left\{ 1, \exp\left[-\alpha\left(q, \Phi_{1/n}(q,G)\right)\right] \right\}, \qquad \Phi_{1/n}(q,G) = q + \sqrt{\frac{2}{\beta n}}\Diff( q)^{1/2}G,
+\]
+with
+\begin{equation}
+  \label{eq:acceptance-rate}
+  \begin{aligned}
+    \alpha(q,\widetilde q) & = \frac{1}{2}\left( \ln \det[\Diff(\widetilde q)] - \ln \det[\Diff(q)] \right) + \beta\left[V(\widetilde q)-V(q)\right]\\
+    & \qquad \qquad + \frac{\beta n}{4}\left[ \left|\Diff(\widetilde q)^{-1/2}(q-\widetilde q)\right|^2 - \left|\Diff(q)^{-1/2}(\widetilde q-q)\right|^2\right].
+  \end{aligned}
+\end{equation}
+First,
+\begin{equation}
+  \label{eq:grad-term}
+  V(\Phi_{1/n}(q,G)) - V(q) = \sqrt{\frac{2}{\beta n}}\nabla V(q)^{\top}\Diff( q)^{1/2}G + \mathrm{O}(n^{-1}).
+\end{equation}
+We next consider the terms involving~$\det(\Diff)$. Since
+\[
+\Diff(\Phi_{1/n}(q,G)) =  \Diff(q) + \sqrt{\frac{2}{\beta n}}\textsf{D}\Diff(q)\cdot \Diff( q)^{1/2}G + \mathrm{O}(n^{-1}),
+\]
+it holds
+\begin{equation}
+  \begin{aligned}
+    \det[\Diff( \Phi_{1/n}(q,G))] & =  \det[\Diff( q)]\det( \Id +  \sqrt{\frac{2}{\beta n}}\Diff( q)^{-1}\textsf{D}\Diff(q)\cdot \Diff(q)^{1/2}G + \mathrm{O}(n^{-1}))\\
+    & =  \det[\Diff( q)]\left(1+  \sqrt{\frac{2}{\beta n}}\operatorname{Tr}\left(\Diff( q)^{-1}[\textsf{D}\Diff(q)\cdot \Diff( q)^{1/2}G]\right) + \mathrm{O}(n^{-1})\right),
+  \end{aligned}
+\end{equation}
+so that 
+\begin{equation}
+  \label{eq:det-term}
+  \ln \det[\Diff(\Phi_{1/n}(q,G))] - \ln \det[\Diff( q)] = \sqrt{\frac{2}{\beta n}}\operatorname{Tr}\left(\Diff( q)^{-1} \left[\textsf{D}\Diff(q)\cdot \Diff( q)^{1/2}G\right]\right) + \mathrm{O}(n^{-1}).
+\end{equation}
+
+We finally turn to the term~$|\Diff(\Phi_{1/n}(q,G))^{-1/2}(q-\Phi_{1/n}(q,G))|^2 -|\Diff(q)^{-1/2}(\Phi_{1/n}(q,G)-q)|^2$. We use the expansion~$\Diff(q + x)^{-1} = \Diff(q)^{-1} - \Diff(q)^{-1}\left[\textsf{D}\Diff(q)\cdot x\right] \Diff(q)^{-1} + \mathrm{O}(|x|^2)$\todo[inline]{je pense qu'il faut en fait une borne inf uniforme sur~$\Diff$ ici pour bien controler le reste...} to write 
+\[
+\begin{aligned}
+& \left|\Diff(\Phi_{1/n}(q,G))^{-1/2}(q-\Phi_{1/n}(q,G))\right|^2 - \left|\Diff(q)^{-1/2}(\Phi_{1/n}(q,G)-q)\right|^2  \\
+& \qquad \qquad \qquad \qquad = (\Phi_{1/n}(q,G)-q)^{\top} \left[\Diff(\Phi_{1/n}(q,G))^{-1} -  \Diff(q)^{-1}\right](\Phi_{1/n}(q,G)-q) \\
+& \qquad \qquad \qquad \qquad = -\left(\frac{2}{\beta n}\right)^{3/2}G^{\top}\Diff(q)^{-1/2}\left[\textsf{D}\Diff(q)\cdot \Diff(q)^{1/2}G\right]\Diff(q)^{-1/2}G + \mathrm{O}(n^{-1}).
+\end{aligned}
+\]
+Combining~\eqref{eq:grad-term} and~\eqref{eq:det-term} with the latter equality leads to~$\alpha(q,\Phi_{1/n}(q,G)) = (2/\beta n)^{1/2} \zeta(q, G) + \mathrm{O}(n^{-1})$, with~$\zeta(q,G)$ given by~\eqref{eq:zeta-def}. The desired conclusion then follows from the inequality~$\max(x,0) - \max(x,0)^2/2 \leq 1-\min(1,\rme^{-x}) \leq \max(x,0)$, obtained by distinguishing the cases~$x \leq 0$ and~$x \geq 0$.
+\end{proof}
+
+The last result makes precise the martingale part of the increments~$\Delta_n(q, G, U)$ defined in~\eqref{eq:increment}.
+
+\begin{lemma}
+\label{lem:martingale-part}
+Fix~$q \in \T^\dim$. The increment $\Delta_n(q, G, U)$ writes
+\[
+\Delta_n(q, G, U) =  M_n(q, G, U) + F_n(q),
+\]
+where~$M_n(q, G, U) = \Delta_n(q, G, U)- \E_{G,U}\left[ \Delta_n(q, G, U) \right]$ and~$F_n(q)  =\E_{G,U}\left[ \Delta_n(q, G, U) \right]$, the latter expectations being with respect to realizations of the independent random variables~$G$ and~$U$, with~$G$ a $\dim$-dimensional standard Gaussian random variable and~$U$ a uniform random variable on~$[0,1]$. Moreover,
+\begin{equation}
+  \label{eq:properties_martingale_decomposition}
+  \E_{G,U}[M_n(q, G, U] = 0,
+  \qquad
+  M_n(q, G, U) = \mathrm{O}(n^{-1/2}),
+  \qquad
+  F_n(q) = \mathrm{O}(n^{-1}),
+\end{equation}
+the last two estimates holding uniformly in~$q \in \T^\dim$.\todo{je pense qu'ici aussi, comme dans le lemme precedent, on a besoin que~$\Diff$ soit uniformement bornee pour la preuve... condition a ajouter ici et au theoreme principal}
+\end{lemma}
+
+\begin{proof}
+  The first property of~\eqref{eq:properties_martingale_decomposition} holds by construction, so it suffices to prove the two other estimates. For the last one, we note that, by definition, 
+  \[
+  F_n(q) = \sqrt{\frac{2}{\beta n}}\Diff(q)^{1/2} \E_G\left[ G R_{1/n}(q,G) \right] = \sqrt{\frac{2}{\beta n}}\Diff(q)^{1/2} \E_G\left[ G \left(R_{1/n}(q,G)-1\right) \right],
+  \]
+  so that the conclusion follows from Lemma~\ref{lem:acceptance-rate-DL} and the fact that~$\Diff$, its derivatives and its inverse, are uniformly bounded in~$q$. The other estimate is obtained by noting that 
+\[
+M_n(q, G, U) = \sqrt{\frac{2}{\beta n}} \Diff(q)^{1/2} \left( G\mathbbm{1}_{\{U\leq R_{1/n}(q,G)\}} - \E_G\left[ G R_{1/n}(q,G) \right]\right),
+\]
+so that, in view of Lemma~\ref{lem:acceptance-rate-DL}, 
+\[
+\forall u \in [0,1], \qquad |M_n(q, G, u)|^2 \leq \frac{C}{n} \normF{\Diff(q)} \left(1+|G|^2\right) + \mathrm{O}(n^{-3/2}). 
+\]
+This implies that~$M_n(q, G, U) = \mathrm{O}(n^{-1/2})$, as claimed. 
+\end{proof}
+
+
+%---------------------- remerciements -------------------
+\paragraph{Acknowledgements.}
+We thank Grégoire Allaire, Federico Ghimenti, Mathieu Lewin, Samuel Power, and Frédéric van Wijland for stimulating discussions. The works of T.L. and G.S. benefit from fundings from the European Research Council (ERC) under the European Union's Horizon 2020 research and innovation programme (project EMC2, grant agreement No 810367), and from the Agence Nationale de la Recherche through the grants ANR-19-CE40-0010-01 (QuAMProcs) and ANR-21-CE40-0006 (SINEQ). This project was initiated as TL was a visiting professor at Imperial College of London (ICL), with a visiting professorship grant from the Leverhulme Trust. The Department of Mathematics at ICL and the Leverhulme Trust are warmly thanked for their support. 
+
+\bibliographystyle{abbrv}
+\bibliography{biblio.bib}
+
+
+\end{document}

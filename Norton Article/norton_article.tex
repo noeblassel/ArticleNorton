@@ -1,0 +1,758 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%                                                                 %%
+%% Please do not use \input{...} to include other tex files.       %%
+%% Submit your LaTeX manuscript as one .tex document.              %%
+%%                                                                 %%
+%% All additional figures and files should be attached             %%
+%% separately and not embedded in the \TeX\ document itself.       %%
+%%                                                                 %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%\documentclass[referee,sn-basic]{sn-jnl}% referee option is meant for double line spacing
+
+%%=======================================================%%
+%% to print line numbers in the margin use lineno option %%
+%%=======================================================%%
+
+%%\documentclass[lineno,sn-basic]{sn-jnl}% Basic Springer Nature Reference Style/Chemistry Reference Style
+
+%%======================================================%%
+%% to compile with pdflatex/xelatex use pdflatex option %%
+%%======================================================%%
+
+%%\documentclass[pdflatex,sn-basic]{sn-jnl}% Basic Springer Nature Reference Style/Chemistry Reference Style
+
+%%\documentclass[sn-basic]{sn-jnl}% Basic Springer Nature Reference Style/Chemistry Reference Style
+\documentclass[pdflatex,sn-mathphys]{sn-jnl}% Math and Physical Sciences Reference Style
+%%\documentclass[sn-aps]{sn-jnl}% American Physical Society (APS) Reference Style
+%%\documentclass[sn-vancouver]{sn-jnl}% Vancouver Reference Style
+%%\documentclass[sn-apa]{sn-jnl}% APA Reference Style
+%%\documentclass[sn-chicago]{sn-jnl}% Chicago-based Humanities Reference Style
+%%\documentclass[sn-standardnature]{sn-jnl}% Standardthevenin_response_SINUSOIDAL_0.3_6_12_3.out Nature Portfolio Reference Style
+%%\documentclass[default]{sn-jnl}% Default
+%%\documentclass[default,iicol]{sn-jnl}% Default with double column layout
+
+%%%% Standard Packages
+%%<additional latex packages if required can be included here>
+\usepackage{bbm}
+%\usepackage{tikz}
+%%%%
+
+%%%%%=============================================================================%%%%
+%%%%  Remarks: This template is provided to aid authors with the preparation
+%%%%  of original research articles intended for submission to journals published 
+%%%%  by Springer Nature. The guidance has been prepared in partnership with 
+%%%%  production teams to conform to Springer Nature technical requirements. 
+%%%%  Editorial and presentation requirements differ among journal portfolios and 
+%%%%  research disciplines. You may find sections in this template are irrelevant 
+%%%%  to your work and are empowered to omit any such section if allowed by the 
+%%%%  journal you intend to submit to. The submission guidelines and policies 
+%%%%  of the journal take precedence. A detailed User Manual is available in the 
+%%%%  template package for technical guidance.
+%%%%%=============================================================================%%%%
+
+\jyear{2022}%
+
+%% as per the requirement new theorem styles can be included as shown below
+\theoremstyle{thmstyleone}%
+\newtheorem{theorem}{Theorem}%  meant for continuous numbers
+%%\newtheorem{theorem}{Theorem}[section]% meant for sectionwise numbers
+%% optional argument [theorem] produces theorem numbering sequence instead of independent numbers for Proposition
+\newtheorem{proposition}[theorem]{Proposition}% 
+%%\newtheorem{proposition}{Proposition}% to get separate numbers for theorem and proposition etc.
+
+\theoremstyle{thmstyletwo}%
+\newtheorem{example}{Example}%
+\newtheorem{remark}{Remark}%
+\newtheorem{algorithm}{Algorithm}
+
+\theoremstyle{thmstylethree}%
+\newtheorem{definition}{Definition}%
+
+\raggedbottom
+%%\unnumbered% uncomment this for unnumbered level heads
+
+
+%%========== CUSTOM COMMANDS ===============%%
+\newcommand{\eps}{\varepsilon}
+\renewcommand{\d}{\mathrm{d}}
+\newcommand{\cL}{\mathcal{L}}
+\newcommand{\1}{\mathbbm{1}}
+\newcommand{\Dt}{{\Delta t}}
+\newcommand{\iid}{{\textit{i.i.d.} }}
+\DeclareMathOperator*{\argmax}{argmax}
+\DeclareMathOperator*{\argmin}{argmin}
+\newcommand{\ind}{\mathrel{\perp\!\!\!\perp}}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\Ethevenin}{\mathbb{E}_{\eta}}
+\newcommand{\Enorton}{\mathbb{E}^{\mathrm{Norton}}_r}
+\newcommand{\Xeta}{X^\eta}
+\newcommand{\Yr}{Y^r}
+\newcommand{\Ybr}{Y^{\mathbf{r}}}
+\newcommand{\Rr}{\mathcal{R}^r}
+\newcommand{\lambdar}{\lambda^r}
+\newcommand{\Lambdar}{\Lambda^r}
+\newcommand{\lambdabr}{\lambda^{\mathbf{r}}}
+\newcommand{\Lambdabr}{\Lambda^{\mathbf{r}}}
+\renewcommand{\e}{\mathrm{e}}
+\renewcommand{\R}{\mathbb{R}}
+
+%% =========================================%%
+\begin{document}
+
+\title[A stochastic Norton method for the efficient computation of transport coefficients]{A stochastic Norton method for the efficient computation of transport coefficients}
+
+\author[1,2]{\fnm{No\'e} \sur{Blassel}}
+\author[1,2]{\fnm{Gabriel} \sur{Stoltz}}
+%%\author[1]{\fnm{Second} \sur{Author}}
+
+\affil[1]{\orgdiv{CERMICS lab}, \orgname{\'ecole des Ponts ParisTech},\city{Paris},\country{France}}
+\affil[2]{\orgdiv{MATHERIALS project}, \orgname{Inria}, \city{Paris}, \country{France}}
+
+%%==================================%%
+%% sample for unstructured abstract %%
+%%==================================%%
+
+\abstract{We propose a stochastic Norton method for the computation of transport coefficients in non-equilibrium systems. 
+In this dual approach to the standard NEMD method, in which the magnitude of a flux is measured in response to a non-equilibrium forcing with a fixed intensity, 
+the magnitude of the flux now acts as the state variable, and the measured quantity is the average intensity of the forcing needed to maintain it.
+We provide numerical evidence that this method provides an equivalent measure of the linear response, as well as suggesting that this equivalence extends well beyond the linear response regime.}
+
+%%================================%%
+%% Sample for structured abstract %%
+%%================================%%
+
+% \abstract{\textbf{Purpose:} The abstract serves both as a general introduction to the topic and as a brief, non-technical summary of the main results and their implications. The abstract must not include subheadings (unless expressly permitted in the journal's Instructions to Authors), equations or citations. As a guide the abstract should not exceed 200 words. Most journals do not set a hard limit however authors are advised to check the author instructions for the journal they are submitting to.
+% 
+% \textbf{Methods:} The abstract serves both as a general introduction to the topic and as a brief, non-technical summary of the main results and their implications. The abstract must not include subheadings (unless expressly permitted in the journal's Instructions to Authors), equations or citations. As a guide the abstract should not exceed 200 words. Most journals do not set a hard limit however authors are advised to check the author instructions for the journal they are submitting to.
+% 
+% \textbf{Results:} The abstract serves both as a general introduction to the topic and as a brief, non-technical summary of the main results and their implications. The abstract must not include subheadings (unless expressly permitted in the journal's Instructions to Authors), equations or citations. As a guide the abstract should not exceed 200 words. Most journals do not set a hard limit however authors are advised to check the author instructions for the journal they are submitting to.
+% 
+% \textbf{Conclusion:} The abstract serves both as a general introduction to the topic and as a brief, non-technical summary of the main results and their implications. The abstract must not include subheadings (unless expressly permitted in the journal's Instructions to Authors), equations or citations. As a guide the abstract should not exceed 200 words. Most journals do not set a hard limit however authors are advised to check the author instructions for the journal they are submitting to.}
+
+\keywords{Non-equilibrium ensembles, Monte-Carlo method}
+
+%%\pacs[JEL Classification]{D8, H51}
+
+%%\pacs[MSC Classification]{35A01, 65L10, 65L12, 65L20, 65L70}
+
+\maketitle
+
+\section{Introduction}\label{intro}
+PARAGRAPHE HISTORIQUE/ INTRO A LA MD pour la physique statistique
+In this work, we are concerned with the problem of computing a certain class of thermodynamic properties for large molecular systems. What we mean generically is that we aim to compute the expectation
+$$\int_{\mathcal X} \varphi \,\d \mu$$
+of a certain observable $\varphi$ with respect to a probability measure $\mu$ over the set $\mathcal X$ of physical configurations, which defines the thermodynamic ensemble. Since $\mu$ is typically a very high-dimensional measure, direct approaches fail to the curse of dimensionality, so that one usually resorts to a Monte--Carlo method. Furthermore, since direct sampling from $\mu$ is not always feasible, one often relies on the fact that this measure is the invariant measure for some dynamics $X_t$ in phase space , so that one computes trajectory averages
+\[\frac1{T}\int_0^T \varphi(X_t)\,\d t.\]
+For this substitution to be consistent, one requires the dynamics to satisfy an ergodic property with respect to $\mu$. While the rigorous proof of such properties can be undertaken, under appropriate assumptions, in the case where the underlying dynamics $X_t$ is a stochastic process, they are typically out of reach in the deterministic case.
+
+One standard approach in computing transport coefficients is the celebrated Green--Kubo method, which relies on analyzing cross fluctuations at equilibrium between appropriate fluxes. Another approach, and in some sense the most natural, is to perturb the equilibrium dynamics 
+Here, we propose a stochastic formulation of the method, which we hope will be more tractable from a theoretical perspective, while providing new numerical evidence of its usefulness for the simulation of mechanically-driven transport phenomena in molecular systems.
+In particular we will offer evidence that constant-flux estimators sometimes offer better statistical properties than their constant-force counterparts, which is of practical importance from the computational efficiency point of view.
+\section{Non-equilibrium molecular dynamics}\label{nemd}
+We consider a class non-equilibrium ensembles, composed of the steady-states for certain stochastic processes corresponding at the dynamical level to a perturbation of some reference equilibrium process.
+Here, we consider the case where this perturbation arises from a change in the drift of the underlying diffusion process. We denote by $\mathcal X$ the state space of the system.
+Typically, we will take $\mathcal X= \mathbb{R}^d$ or $\mathbb{T}^d$, with $\mathbb{T}= \mathbb{R}/\mathbb{Z}$ the one-dimensional torus. We introduce smooth vector fields $b,F: \mathcal{X}\to \mathbb{R}^d$, corresponding respectively to the equilibrium drift and its perturbation.
+The non-equilibrium molecular dynamics is given as the solution to the following stochastic differential equation (SDE),
+\begin{equation}
+    \label{eq:thevenin_dynamics}
+    \d \Xeta_t = b(\Xeta_t)\,\d t +\sigma(\Xeta_t)\,\d W_t +\eta F(\Xeta_t)\,\d t,
+\end{equation}
+where $\sigma$ is a $\mathrm{dim}(\mathcal X)\times m$ matrix-valued map, $(W_t)_{t\geq 0}$ a standard $m$-dimensional Brownian motion, and $\eta>0$ is a scalar parameter modulating the strength of the perturbation.
+The equilibrium dynamics is recovered in the absence of a non-equilibrium perturbation, that is the case $\eta=0$.
+The infinitesimal generator of the dynamics can be decomposed as the sum
+\begin{equation}
+    \label{eq:thevenin_generator}\cL_\eta=\cL+\eta \widetilde{\cL},\qquad \cL=b \cdot \nabla + \sigma ^\intercal \sigma : \nabla ^2,\qquad \widetilde{\cL}=F\cdot \nabla,
+\end{equation}
+where $\nabla^2$ denotes the Hessian matrix and $:$ denotes the Frobenius inner product $A:B=\mathrm{Tr}(A^\intercal B)$. 
+Note that $\cL$ is the generator of the reference dynamics, and $\widetilde{\cL}$ its perturbation.
+The invariant probability measure satisfies the stationary Fokker-Planck equation,
+\begin{equation}
+    \label{eq:thevenin_fokker-planck equation}
+    \cL_\eta^{\dagger} \psi_\eta = 0,
+\end{equation}
+where $\cL_\eta^{\dagger}$ is the flat $L^2(\mathcal X)$ adjoint of the generator, equation \eqref{eq:thevenin_fokker-planck equation} being understood in the sense of distributions. Existence, uniqueness and regularity results for its solution depend on the particular form of the dynamics, as do properties pertaining to convergence to the steady-state. General criteria can be found in [article de Kliemann]. Let us assume in the remainder of this section that for small enough $\eta \geq 0$, the dynamics admits a unique invariant probability measure for which it is ergodic, and denote the corresponding expectation by $\mathbb{E}_\eta$. Given a response observable $R : \mathcal X \to \mathbb R$ such that $\mathbb{E}_0\left[ R\right]=0$, which we think of as measuring a flux in the system out of equilibrium, we define the associated transport coefficient as the limit, provided it is well defined,
+\begin{equation}
+    \label{eq:def_thevenin_transport_coeff}
+    \rho_{F,R} = \underset{\eta\to 0}{\lim}\frac{\mathbb{E}_{\eta}\left[R\right]}{\eta}.
+\end{equation}
+
+Rigorous assumptions under which this limit exists are given in \cite{hairer_simple_2010}. This definition suggests a simple and natural method to estimate these coefficients: one can compute ergodic averages of $R$ over trajectories of the non-equilibrium dynamics \eqref{eq:thevenin_dynamics}, and estimate the linear relation between $\eta$ and $R$ for one or several $\eta$s in the linear response regime. The finite-difference estimator for the limit \eqref{eq:def_thevenin_transport_coeff} is given by the following ergodic average:
+\begin{equation}
+    \label{eq:thevenin_rho_estimators_continuous_time}
+    \widehat{R}_{T,\eta}=\frac1{T\eta}\int_0^T R(X^\eta_t)\,\d t.
+\end{equation}
+One can also consider estimators obtained by estimating $\mathbb{E}_\eta[R]$ for several values of $\eta$ using similar ergodic averages, and performing a polynomial fit on the resulting sample points: the corresponding linear coefficient is an estimation of $\rho_{F,R}$.
+However, this method has the disadvantage that the asymptotic variance of the estimator \eqref{eq:thevenin_rho_estimators_continuous_time} scales as $\eta^{-2}$ as $\eta$ approaches $0$, thus making it computationally prohibitive to compute accurately if the size of the linear response regime is too small, due to persistent statistical noise. One current avenue of research is to replace the forcing $F$ by a so-called synthetic forcing devised to induce the same transport coefficient, but which extends the range of the linear response. See, for instance, the discussion in \cite[Section 6.1]{evans_statistical_2008}. Other alternatives 
+include relying on Green-Kubo formulas, or other fluctuation identities, see for instance \cite{plechac_convergence_2021}. 
+
+\section{A stochastic Norton method}\label{norton}
+We consider here another approach consists of exploiting the macroscopic duality between thermodynamic forces and fluxes: 
+at a macroscopic level, one can equivalently choose to measure the current induced by a constant force, or the resistance opposed to a constant current, since these are related by a version of Ohm's law.
+The idea of the Norton method is precisely to leverage this macroscopic duality. This amounts to consider a new non-equilibrium ensemble in which the flux is the defining state variable instead of the force. 
+If the transport coefficient \eqref{eq:def_thevenin_transport_coeff} is thought of as measuring a conductance, one should think of the dual coefficient in the Norton ensemble (that relating the average forcing to the magnitude of the flux) as a measure of the resistance.
+By analogy with the Norton--Th\'evenin reciprocity in electrical circuit theory, one can consider the standard approach as a Th\'evenin method, which is the terminology we shall now use. The Norton approach was suggested and has been studied theoretically by Evans and Morris,  but in a deterministic setting in which ergodicity typically cannot be shown to hold, making most theoretical results only accessible at a formal level.
+Furthermore, the generalization of Langevin dynamics as the standard approach to canonical sampling, rather than deterministic thermostats on which the work of Evans and Morris is based, warrants a new look at this method in a stochastic context.
+Previous results include the computation of Green-Kubo like relations for constant-mobility ensembles \cite{}, relating the Norton transport coefficient to integrated autocorrelation functions in the corresponding zero-flux Norton ensemble, as well as a formal proof of the equivalence between the Norton and Th\'evenin ensembles \cite{}.
+The deterministic Norton method has finally been applied to shear viscosity computations, and the results of simulations have been shown to agree with their Th\'evenin counterparts \cite{}.
+In this section, we present the Norton pertubation approach for a generic reference dynamics of the form \eqref{eq:thevenin_dynamics}. We then proceed to compute a closed-form for the forcing, and deduce a microscopic obervable whose average corresponds to that of the forcing. We finally discuss how the Norton approach can easily be extended to the cases of multiple forcings, or time-dependent flux constraints.
+
+\subsection{Presentation of the dynamics}
+At a dynamical level, the Norton ensemble is defined as the invariant probability measure for the solution of the follownig stochastic differential equation:
+\begin{equation}
+    \label{eq:norton_dynamics}
+    \left\{\begin{aligned}
+    \d \Yr_t &= b(\Yr_t)\, \d t + \sigma(\Yr_t)\, \d W_t +  F(\Yr_t)\,\d\Lambdar_t,\\
+    R(\Yr_t) &= R(\Yr_0)=r.
+    \end{aligned}\right.
+\end{equation}
+Here, the evolution of the state is given by the dynamics of $\Yr_t \in \mathcal X$, and $r\in \mathbb{R}$ is the magnitude of the response flux, which is held at a constant level. Thus the dynamics evolves on the submanifold
+\begin{equation}
+    \label{eq:norton_submanifold}
+    \Sigma_r =\left\{y\in \mathcal{X},\quad R(y)=r\right\} = R^{-1}\{r\}
+\end{equation}
+of the full state space. The dynamics \eqref{eq:norton_dynamics} can formally still be considered as a perturbation of the equilibrium dynamics, in the same direction as the Th\'evenin process \eqref{eq:thevenin_dynamics}, but with a random intensity given by the process $\Lambdar_t$, acting as the control by which the constant-flux condition is enforced.
+
+We will proceed in the following to show that $\Lambdar$ can in fact be defined as an Itô process adapted to the natural filtration of the Brownian motion $W$,
+\begin{equation}
+    \label{eq:norton_lambda_sde}
+    \Lambdar_t = \Lambdar_0 + \int_0^t \lambdar_s \d s + \widetilde{\Lambda}^r_t.
+\end{equation}
+where $\widetilde{\Lambda}^r$ is a $W$-adapted martingale, and where $\lambdar_t$ can be written as a function $\lambda$ of the state $\Yr_t$. The average forcing in the Norton ensemble can then be defined as the average of the function $\lambda$ under the steady-state probability measure.
+Numerically, these averages can be computed as ergodic averages over numerical trajectories of the Norton dynamics. Assuming the well-posedness of the dynamics, the existence and uniqueness of the invariant steady-state measure, whose expectation is denoted by $\mathbb{E}_{r}^*$, the Norton analog of the transport coefficient is defined in a natural manner as
+
+\begin{equation}
+    \label{eq:def_norton_transport_coeff}
+    \widetilde{\rho}_{F,R} = \underset{r\to 0}{\lim}\,\frac{r}{\mathbb{E}_r^* \left[\lambda\right]},
+\end{equation}
+provided the limit exists. In equation \eqref{eq:def_norton_transport_coeff}, $\widetilde{\rho}_{F,R}$ can be considered as the inverse of the resistance.
+
+\subsection{A closed form for the forcing process}
+Let us now compute the dynamics for the forcing, which will allow us to isolate the observable of interest $\lambda$, and write the Norton dynamics without explicit reference to the forcing 
+We assume that $\Lambdar$ is of the form \eqref{eq:norton_lambda_sde}, and verify a posteriori that this ansatz is valid.
+Applying Itô's formula to the constant response condition $R(\Yr_t)=r$ yields
+\begin{equation}
+\label{eq:norton_ito_formula}
+    \nabla R(\Yr_t)\cdot \left[b(\Yr_t) \d t + \sigma(\Yr_t) \d W_t + \d\Lambdar_t F(\Yr_t)\right] +\frac 12 \nabla ^2 R(\Yr_t) : \d\left\langle M^r\right\rangle_t = 0,
+\end{equation}
+where $\langle M \rangle_t$ denotes the quadratic covariation process for the martingale part in the Itô decomposition of $\Yr$:
+\begin{equation}
+    \label{eq:norton_martingale_part}
+    \d M^r_t = \sigma(\Yr_t)\,\d W_t + F(\Yr_t)\,\d \widetilde{\Lambda}^r_t.
+\end{equation}
+Using the uniqueness of the Itô decomposition, we can identify martingale increments in \eqref{eq:norton_ito_formula} as:
+\begin{equation}
+    \label{eq:norton_forcing_martingale_part}
+    \d \widetilde{\Lambda}^r_t = -\frac{\nabla R(\Yr_t) \cdot \sigma(\Yr_t) \d W_t}{\nabla R(\Yr_t)\cdot F(\Yr_t)}.
+\end{equation}
+We assume that $\nabla R \cdot F \neq 0$ almost surely.
+Plugging this equality in \eqref{eq:norton_martingale_part} in turn gives the value of the covariation increment:
+\begin{equation}
+    \label{eq:norton_covariation_increment}
+    \begin{aligned}
+    d\left\langle M^r\right\rangle_t &=\d\,\left\langle \left(\mathrm{Id} -\frac{F(\Yr) \otimes \nabla R(\Yr)}{F(\Yr) \cdot \nabla R(\Yr)}\right)\sigma(\Yr) \d W\right\rangle_t\\
+    &= \left[\overline{P}_{F,\nabla R} \sigma\sigma ^\intercal \overline{P}_{\nabla F,R}^\intercal\right](\Yr_t)\d t,
+    \end{aligned}
+\end{equation}
+where we define for vector fields $A,B$ the following non-orthogonal projector-valued map,
+\begin{equation}
+    \label{eq:norton_proj_AB}
+    P_{A,B}(x) = \frac{A(x) \otimes B(x)}{A(x) \cdot B(x)},\qquad \overline{P}_{A,B}(x)=\mathrm{Id}-P_{A,B}(x).
+\end{equation}
+The action of the projector is given, for $\xi\in \mathbb{R}^d$ and $x\in\mathcal{X}$, by
+\[P_{A,B}(x)(\xi)=\frac{B(x)\cdot \xi}{A(x)\cdot B(x)}A(x).\]
+For notational convenience, let us define
+\begin{equation}
+    \label{eq:norton_covariation_projector_term}
+    \Pi_{F,\nabla R,\sigma}(y)=\left[\overline{P}_{F,\nabla R} \sigma\sigma ^\intercal \overline{P}_{ F,\nabla R}^\intercal\right](y).
+\end{equation}
+We next proceed to identifying the bounded-variation increments on both sides of \eqref{eq:norton_ito_formula}. After rearrangement and substitution of \eqref{eq:norton_covariation_increment}, one obtains the following expression:
+\[\lambda_t^r =\lambda(Y_t^r),\]
+with
+\begin{equation}
+    \label{eq:norton_lambda_expr}
+    \lambda(y) = \left[-\frac1{F\cdot \nabla R}\left(b\cdot \nabla R +\frac12 \nabla^2 R:\Pi_{F,\nabla R,\sigma}\right)\right](y).
+\end{equation}
+Substituting the expression for $\d\Lambdar_t = \lambdar_t \d t+ \d \widetilde{\Lambda}^r_t$ in \eqref{eq:norton_dynamics} yields the following expression for the Norton dynamics:
+\begin{multline}
+    \label{eq:norton_dynamics_solved}
+    \d \Yr_t = \overline{P}_{F,\nabla R}(\Yr_t)\left[b(\Yr_t) \d t + \sigma(\Yr_t) \d W_t\right]
+    -\frac{\left(\nabla^2 R:\Pi_{F,\nabla R,\sigma}\right)(\Yr_t)}{2\nabla R(\Yr_t)\cdot F(\Yr_t)}F(\Yr_t)\,\d t.
+\end{multline}
+
+One can then to check a posteriori, using Itô's formula, that the dynamics \eqref{eq:norton_dynamics_solved} is such that $R(\Yr_t)=r$ for all $t\geq 0$, provided the coefficients are smooth.
+Without delving into the particular choice for the reference dynamics, the response flux observable $R$ and non-equilibrium forcing $F$, it is difficult to make general comments about the well-posedness of \eqref{eq:norton_dynamics_solved}.
+Let us however emphasize that a crucial condition for the dynamics to be well-defined is that the denominator $F(\Yr_t) \cdot \nabla R(\Yr_t)$ in the expression of the projector $P_{F,\nabla R}$ should not vanish.
+Thinking of the extreme case where $\nabla R$ and $F$ are everywhere orthogonal, we see that this requirement translates into a controllability condition: in this case, any forcing in the direction $F$ has no effect on the flux, thus there is no way to control the latter using such a perturbation. More generally, starting from a configuration for which $F\cdot \nabla R(q)=0$, it is not possible to maintain the value of the response function using the forcing $F$. We therefore assume in the sequel that the condition
+\begin{equation}
+    \label{eq:norton_controllability_condition}
+    \forall y\in\mathcal X,\qquad F(y)\cdot \nabla R(y) \neq 0
+\end{equation}
+is satisfied.
+The Norton analog of the transport coefficient can in practice be computed using ergodic averages of $\lambdar_t=\lambda(\Yr_t)$, which we interpret as ensemble averages of the function $\lambda$ in \eqref{eq:norton_lambda_expr}. Averages are taken with respect to the invariant probability measure of \eqref{eq:norton_dynamics_solved}, which we assume to exist and be unique. Note that this measure is supported on the $(d-1)$-dimensional manifold $\Sigma_r$, and in particular is singular with respect to the invariant probability measure of the reference dynamics.
+
+\subsection{Two straightforward generalizations}
+    For ease of presentation, we restricted ourselves to the case where only one flux is fixed. However, the same computation can be straightforwardly extended to the case where several fluxes are simultaneously constrained, and to the case where the response depends on time. These two generalizations can of course be combined together.
+
+    \subsubsection{Multiple constraints}
+    We consider the case where $(c\geq 1)$ fluxes are fixed. These are described by a map $R:\mathcal X \to \mathbb{R}^c$, whose value is held at a fixed value $\mathbf{r}\in\mathbb{R}^c$ using a Lagrange multiplier $\d\Lambda_t^{\mathbf{r}}$, which is a $W$-adapted Itô process with values in $\mathbb{R}^c$. The forcing is then a matrix-valued map $F:\mathcal X \to \mathbb{R}^{d\times c}$, and the Norton dynamics then writes identically to \eqref{eq:norton_dynamics} upon replacing $r$ by $\mathbf{r}$.
+    As the computations are verbatim the same as the ones leading to \eqref{eq:norton_dynamics_solved}, we simply state the results.
+    Similarly to the single flux case, the dynamics can be written in closed form as
+    \begin{multline}
+        \d \Ybr_t =\overline{P}_{F,\nabla R}(b(\Ybr_t)\,\d t +\sigma(\Ybr_t)\,\d W_t)\\
+        - \frac{F(\Ybr_t)}2(\nabla R(\Ybr_t)^\intercal F(\Ybr_t))^{-1}\left(\nabla^2 R(\Ybr_t)^\intercal: \Pi_{F,\nabla R,\sigma}(\Ybr_t)\right),
+    \end{multline}
+    where $\nabla R : \mathcal X\to \mathbb{R}^{d\times C}, \nabla^2 R: \mathcal X \to \mathbb{R}^{d\times d\times C}$ are the Jacobian and Hessian matrices of the fluxes. Here, we define the contraction product by
+    \[\forall A\in \mathbb{R}^{d\times d\times C}, B\in \mathbb{R}^{d\times d},\quad A:B = \left(\sum_{j,k=1}^d A_{kji}B_{kj}\right)_{1\leq i\leq C},\]
+    the projector $\overline{P}_{F,\nabla R}$ is given, for $A,B\in \mathbb{R}^{d\times C}$, by
+    \[P_{A,B} = A(B^\intercal A)^{-1}B^\intercal,\qquad \overline{P}_{A,B} = \operatorname{Id}-P_{A,B},\]
+    and $\Pi_{F,\nabla R,\sigma}$ accordingly to \eqref{eq:norton_covariation_projector_term}. Note the controllability condition becomes
+    \begin{equation}
+        \forall y\in \mathcal X,\qquad\operatorname{det}(\nabla R(y)^\intercal F(y)) \neq 0, 
+    \end{equation}
+    and that the invariant measure is supported on a $(d-C)$-dimensional manifold $\Sigma_{\mathbf{r}}$.
+    The average value of the forcing can be written as the ergodic average of the following vector-valued observable, which is the analog of \eqref{eq:norton_lambda_expr}:
+    \begin{equation}
+        \lambda = -(\nabla R^\intercal F)^{-1}\left[\nabla R^\intercal b + \frac12\left(\nabla^2 R^\intercal: \Pi_{F,\nabla R,\sigma}\right)\right].
+    \end{equation}
+    This type of dynamics should in particular allow for the numerical computation of Onsager relations in the Norton ensemble.
+    
+    \subsubsection{Time-dependent fluxes}
+    One can also to extend the dynamics to the case where we replace the condition $R(Y_t^r)=r$ by $R(Y_t^r)=\Rr_t$, when $\Rr_t$ is the Itô process defined by
+    \begin{equation}  
+    \label{eq:norton_sde_R}
+    \Rr_t=R(\Yr_0) +\int_0^t \bar{r}_s\d s + \int_0^t \widetilde{r}_s \d B_s,
+    \end{equation}
+    with $B$ a one-dimensional Brownian motion independent from $W$. These dynamics in particular cover the deterministic case $\widetilde{r}_t = 0$, so that one can for instance consider time-periodic fluxes. One can also take $\Rr$ to be a stochastic process whose ergodic properties are well-understood, such as an Ornstein-Uhlenbeck process centered at $r$. One expects the resulting steady-state to be non-singular with respect to the reference invariant measure, which may be of some use from a theoretical perspective.
+    Following the same strategy as in the constant response case, one can arrive at the following expression for the bounded variation contribution to the forcing:
+    \begin{equation}
+    \label{eq:norton_lambda_t_expr}
+    \lambdar_t = \left[\frac1{F\cdot \nabla R}\left(\bar{r}_t-b\cdot \nabla R -\frac12 \nabla^2 R:\left[ \widetilde{r}_t^2 F F^\intercal +\overline{P}_{F,\nabla R} \sigma\sigma ^\intercal \overline{P}_{\nabla R,F}\right]\right)\right](\Yr_t),
+    \end{equation}
+    and write the dynamics in closed form as
+    \begin{multline}
+        \d \Yr_t = \overline{P}_{F,\nabla R}(\Yr_t)\left[b(\Yr_t) \d t + \sigma(\Yr_t) \d W_t\right]
+        +\frac{\bar{r}_t\d t+\widetilde{r}_t \d B_t}{\nabla R(\Yr_t)\cdot F(\Yr_t)}\\
+        -\frac{1}{2\nabla R(\Yr_t)\cdot F(\Yr_t)}\left(\nabla^2 R:\left[ \widetilde{r}_t^2 F F^\intercal +\overline{P}_{F,\nabla R} \sigma\sigma ^\intercal \overline{P}_{\nabla R,F}\right]\right)(\Yr_t)F(\Yr_t),
+    \end{multline}
+which is still an Itô process, although only adapted to the larger filtration $$\left[\sigma(B_s,W_s : 0\leq s\leq t)\right]_{t\geq 0}.$$
+\subsection{Linear response}
+In this paragraph, we outline a general strategy to obtain expressions for the linear response of a Norton system. More precisely, if we write $\mu_r$ for the invariant probability measure of the dynamics \eqref{eq:norton_dynamics}, we wish to compute, for a bounded measurable $\varphi : \mathcal X \to \mathbb{R}$, the following limits
+\begin{equation}
+    \label{eq:linear_response}
+    \rho(\varphi)=\underset{r\to 0}{\lim}\,\frac1r\left(\int_{\mathcal X} \varphi\, \d\mu_r - \int_{\mathcal X} \varphi\,\d\mu_0\right).
+\end{equation}
+These quantities characterize the first-order correction to the perturbed invariant measure $\mu_r$ with respect to $\mu_0$. It turns out one can obtain expressions for this limits in terms of integrated fluctuations in the zero-flux ensemble. In particular, taking $\varphi = \lambda$ in \eqref{eq:linear_response}, one can derive expressions for the transport coefficient in terms of averages in the zero-flux Norton ensemble. These can be considered to be Norton analogs of the Green--Kubo relations. We highlight at this point that our computations are formal: justifying them rigorously requires the choice of a functional framework in which linear response can be shown to hold, which in general depend on the form of the reference dynamics \eqref{eq:thevenin_dynamics}. See \cite{} (citer hairer et majda), for an example of such a framework.
+Using Itô calculus, one can easily show that the infinitesimal generator of the dynamics \eqref{eq:norton_dynamics} acts on smooth functions $\varphi$ as
+\begin{equation}
+    \label{eq:norton_generator}
+    \cL^0 \varphi = \cL \varphi - \lambda F\cdot \nabla \varphi + \frac12 \nabla^2\varphi : \Pi_{\nabla R,F,\sigma},
+\end{equation}
+where $\cL$ is the generator of the reference dynamics, given in \eqref{eq:thevenin_generator}. Since the expression \eqref{eq:norton_generator} is independent from the intensity of the flux, the perturbation of the dynamics is not perceptible at the level of the generator: instead, it is fully encoded in the initial condition, and indeed, since $\mu_r$ and $\mu_0$ have disjoint supports, there is no direct way to write one as a perturbation of the other. Instead, one can resort to a reprojection of the dynamics onto the zero-flux manifold $\Sigma_0$. This can be simply achieved by considering the flow $\phi$ of the following ordinary differential equation:
+\begin{equation}
+    \label{eq:norton_ode_flow}
+    \dot{x} = \frac{N(x)}{\nabla R(x)\cdot N(x)},
+\end{equation}
+where $N$ is a vector field such that $N \cdot R \neq 0$ everywhere. We assume that the flow is globally defined for small enough $r$ around $0$. A simple calculation shows that $\phi_r(\Sigma_0) = \Sigma_r$ for all $r$.
+This is motivated by the observation that ergodic averages corresponding to the integral with respect to $\mu_r$ in \eqref{eq:linear_response} can be written as
+\begin{equation}
+\label{eq:norton_ergodic_averages_reprojected}
+    \frac{1}{T}\int_0^T \varphi(Y_t^r)\,\d t = \frac{1}{T}\int_0^T \varphi\circ \phi_r (\phi_{-r}(Y_t^r)\,\d t \underset{T\to\infty}{\longrightarrow}\int_{\Sigma_0}\varphi\circ \phi_{r}\,\d \widetilde{\mu}_r,
+\end{equation}
+assuming ergodicity, existence and uniqueness of an invariant probability measure $\widetilde{\mu}_r$ for the reprojected dynamics $\phi_{-r}(Y_t^r)$. The latter then satisfies a stationnary Fokker-Planck equation
+\begin{equation}
+    \label{eq:norton_fp_equation}
+    \left(\cL^{r}\right)^{\dagger}\widetilde{\mu}_r=0,
+\end{equation}
+where $\cL^r$ is the generator of the reprojected dynamics, given by
+\begin{align*}
+    \cL^r\varphi(y)&=\frac{\d}{\d t}\mathbb{E}\left[\varphi(\phi_{-r}(Y_t^r)\middle\vline\, \phi_{-r}(Y_0^r) =y\right]_{t=0}\\
+    &=\frac{\d}{\d t}\mathbb{E}\left[ \varphi \circ \phi_{-r} (Y_t^r) \middle\vline\, Y_0^r =\phi_r(y)\right]_{t=0}\\
+    &=\cL^0\left[\varphi\circ \phi_{-r}\right]\left(\phi_r(y)\right).
+\end{align*}
+Note that, contrary to the Th\'evenin setting \eqref{eq:thevenin_generator}, this corresponds to a non-linear perturbation of the zero-flux generator $\cL^0$. However, a linearization of $\cL^r$ around $r=0$ yields
+\begin{equation}
+    \label{eq:norton_generator_perturbation}
+    \cL^r\varphi = \cL^0 \varphi + r \mathcal{P}\varphi + r^2\mathcal A,
+\end{equation}
+with the first-order perturbation $\mathcal{P}$ given by
+\begin{equation}
+    \mathcal{P}\varphi = \nabla \left[\cL^0 \varphi\right]\cdot \frac{N}{\nabla R\cdot N} - \cL^0\left[\nabla \varphi \cdot \frac{N}{\nabla R\cdot N}\right],
+\end{equation}
+and $\mathcal A$ is a remainder term.
+Assuming that $\mu_0$ has a smooth density $\psi_0$ with respect to the surface measure on $\Sigma_0$, and that $\widetilde{\mu}_r$ has a smooth density $\psi_r$ with respect to $\mu_0$ which can be written $1+rf+r^2g$, the stationary Fokker-Planck equation writes 
+\begin{equation}
+    \left(\cL^0  + r \mathcal{P} + r^2\mathcal A\right)^\dagger\left[(1+rf+r^2g)\psi_0\right]=0,
+\end{equation}
+or equivalently,
+\begin{equation}
+    \left(\cL^0  + r \mathcal{P} + r^2\mathcal A \right)^*(1+rf+r^2g)=0,
+\end{equation}
+where the adjoint is taken with respect to the weighted $L^2(\mu_0)$ inner product. Formally identifying first-order terms yields an expression for $f$
+\begin{equation}
+    (-\cL^0)^*f=\mathcal{P}^*1
+\end{equation}
+as the solution of a second-order partial differential equation.
+Provided $\cL^0$ is one-to-one and $\varphi\,\in \mathrm{Range}(\cL^0)$, we can therefore rewrite the right-hand side of \eqref{eq:norton_ergodic_averages_reprojected} as
+\begin{equation}
+    \int_{\Sigma_0}\varphi\circ \phi_{r}\,\d \widetilde{\mu}_r = \int_{\Sigma_0} \varphi \,\d \mu_0 + r\int_{\Sigma_0}\nabla \varphi \cdot \frac{N}{\nabla R\cdot N}\, \d \mu_0 + r\int_{\Sigma_0}(-\cL^0)^{-1}\varphi \mathcal{P}^*1\,\d\mu_0+\mathrm{O}(r^2).
+\end{equation}
+In particular, the linear response \eqref{eq:linear_response} is then given by
+\[\rho(\varphi)=\int_{\Sigma_0}\nabla \varphi \cdot \frac{N}{\nabla R\cdot N} + (-\cL^0)^{-1}\varphi \mathcal{P}^*1\, \d \mu_0.\]
+
+The effective computation of such expressions requires an ability to compute an explicit form for the conjugate response $S=\mathcal{P}^*1$. If one knows an expression for the zero-flux steady state probability density, then these can be obtained using appropriate integration by parts. If, furthermore, one can write 
+\[(-\cL^0)^{-1}\varphi = \int_0^\infty \mathrm{e}^{t\cL^0}\varphi\,\d t,\]
+where $\mathrm{e}^{t\cL^0}$ is the evolution semi-group for the Norton dynamics, then the linear response can be rewritten as an equilibrium average, 
+\begin{equation}
+\label{eq:green_kubo_relation}
+    \rho(\varphi)=\mathbb{E}_{\mu_0}\left[\nabla \varphi(Y_0^0) \cdot \frac{N(Y_0^0)}{\nabla R(Y_0^0)\cdot N(Y_0^0)}\right]+\int_0^\infty \mathbb{E}_{\mu_0}\left[\varphi(Y_t^0)S(Y_0^0)\right]\,\d t,
+\end{equation}
+which is the Norton equivalent of a Green--Kubo relation. The subscript in the expectation denotes that initial conditions are distributed according to $\mu_0$. Note that there is some freedom in the choice of the direction $N$ of the reprojection flow. 
+\section{The Norton method for mobility and shear viscosity}
+So far, we have made very few assumptions about the type of reference dynamics, driving force or flux. We now turn to presenting the framework in which the computation of physically meaningful transport coefficients may be performed, namely that of non-equilibrium Langevin dynamics. We first present the Th\'evenin method, before giving the corresponding Norton dynamics. We conclude the section by giving an interpretation of the Norton dynamics in terms of the Gauss principle of least constraint.
+
+\subsection{The Th\'evenin method}
+The non-equilibrium framework we consider is that of a driving force perturbation of the Langevin dynamics, given by the following stochastic differential equation:
+\begin{equation}
+    \label{eq:langevin_equation}
+    \left\{\begin{aligned}
+    \d q_t & = M^{-1}p_t \d t, \\
+    \d p_t &= -\nabla V(q_t)\,\d t -\gamma M^{-1}p_t\,\d t +\sqrt{\frac{2\gamma}{\beta}}\d W_t +\eta F(q_t)\,\d t,
+    \end{aligned}\right.
+\end{equation}
+Here, we take $(q,p)\in \mathcal D\times \mathbb{R}^{DN}$, where $D$ is the physical dimension and $N$ is the number of atoms.
+The configurational domain $\mathcal D$ is taken to be $\mathbb{R}^{DN}$ or $(L\mathbb{T})^{DN}$ for some box length $L$.
+The parameter $\beta$ is inversely proportional to the temperature, $M$ is a positive-definite symmetric mass matrix, $\gamma$ and $\sigma$ satisfy the fluctuation-dissipation relation 
+\[\sigma\sigma^\intercal=\frac{2\gamma}\beta.\]
+The friction coefficient $\gamma$ is thus a symmetric positive semi-definite matrix, and the Botzmann--Gibbs distribution
+\begin{equation}
+    \label{eq:boltzmann_gibbs_measure}
+    \mu(p,q)\,\d p\d q= Z^{-1}\mathrm{e}^{-\beta H(q,p)}\d q\d p
+\end{equation}
+is an invariant probability measure, where the Hamiltonian is given by
+\[H(q,p)=V(q) +\frac12 p\cdot M^{-1}p.\]
+In view of the separability of the Hamiltonian into a configurational and kinetic part, the Boltzmann--Gibbs measure can be written in tensor form, as the product of a configurational measure
+\[\nu(q)\,\d q = \frac1{Z_\nu}\mathrm{e}^{-\beta V(q)}\,\d q\]
+and of a Gaussian kinetic measure
+\[\kappa(p)\,\d p ) = \operatorname{det}\left(\frac{2\pi M}\beta\right)^{-ND/2}\mathrm{e}^{-\frac12 p\cdot M^{-1}p}\,\d p.\]
+Momenta and positions are in particular independent at equilibrium, which excludes the observation of fluxes.
+Since the perturbation is not in general the gradient of a periodic function, there is however no way to express the perturbed dynamics in potential form, and thus an analytic expression for the invariant measure is not known. One can think of the effect of the driving $F$ as tilting the steady-state distribution, inducing small correlations between the kinetic and potential marginals, and explaining the emergence of transport phenomena. In this work, we are concerned with transport coefficients corresponding to fluxes which can be written in the form
+\begin{equation}
+    \label{eq:nemd_response_observable}
+    R(q,p)=G(q)\cdot p,
+\end{equation}
+where $G: \mathcal D \to \mathbb{R}^{DN}$ is a vector field. This form of response is general enough to capture the cases of mobility and shear viscosity computations, which we now proceed to present, and which will serve as our numerical examples.
+
+\subsubsection{Mobility computations}
+Diffusion properties of the particle system can be computed by taking $F$ as a constant vector field, and the velocity in the direction $F$ as the response, which measures the particle flux in the direction dictated by $F$. We assume $F$ is normalized so that $\| F \|=1$.
+\begin{equation}
+    \label{eq:mobility_force_flux}
+    F(q) = F\in \mathbb{R}^{DN},\qquad R(q)= F\cdot M^{-1}p = M^{-1}F\cdot p,
+\end{equation}
+using the symmetry of $M$.
+
+For practical computations, we consider two cases:
+\begin{enumerate}[(i)]
+    \item \textbf{Single drift}: this corresponds to a perturbation where the force acts on a single component of the momentum, which we can assume by indistinguishability of the particles to be the $x$ component of the first particle: \[F_{\mathrm{S}}=(1,0,\dots)^\intercal \in \R^{dN}.\]
+    \item \textbf{Color drift} \cite[Chapter 6]{EM08}: this corresponds to a perturbation in which we the force acts on half of the particles in one direction, and on half of the particles in the opposite direction, which we convene is the $x$ direction: \[F_{\mathrm{C}}=\frac1{\sqrt N}\underbrace{(1,0,\dots,}_{d \text{ components}}-1,0,\dots,1,0\dots)^\intercal \in \R^{dN}.\]
+\end{enumerate}
+The corresponding transport coefficients are related to the diffusion properties of the molecular medium: if $\rho_{F_{\mathrm{S}}}$ denotes the transport coefficients for the single drift, in the case of an isotropic system, the diffusion coefficient $D$ is given by the relation
+\begin{equation}
+    \label{eq:diffusion_coefficient}
+    \rho_{F_{\mathrm S}} = \beta D,
+\end{equation}
+while the transport coefficient $\rho_{F_{\mathrm C}}$ for the color drift is in turn related to $\rho_{F_{\mathrm S}}$ through
+\begin{equation}
+\label{eq:color_drift_relation}
+    \rho_{F_{\mathrm{C}}}=\rho_{F_{\mathrm S}}-\frac{2\lfloor N/2 \rfloor}{N(N-1)}\left(\frac1{\gamma}-\rho_{F_{\mathrm S}}\right).
+\end{equation}
+\subsubsection{Shear viscosity computations}
+This framework also allows for the computation of the shear viscosity, using the method described in \cite{gosling_calculation_1973}, and adapted to the Langevin setting in \cite{joubaud_nonequilibrium_2012}.
+A forcing is applied to the first (longitudinal) momentum coordinate of each particle, with an intensity depending on the corresponding second (transverse) configurational coordinate, according to a predefined forcing profile $F_y: L\mathbb T\to \mathbb R$. 
+In the steady-state, the system displays an average longitudinal velocity profile depending on the transverse coordinate. Since this profile is periodic in the transverse coordinate, it can be measured through Fourier analysis, suggesting the following response:
+\begin{align}
+    \label{eq:shear_viscosity_force_flux}
+    &\forall\, 1\leq j\leq N,\,\forall\, 2\leq \alpha\leq D,\quad F(q)_{j1}=f_y(q_{j2}),\quad F(q)_{j\alpha}=0,\\
+    &R(q,p)=\frac{1}N\sum_{j=1}^N\left(M^{-1}p\right)_{j1}\exp\left(\frac{2i\pi q_{j2}}{L}\right),
+\end{align}
+where for practical purposes we choose $F_y$ such that its first Fourier coefficient is real.
+It is an empirical Fourier coefficient measuring the magnitude of the response profile.
+Note this is again of the form $R=G\cdot p$. Denoting by $\rho_F$ the corresponding transport coefficient, it can be related to the shear viscosity $\eta$ by the relation
+
+\begin{equation}
+    \label{eq:shear_viscosity}
+    \eta = \overline{\rho}\left(\frac{c_1(f_y)}{\rho_F}-\gamma \right)\left(\frac{L}{2\pi}\right)^2,
+\end{equation}
+where $\overline{\rho}$ denotes the particle density of the system.
+\subsection{The Norton method}
+The$\nabla^2_p R=0$ and both the forcing and the noise act only on the momenta, the quadratic covariation term vanishes in \eqref{eq:norton_dynamics_solved}, so that we can express the Norton dynamics in the following form:
+\begin{equation}
+    \label{eq:norton_langevin}
+    \left\{
+    \begin{aligned}
+        \d q_t &= M^{-1}p_t\,\d t,\\
+        \d p_t &= \overline{P}_{F,G}(q_t)\left(-\nabla V(q_t)\,\d t -\gamma M^{-1}p_t \,\d t +\sqrt{\frac{2\gamma}{\beta}}\,\d W_t\right) + \frac{\nabla G(q_t)p_t\cdot M^{-1}p_t}{F(q_t)\cdot G(q_t)}F(q_t)\,\d t.
+    \end{aligned}
+    \right.
+\end{equation}
+
+\subsubsection{Physical interpretation}
+Gauss's principle of least constraints is a statement of classical dynamics which is equivalent to D'Alembert's principle, and states that the force applied to a system subject to a set of holonomic or non-holonomic constraints minimizes at every point in time the Euclidean distance to the force of the same system free from any constraints.
+Assume that the dynamics for the unconstrained system can be written
+\begin{equation}
+    \left\{
+    \begin{aligned}
+        \dot q &= M^{-1}p,\\
+        \dot p &= f_{\mathrm{ref}}(q),
+    \end{aligned}
+    \right.
+\end{equation}
+
+\begin{tikzpicture}
+\draw (0,0) -- (4,0) -- (4,4) -- (0,4) -- (0,0)
+\end{tikzpicture}
+
+and that the constraint is of the form $G(q)=r$ (holonomic case) or $G(q,p)=r$ (non-holonomic case). We write the dynamics of the constrained system as 
+\begin{equation}
+    \left\{
+    \begin{aligned}
+        \dot q &= M^{-1}p,\\
+        \dot p &= f_{\mathrm{cons}}(q,p).
+    \end{aligned}
+    \right.
+\end{equation}
+Gauss's principle is the statement that $f_{\mathrm{cons}}(q,p)$ is the projection of $f_{\mathrm{ref}}(q)$ onto the affine hyperplane $\mathcal{H}_{q,p}$ of admissible forces, which can be computed by differentiating the constraint in time and setting it to zero, once in the non-holonomic case, or twice in the holonomic case. Therefore, $\mathcal H_{q,p}$ is given by:
+\begin{equation}
+    \label{eq:gplc_hyperplanes}
+    \begin{cases}
+        f_{\mathrm{cons}}\cdot \left(M^{-1}\nabla G(q)\right) + p\cdot \left(M^{-1}\nabla^2 G(q)M^{-1}p\right)=0 & \text{in the holonomic case},\\
+        f_{\mathrm{cons}}\cdot \left(M^{-1}\nabla_p G(q,p)\right)+M^{-1}p\cdot \nabla_q G(q,p) =0 & \text{in the non-holonomic case}.
+    \end{cases}
+\end{equation}
+In particular, the constraining force can be chosen to be orthogonal to $\nabla_p G(q,p)$ in the non-holonomic case, and $M^{-1}\nabla G(q)$ in the holonomic-case. These are obtained by differentiating the constraint in time, once in the non-holonomic case, and twice in the holonomic case.
+The use of Gauss's principle to define dynamical equations in non-equilibrium molecular dynamics was recognized by Evans and Morris in \cite{evans_statistical_2008} (mauvaise ref), yielding dynamics very close in spirit to the Norton case, but in a purely deterministic setting. Here, we show that the Norton dynamics \eqref{eq:norton_langevin} satisfies an oblique version of Gauss's principle of least constraint, with respect to a configuration-dependent metric for which $F(q)$ is orthogonal to $G(q)^{\perp}$.
+
+More precisely, we define, for $q\in (L\mathbb{T})^{dN}$,
+
+\begin{equation}
+\varphi_q = \mathrm{Id} + \frac{\left(F(q)-G(q)\right)\otimes G(q)}{G(q)\cdot G(q)},
+\end{equation}
+which is such that 
+\[\varphi_q G=F,\quad \forall x\in G^\perp,\quad\varphi_q x=x.\]
+In particular if $F(q)\not\in G(q)^\perp$, then $\varphi_q$ is invertible, so that $q\mapsto \varphi_q$ defines a continuous map from $\Omega_{F,G}$ to $\mathrm{GL}(\mathbb{R}^{dN})$, where
+\[\Omega_{F,G}=\left\{ q\in (L\mathbb{T})^{dN} \middle.: F(q)\cdot G(q)\neq 0 \right\}\]
+is the set of configurations satisfying the controllability assumption. Thus the map
+\[(x,y) \mapsto \varphi_q^{-1}x \cdot \varphi_q^{-1}y\]
+defines an inner product which we denote $\langle \cdot ,\cdot \rangle_q$, with associated norm $\|\cdot \|_q$, and for which $F$ is orthogonal to $G^{\perp}$.
+
+Denote
+\[f_{\mathrm{cons}}(q,p) = \overline{P}_{F,G}(q) f_{\mathrm{ref}} - \frac{\nabla G(q) p\cdot M^{-1}p}{F(q)\cdot G(q)}F(q)\]
+the Norton force associated to $f_{\mathrm{ref}}$. Then 
+\begin{equation}
+    f_{\mathrm{cons}}(q,p)= \underset{f\in \mathcal{H}_{q,p}}{\argmin} \left\| f- f_{\mathrm{ref}}\right\|_q,
+\end{equation}
+along the trajectory, where $\mathcal{H}_{q,p}$ is the hyperplane defined in \eqref{eq:gplc_hyperplanes},
+\[\mathcal{H}_{q,p}=\{f:\, f\cdot G(q) + \nabla G(q)p\cdot M^{-1}p = 0\}.\]
+Note that this is an affine translate of $G^\perp$, so that its normal direction with respect to $\langle \cdot ,\cdot \rangle_q$ is $F(q)$.
+It follows that the element of $\mathcal{H}_{q,p}$ minimizing the $\|\cdot\|_q$ distance is of the form 
+\[f^* = f_{\mathrm{ref}} -\alpha F(q) \in \mathcal{H}_{q,p}.\]
+Hence,
+\[\left(f_{\mathrm{ref}} -\lambda F(q)\right)\cdot G(q) + \nabla G(q)p\cdot M^{-1}p =0,\]
+whence 
+\[\lambda = \frac{f_{\mathrm{ref}}\cdot G(q) +\nabla G(q)p\cdot M^{-1}p}{F(q)\cdot G(q)},\]
+and finally,
+\[f^*=f_{\mathrm{ref}}-\lambda F(q)=\overline P_{F,G}(q)f_{\mathrm{ref}}-\frac{\nabla G(q)p\cdot M^{-1}p}{F(q)\cdot G(q)}F(q)=f_{\mathrm{cons}}.\]
+In informal terms, the Norton dynamics is the most equilibrium-like of all dynamics on the constant response manifold, where similarity with equilibrium dynamics is measured with respect to the $\|\cdot\|_q$ metric. Note that this interpretation remains valid upon formally replacing $f_{\mathrm{ref}}$ by its stochastic counterpart given in the Langevin equation \eqref{eq:norton_langevin}.
+
+\section{Numerical discretization of the Norton dynamics}
+\subsection{Schemes for the general dynamics}
+We now discuss the simulation of Norton dynamics, which requires a discretization in time.
+Formally, a stochastic scheme for the equilibrium dynamics \eqref{eq:thevenin_dynamics} is, given a timestep $\Delta t>0$, defined by a map
+\begin{equation}
+    \label{eq:general_scheme}
+    \Phi_{\Delta t} : \mathcal X \times \mathbb{R}^m \to \mathcal X,
+\end{equation}
+which iterated with i.i.d standard Gaussian variables yields a discretization of the dynamics:
+\begin{equation}
+    X^{n+1} = \Phi_{\Delta t}(X^n,G^n).
+\end{equation}
+For example, the Euler-Maruyama scheme for the Th\'evenin dynamics \eqref{eq:thevenin_dynamics} is defined by
+\begin{equation}
+    \label{eq:em_scheme}
+    \Phi^{\mathrm{EM}}_{\Delta t}(x,g)=x + \Delta t \left[b(x) +\eta F(x)\right] +\sqrt{\Delta t}\sigma(x)g.
+\end{equation}
+The interpretation of $\Phi_{\Delta t}$ is that it constitutes a discrete-time approximation to the stochastic flow map, in the sense that the random variable $\Phi_{\Delta t}(x,G)$ approximates in law $X_{\Delta t}$ under initial distribution $\delta_x$.
+In principle, it would be possible to consider discretizations directly based on the autonomous form of the Norton dynamics \eqref{eq:norton_dynamics_solved}, and sample the average forcing observable $\lambda$ along the thus obtained numerical trajectories.
+However, since the autonomous form of the dynamics involves second-order derivatives of the response, it is typically more convenient numerically to take a more implicit and naive approach, relying on a correction of the equilibrium discretization. Besides, the main property we require from a numerical scheme is that the constant flux manifold should be preserved under the discrete dynamics. Standard discretizations of \eqref{eq:norton_dynamics_solved} do not generally satisfy such preservation properties.
+Given a stochastic scheme $\Phi_{\Delta t}$ for the equilibrium dynamics, we can generally consider the following discretization of the Norton dynamics:
+\begin{equation}
+    \label{eq:scheme_norton_general_sde}
+    \left\{\begin{aligned}
+        \widetilde{X}^{n+1} &= \Phi_{\Delta t}(X^n, G^n),\\
+        X^{n+1} &= \widetilde{X}^{n+1} +\Lambda^{n,*} F(X^n),\\
+        R(X^{n+1}) &=r.
+    \end{aligned}\right.
+\end{equation}
+This requires solving the following constraint equation for $\Lambda^*$:
+\[R\left(\widetilde{X}^{n+1} +\Delta t\Lambda^{*} F(X^n)\right)=r,\]
+which is typically a non-linear equation, for which the appropriate numerical strategy depends on the situation at hand. A typical choice is to resort to a Newton's method or a fixed-point iteration.
+Note that $\Lambda^{n,*}$ corresponds to an approximation of the full forcing increment ~$\Lambda_{(n+1)\Delta t}-\Lambda_{n\Delta t}$, and in particular incorporates the martingale increment, which contributes to the total variance of the estimator for $\mathbb{E}_r[\lambda]$.
+However, it is possible to cancel the martingale increment to the first order in $\sqrt{\Delta t}$, using its analytic expression \eqref{eq:norton_forcing_martingale_part}, and the equality in law $\sqrt{\Delta t} G^n \overset{\mathrm{law}}{=}W_{(n+1)\Delta t}-W_{n\Delta t}$. This gives the following estimator
+\[\Lambda^{n} = \Lambda^{n,*}-\sqrt{\Dt}\frac{\nabla R(X^n)\cdot \sigma(X^n)G^n}{\nabla R(X^n)\cdot F(X^n)}.\]
+An estimation of the bounded-variation increment of the forcing can be obtained by defining
+\begin{equation}
+    \label{eq:norton_lambda_n_definition}
+    \lambda^{n} = \frac{1}{\Dt}\Lambda^n.
+\end{equation}
+This strategy has the clear advantage that one does not have to compute $\lambda(X^n)$ along the trajectory, which may be tedious to implement in practice, since consistent approximations thereof appear as a natural byproduct of the integration procedure.
+
+\subsubsection{Splitting schemes in the Langevin framework}
+In the particular case where the reference dynamics is of the Langevin type \eqref{eq:langevin_equation}, one can resort to a particular class of discretization strategies based on operator splittings of the infinitesimal generator.
+
+\begin{equation}
+    \label{eq:thevenin_generator}
+    \cL_{\eta} = M^{-1}p \cdot \nabla_q -\nabla V\cdot \nabla_p - \gamma M^{-1}p \cdot \nabla_p + \frac{\gamma}{\beta}\Delta_p +\eta F\cdot \nabla_p,
+\end{equation}
+which can be split as
+\[\cL_{\eta} = \cL^{\mathrm{A}} + \cL^{\mathrm{B}} +\gamma\cL^{\mathrm{O}} +\eta \widetilde{\cL}\]
+with 
+\begin{equation}
+    \label{eq:thevenin_generator_splitting_parts}
+    \left\{
+    \begin{aligned}
+    \cL^{\mathrm{A}}&=M^{-1}p\cdot \nabla_q,\\
+    \cL^{\mathrm{B}}&=-\nabla V\cdot \nabla_p,\\
+    \cL^{\mathrm{O}}&=-M^{-1}p\cdot \nabla_p +\frac{1}{\beta}\Delta_p,\\
+    \widetilde{\cL}&=F\cdot\nabla_p.
+    \end{aligned}\right.
+\end{equation}
+The key observation is that $\cL^{\mathrm{A}}$, $\cL^{\mathrm{B}}+\eta\widetilde{\cL}$ and $\gamma\cL^{\mathrm{O}}$ can be viewed as infinitesimal generators in their own right, and the corresponding dynamics are, crucially, analytically integrable. Indeed, the first two correspond to deterministic linear evolutions, respectively in the configurational and momentum coordinates, while the third is the generator of an Ornstein-Uhlenbeck process on the momenta. One can obtain a family of numerical scheme for the Th\'evenin dynamics by evolving the system according to the flow of each of these elementary evolutions, in a predetermined order. This can be interpreted as an approximation of the evolution operator over one timestep by a composition of simpler evolution operators. For example, the BAOAB method for the Th\'evenin dynamics corresponds to the approximation
+\[\e^{\frac{\Dt}2\left(\cL^{\mathrm{B}}+\eta\widetilde{\cL}\right)}\e^{\frac\Dt2\cL^{\mathrm{A}}}\e^{\Dt\gamma\cL^{\mathrm{O}}}\e^{\frac\Dt2\cL^{\mathrm{A}}}\e^{\frac{\Dt}2\left(\cL^{\mathrm{B}}+\eta\widetilde{\cL}\right)}\]
+to the true evolution operator $\e^{\Dt\cL_\eta}.$
+These schemes can be formally justified, as well as rigorously analyzed through the use of Baker--Campbell--Hausdorff formul\ae, yielding error estimates of the Talay--Tubaro family on the invariant measure in the equilibrium case $\eta=0$, as well as on estimators of transport coefficients in the non-equilibrium setting. For a comprehensive review, we point the reader to \cite{leimkhuler-stoltz ima numerical analysis}.
+
+\subsubsection{Splitting schemes for the Norton dynamics}
+It so happens in the case of a Norton perturbation, a similar strategy is available. Indeed, the generator \eqref{eq:norton_generator} can then be written as
+\begin{equation}
+    \label{eq:norton_generator_langevin}
+    \cL^0 = M^{-1}p\cdot \nabla_q + \overline{P}_{F,G}\left(-\nabla V -\gamma M^{-1}p\right)\cdot \nabla_p - \frac{\nabla G p \cdot M^{-1} p }{F\cdot G} F \cdot \nabla_p +\frac{\gamma}{\beta} \overline{P}_{F,G}\overline{P}_{G,F}:\nabla^2_p,
+\end{equation}
+which can be decomposed as
+\begin{equation}
+    \label{eq:norton_generator_splitting}
+    \cL^{0} = \cL^{0,\mathrm{A}}+\cL^{0,\mathrm{B}}+\gamma\cL^{0,\mathrm{O}},
+\end{equation}
+with
+\begin{equation}
+    \label{eq:norton_generator_splitting_parts}
+    \left\{
+    \begin{aligned}
+    \cL^{0,\mathrm{A}}&=M^{-1}p\cdot \nabla_q -\frac{\nabla G p \cdot M^{-1}p}{F\cdot G}F \cdot \nabla_p,\\
+    \cL^{0,\mathrm{B}}&=-\overline{P}_{F,G}\nabla V\cdot \nabla_p,\\
+    \cL^{0,\mathrm{O}}&=-\overline{P}_{F,G}M^{-1}p\cdot \nabla_p +\frac{1}{\beta} \overline{P}_{F,G}\overline{P}_{F,G}^\intercal:\nabla_p^2.
+    \end{aligned}\right.
+\end{equation}
+Analogously to the equilibrium case, we interpret these as the generators of dynamics in their own rights, which are given respectively by
+\begin{equation}
+   \begin{aligned}
+        \text{$\mathrm{A}$ dynamics: }&\left\{\begin{aligned}
+            \d q_t &= M^{-1}p_t \,\d t\\
+            \d p_t &= -\frac{\nabla G(q_t)p_t\cdot M^{-1}p_t}{F(q_t)\cdot G(q_t)}F(q_t)\,\d t
+        \end{aligned}\right.\\
+        \text{$\mathrm{B}$ dynamics: }&\left\{\begin{aligned}
+            \d q_t &= 0\\
+            \d p_t &=-\overline{P}_{F,G}(q_t)\nabla V(q_t)\,\d t
+        \end{aligned}\right.,\\
+        \text{$\mathrm{O}$ dynamics: }&\left\{\begin{aligned}
+            \d q_t &= 0\\
+            \d p_t &= \overline{P}_{F,G}(q_t)\left(-\gamma M^{-1}p_t\, \d t +\sqrt{\frac{2\gamma}\beta}\,\d W_t\right)
+        \end{aligned}\right..
+    \end{aligned}    
+\end{equation}
+The $\mathrm{B}$-dynamics is a linear evolution in the momenta, whose solution is given by
+\[(q_t,p_t)=\left(q_0, p_0 - t \overline{P}_{F,G}\nabla V(q_0)\right).\]
+The $\mathrm{O}$-dynamics is a projected Ornstein--Uhlenbeck process. Using standard arguments of It\^o calculus, it is straightforward to show that its solution is given for all $t\geq 0$ by $q_t=q_0$ and
+\[p_t = {P}_{F,G}(q_0)p_0 +\overline{P}_{F,G}(q_0)\left(\e^{-t\gamma M^{-1}}p_0 +\int_0^t e^{-\gamma M^{-1}(t-s)}\sqrt{\frac{2\gamma}{\beta}}\,\d W_s\right),\]
+under the tame assumption that $\overline{P}_{F,G}$ and $\gamma M^{-1}$ commute.
+This solution is a Gaussian process, and has the following representation at time $t$:
+\begin{equation}
+\label{eq:norton_o_step_gaussian_distribution}
+p_t = {P}_{F,G}(q_0)p_0 + \overline{P}_{F,G}(q_0)\left(\e^{-t\gamma M^{-1}}p_0 +\sqrt{\frac{1-e^{-2t\gamma M^{-1}}}{\beta}M}\mathcal{G}\right),
+\end{equation}
+where $\mathcal{G}$ is a standard $dN$-dimensional Gaussian.
+
+However, contrary to the Th\'evenin case, the flow of the $\mathrm{A}$-dynamics is generally not known in analytical form, and one has to resort to a numerical scheme. Nevertheless, this splitting strategy is still motivated by the fact that each part of the splitting individually preserves the flux observable \eqref{eq:nemd_response_observable}. Indeed, a simple computation shows that 
+\[ \cL^{0,\mathrm{A}} \left(G\cdot p\right) = \cL^{0,\mathrm{B}} \left( G\cdot p\right) = 0,\]
+while directly applying $R$ to the solution \eqref{eq:norton_o_step_gaussian_distribution} of the $\mathrm{O}$-dynamics shows
+\[G(q_t)\cdot p_t=G(q_0)\cdot p_t = G(q_0)\cdot P_{F,G}(q_0)p_0 + G(q_0)\cdot \overline{P}_{F,G}(q_0)\widetilde{p}_t = G(q_0)\cdot p_0,\]
+where \[\widetilde{p}_t = \e^{-t\gamma M^{-1}}p_0 +\sqrt{\frac{1-e^{-2t\gamma M^{-1}}}{\beta}M}\mathcal{G},\]
+since for any choice of $p,G,F\,\in \R^{dN},$
+\[G\cdot P_{F,G} p = G\cdot p,\qquad G\cdot \overline{P}_{F,G}p = 0.\]
+
+\subsubsection{Numerical implementation}
+As mentioned in the previous section, the evolution operator for the Norton dynamics can be approximated over one time step by a composition of evolution operators of elementary flux-preserving dynamics, which are nothing more than the Norton dynamics associated with the corresponding equilibrium elementary dynamics. By composing the evolution operator for the forcing process of each one of these Norton dynamics, one obtains a natural splitting approximation of the evolution operator for the forcing process of the full Norton dynamics. The numerical translation of this observation is that one can estimate trajectory averages of $\lambda$ from individual integration steps of the splitting scheme. The general procedure is as follows:
+
+Fix a flux magnitude $r\geq 0$, as well as a timestep $\Delta t>0$, and define $\Delta t_{\mathrm{A}}=\Delta t / N_{\mathrm{A}}$, $\Delta t_{\mathrm{B}}=\Delta t / N_{\mathrm{B}}$ and $\Delta t_{\mathrm{O}}=\Delta t / N_{\mathrm{O}}$, where $N_{\mathrm{A}},N_{\mathrm{B}}$ and $N_{\mathrm{O}}$ are respectively the number of $\mathrm{A}$, $\mathrm{B}$ and $\mathrm{O}$ steps.
+We denote by $(q^n,p^n)$ the input to an intermediary integration step and by $(q^{n+1},p^{n+1})$, regardless of whether these correspond to 
+At each integration step, three variables $\lambda_{\mathrm{A}} = \lambda_{\mathrm{B}} = \lambda_{\mathrm{O}} = 0$ are initialized, and the following schemes are chained according to the order of the splitting.
+
+\begin{algorithm}
+    \caption{$\mathrm{A}$-scheme}
+    The position variable is updated with an explicit Euler scheme, which coincides with the analytic solution to the equilibrium $\mathrm{A}$-dynamics. The momentum variable is then corrected in the direction $F$ to enforce the constant-flux condition. This yields the following update rule.
+\begin{equation}
+\left\{\begin{aligned}
+    q^{n+1} &= q^n +\Delta t_{\mathrm{A}},\\
+    \xi &= \frac{r-G(q^{n+1})\cdot p^n}{F(q^{n+1})\cdot G(q^{n+1})},\\
+    \lambda_{\mathrm{A}} &\gets \lambda_{\mathrm{A}} + \xi,\\
+    p^{n+1} &= p^n + \xi\Delta t_{\mathrm{A}} F(q^{n+1}),
+\end{aligned}\right.
+\end{equation}
+\end{algorithm}
+
+\begin{algorithm}
+\caption{$\mathrm{B}$-scheme}
+The momentum variable is updated using the analytical flow of the equilibrium $\mathrm{B}$-dynamics, and subsequently corrected to enforce the constant-flux condition, yielding:
+\begin{equation}
+\left\{\begin{aligned}
+    q^{n+1} &= q^n,\\
+    \widetilde{p}^{n+1}&=p^n -\Delta t_{\mathrm{B}}\nabla V(q^n),\\
+    \xi &= \frac{r-G(q^{n+1})\cdot \widetilde{p}^{n+1}}{F(q^{n+1})\cdot G(q^{n+1})},\\
+    \lambda_{\mathrm{B}} &\gets \lambda_{\mathrm{B}} + \xi,\\
+    p^{n+1} &= \widetilde{p}^n + \xi\Delta t_{\mathrm{B}} F(q^{n+1}).
+\end{aligned}\right.
+\end{equation}
+\end{algorithm}
+
+\begin{algorithm}
+\caption{$\mathrm{O}$-scheme}
+The momentum variable is again updated according to the analytical flow of the equilibrium $\mathrm{O}$-dynamics, before a correction step. Defining
+$$\alpha_{\Delta t_{\mathrm{O}}}=\e^{-\gamma \Delta t_{\mathrm{O}}},\quad\sigma_{\Delta t_{\mathrm{O}}}=\sqrt{\frac{M}{\beta}\alpha_{\Delta t_{\mathrm{O}}}^2},$$
+and taking $\mathcal{G}^{n+1}$ to be a $dN$-dimensional standard Gaussian, the update rule is given by:
+\begin{equation}
+\left\{\begin{aligned}
+    q^{n+1} &= q^n,\\
+    \widetilde{p}^{n+1}&=\alpha_{\Delta t_{\mathrm{O}}}p^n +\sigma_{\Delta t_{\mathrm{O}}}\mathcal{G}^{n+1},\\
+    \xi &= \frac{r-G(q^{n+1})\cdot \widetilde{p}^{n+1}}{F(q^{n+1})\cdot G(q^{n+1})},\\
+    \lambda_{\mathrm{O}} &\gets \lambda_{\mathrm{O}} + \frac{r(1-\alpha_{\Delta t_{\mathrm{O}}})}{F(q^{n+1}\cdot G(q^{n+1})},\\
+    p^{n+1} &= \widetilde{p}^n + \xi F(q^{n+1}).
+\end{aligned}\right.
+\end{equation}
+Note the value by which $\lambda_{\mathrm{O}}$ is incremented is obtained by removing the contribution of $\mathcal G$ to $\xi$, and using $G(q^{n+1})\cdot p^{n} = G(q^n)\cdot p^n =r$.
+\end{algorithm}
+
+Finally, one can define
+\begin{equation}
+    \label{eq:lambda_numerical_estimation}
+    \lambda^n=\frac{\lambda_{\mathrm{A}}+\lambda_{\mathrm{B}}+\lambda_{\mathrm{O}}}{\Delta t}
+\end{equation}
+
+\section{Numerical results}\label{num}
+\section{Perspective}\label{pers}
+\bibliography{bibliography}% common bib file
+%% if required, the content of .bbl file can be included here once bbl is generated
+%%\input sn-article.bbl
+
+%% Default %%
+%%\input sn-sample-bib.tex%
+
+\end{document}
