@@ -1,8 +1,9 @@
 using Statistics
 
-println("USAGE: N_BINS_HISTOGRAM OUTPUT_FILENAME INPUT_FILES[]")
-n_bins,output_file,input_files... = ARGS
+println("USAGE: N_BINS_HISTOGRAM N_σ OUTPUT_FILENAME INPUT_FILES[]")
+n_bins,n_σ, output_file,input_files... = ARGS
 n_bins=parse(Int64,n_bins)
+n_σ=parse(Float64,n_σ)
 
 if !isdir("histograms")
     mkdir("histograms")
@@ -26,7 +27,7 @@ function asymptotic_variance(v)
     return max_var
 end
 
-header = "FILENAME MEAN N_SAMPLES ASYMPTOTIC_VARIANCE HISTOGRAM_PATH"
+header = "FILENAME MEAN STD N_SAMPLES ASYMPTOTIC_VARIANCE HISTOGRAM_PATH"
 f_output=open(output_file,"w")
 
 println(f_output,header)
@@ -38,16 +39,17 @@ for f in input_files
         series=reinterpret(Float64,read(f))
         av=asymptotic_variance(series)
         avg=mean(series)
+        σ = std(series)
         N_samps=length(series)
-        println(f_output,"$f $avg $N_samps $av $(ENV["PWD"])/histograms/histogram_$f")
-
+        println(f_output,"$f $avg $σ $N_samps $av $(ENV["PWD"])/histograms/histogram_$f")
         # compute histogram
-        m,M=minimum(series),maximum(series)
+        m,M = avg + n_σ*σ, avg-n_σ*σ
         dx=(M-m)/n_bins
         hist=zeros(n_bins)
         ts = (M .- series) / (M-m)
+        ts = ts[0 .< ts .< 1]
         is = ceil.(Int64,ts*n_bins)
-        clamp!(is,1,n_bins)
+        #clamp!(is,1,n_bins)
         println(m," ", M, " ",minimum(is)," ",maximum(is))
         map(i-> hist[i]+=1,is)
 
