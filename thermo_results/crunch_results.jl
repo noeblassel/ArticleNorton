@@ -43,7 +43,7 @@ for f in input_files
         N_samps=length(series)
         println(f_output,"$f $avg $σ $N_samps $av $(ENV["PWD"])/histograms/histogram_$f")
         # compute histogram
-        m,M = avg + n_σ*σ, avg-n_σ*σ
+        m,M = avg - n_σ*σ, avg + n_σ*σ
         dx=(M-m)/n_bins
         hist=zeros(n_bins)
         ts = (M .- series) / (M-m)
@@ -54,7 +54,7 @@ for f in input_files
         map(i-> hist[i]+=1,is)
 
         hist_file=open(joinpath("histograms","histogram_$(n_bins)_$f"),"w")
-        println(hist_file,"$m $M $n_bins")
+        println(hist_file,"$m $M $n_bins $avg $σ")
         print(hist_file,join(hist,", "))
         close(hist_file)
     catch e
