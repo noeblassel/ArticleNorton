@@ -9,21 +9,36 @@ if !isdir("histograms")
     mkdir("histograms")
 end
 
-function asymptotic_variance(v)
+function asymptotic_variance(v, min_n_blocks = 10)
     data=copy(v)
     avg=mean(v)
     data .-= avg
-    N_steps=floor(Int64,log2(length(data)))
-    data=data[1:2^N_steps]#crop series to largest possible power of two
-    L=1
+
+    if length(data)%2 ==1
+        pop!(data)
+    end
+
     N=length(data)
-    K=N
+    K = 1 # block size
     max_var=0.0
-    while K>1000
-        max_var=max(max_var,varm(data,0.0)*N*inv(K))
-        K >>=1
-            data=(data[1:2:end]+data[2:2:end])/2
+
+    while length(data) > min_n_blocks
+        var_K = var(data) * K
+
+        if var_K > max_var
+            max_var = var_K
+        else
+            break 
         end
+
+        K *=2
+        data = (data[1:2:end]+data[2:2:end])/2
+
+        if length(data)%2 ==1 # always keep an even number of blocks
+            pop!(data)
+        end
+
+    end
     return max_var
 end
 
