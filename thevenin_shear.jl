@@ -27,13 +27,9 @@ Lx=Nx/cbrt(ρ)
 Ly=Lx*y_ratio
 Lz=Lx*z_ratio
 
-box_size=CubicBoundary(Lx,Ly,Lz)
+box_size = CubicBoundary(Lx,Ly,Lz)
 
-max_speed=10.0*sqrt(T)
-n_steps_neighbors=floor(Int64,0.2*r_c/(dt*max_speed))
-
-max_speed=10.0*(sqrt(T)+η)
-n_steps_neighbors=floor(Int64,0.2*r_c/(dt*max_speed))
+n_steps_neighbors = 20
 
 
 struct NEMD_longitudinal_forcing{F}
@@ -57,9 +53,9 @@ function fourier_response(s::System,args...;kwargs...)
     return imag(dot(p_x,exp.(2im*π*q_y/Ly))/N)
 end
 
-sinus_forcing=(y-> Lx*sin(2π*y/Ly))
-constant_forcing=(y -> (y<Ly/2) ? Lx : -Lx)
-linear_forcing=(y -> (y<Ly/2) ? 4Lx*(y-Ly/4)/Ly : 4Lx*(3Ly/4-y)/Ly)
+sinus_forcing=(y-> sin(2π*y/Ly))
+constant_forcing=(y -> (y<Ly/2) ? 1 : -1)
+linear_forcing=(y -> (y<Ly/2) ? 4*(y-Ly/4)/Ly : 4*(3Ly/4-y)/Ly)
 
 forcing=NEMD_longitudinal_forcing(sinus_forcing,η)
 

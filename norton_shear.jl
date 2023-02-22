@@ -35,16 +35,15 @@ Lz=Lx*z_ratio
 println("Lx: $Lx, Ly: $Ly, Lz: $Lz")    
 box_size=CubicBoundary(Lx,Ly,Lz)
 
-max_speed=10.0*sqrt(T)
-n_steps_neighbors=floor(Int64,0.2*r_c/(dt*max_speed))
+n_steps_neighbors = 20
 
 
 F_sin(y) = sin(2π * y / Ly)
-F_const(y) = (y < Ly / 2) ? 1.0 : -1.0
+F_const(y) = (y < Ly / 2) ? 1 : -1
 F_lin(y) = (y < Ly / 2) ? 4 * (y - Ly / 4) / L : 4 * (3Ly / 4 - y) / Ly
 
-G_imag(y) = sin(2π * y / Ly) / N
-G_real(y) = cos(2π * y/ Ly) / N
+G_imag(y) = sin(2π * y / Ly) / N 
+G_real(y) = cos(2π * y/ Ly) / N 
 
 F=F_sin
 G=G_imag
