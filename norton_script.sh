@@ -1,8 +1,7 @@
 #!/bin/bash
 Nmin=$1
 Nmax=$2
-
-eta = $3
+eta=$3
 
 for N in `seq $Nmin 2 $Nmax`
 do
