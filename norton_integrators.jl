@@ -336,3 +336,110 @@ function Molly.simulate!(sys::System, sim::GeneralizedNortonSplitting, n_steps; 
     
     return λ_hist
 end
+
+struct NortonSplittingColorDrift{S,E,K,F,W,TF}
+    dt::S
+    r::E
+    T::K
+    γ::F
+    splitting::W
+    F::TF # forcing profile
+end
+
+function NortonSplittingColorDrift(dt,r,T,γ,N,splitting)
+    S,E,K,F,W = typeof.([dt,r,T,γ,splitting])
+    cd = ones(N)
+    cd[1:2:end] .= -1
+    cd /= sqrt(N)
+
+    return NortonSplittingColorDrift{S,E,K,F,W,typeof(cd)}(dt,r,T,γ,splitting,cd)
+end
+
+function Molly.simulate!(sys::System, sim::NortonSplittingColorDrift, n_steps; n_threads::Integer=Threads.nthreads(), rng=Random.GLOBAL_RNG)
+    α_eff = exp(-sim.γ * sim.dt / count('O', sim.splitting))
+    σ_eff = sqrt(1 - α_eff^2) #noise on velocities, not momenta
+
+    effective_dts=[sim.dt / count(c,sim.splitting) for c in sim.splitting]
+
+    forces_known = true
+    force_computation_steps = Bool[]
+
+    occursin(r"^.*B[^B]*A[^B]*$", sim.splitting) && (forces_known = false) #determine the need to recompute accelerations before B steps
+
+    for op in sim.splitting
+        if op == 'O'
+            push!(force_computation_steps, false)
+        elseif op == 'A'
+            push!(force_computation_steps, false)
+            forces_known = false
+        elseif op == 'B'
+            if forces_known
+                push!(force_computation_steps, false)
+            else
+                push!(force_computation_steps, true)
+                forces_known = true
+            end
+        end
+    end
+
+    sys.coords .= wrap_coords.(sys.coords, (sys.boundary,))
+    neighbors = find_neighbors(sys, sys.neighbor_finder; n_threads=n_threads)
+    run_loggers!(sys, neighbors, 0; n_threads=n_threads)
+
+    accels = accelerations(sys, neighbors; n_threads=n_threads)
+    
+    velocities_array = reinterpret(reshape, Float64, sys.velocities)
+
+    #views into longitudinal component
+
+    v_x = view(velocities_array, 1, :)
+
+    F = sim.F # F = G = constant
+
+    #initialize state on constant response manifold
+    λ = (sim.r-dot(F,v_x))
+    v_x .+= λ * F
+
+
+    λ_hist=Float64[]
+
+    for step_n=1:n_steps
+        λ_A = λ_B = λ_O = 0.0
+
+        for (i,op)=enumerate(sim.splitting)
+            if op=='A'
+                sys.coords .+= sys.velocities * effective_dts[i]
+                sys.coords .= Molly.wrap_coords.(sys.coords, (sys.boundary,))
+
+                λ = (r - dot(F, v_x)) #reprojection in p onto the constant response manifold
+                v_x .+= λ * F
+                λ_A += λ
+
+            elseif op=='B'
+                ( force_computation_steps[i] ) &&  ( accels .= accelerations(sys,neighbors, n_threads=n_threads) )
+                sys.velocities .+= accels * effective_dts[i]
+                λ = (r- dot(F, v_x))
+                v_x .+= λ * F
+                λ_B += λ
+                
+            elseif op=='O'
+                sys.velocities .= α_eff*sys.velocities + σ_eff * random_velocities(sys,sim.T; rng=rng)
+                λ = (r- dot(F, v_x))
+                v_x .+= λ * F
+
+                λ_O += (1-α_eff)*sim.r # only record bounded-variation increment, which is analytically known
+
+            end
+        end
+
+        λ_est= (λ_A + λ_B + λ_O) / sim.dt
+        push!(λ_hist, λ_est)
+
+        run_loggers!(sys,neighbors,step_n)
+
+        if step_n != n_steps
+            neighbors = find_neighbors(sys, sys.neighbor_finder, neighbors, step_n ; n_threads=n_threads)
+        end
+    end
+    return λ_hist
+end
