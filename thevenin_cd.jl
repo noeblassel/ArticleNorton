@@ -43,7 +43,7 @@ end
 forcing=ColorDriftForcing(η)
 
 atoms=[Atom(index=i,ϵ=1.0,σ=2^(-1/6),mass=1.0) for i=1:N]
-coords=place_atoms(N,box_size;min_dist=0.8)
+coords=place_atoms(N,box_size;min_dist=0.5)
 velocities=[velocity(1.0,T,1.0) for i=1:N]
 
 inter=LennardJones(force_units=NoUnits,energy_units=NoUnits,cutoff=ShiftedForceCutoff(r_c),nl_only=true)
@@ -58,6 +58,7 @@ simulate!(sys,sim,n_steps_eq)
 sys=System(atoms=atoms,coords=sys.coords,velocities=sys.velocities,pairwise_inters=(inter,),general_inters=(forcing,),neighbor_finder=nf,boundary=box_size,force_units=NoUnits,energy_units=NoUnits,k=1.0,loggers=(mobility=GeneralObservableLogger(colordrift_response,Float64,1),))
 
 for i=1:n_iter_sim
+    println("iteration $i")
     simulate!(sys,sim,n_steps_eq)
     f=open("thermo_results/nemd_response_colordrift_$(N)_$(ρ)_$(T)_$(η).out","a")
 
