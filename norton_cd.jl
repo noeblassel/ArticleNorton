@@ -31,7 +31,7 @@ velocities = [velocity(1.0, T, 1.0) for i = 1:N]
 
 inter=LennardJones(force_units=NoUnits,energy_units=NoUnits,cutoff=ShiftedForceCutoff(r_c),nl_only=true)
 
-nf = DistanceNeighborFinder(nb_matrix=trues(N,N),n_steps=10,dist_cutoff=r_c)
+nf = DistanceNeighborFinder(nb_matrix=trues(N,N),n_steps=1,dist_cutoff=r_c)
 
 n_steps_eq=floor(Int64,t_eq/1e-4)
 n_steps_sim=floor(Int64,t_eq/dt)

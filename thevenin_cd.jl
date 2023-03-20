@@ -47,7 +47,7 @@ coords=place_atoms(N,box_size;min_dist=0.5)
 velocities=[velocity(1.0,T,1.0) for i=1:N]
 
 inter=LennardJones(force_units=NoUnits,energy_units=NoUnits,cutoff=ShiftedForceCutoff(r_c),nl_only=true)
-nf = DistanceNeighborFinder(nb_matrix=trues(N,N),n_steps=10,dist_cutoff=r_c)
+nf = DistanceNeighborFinder(nb_matrix=trues(N,N),n_steps=1,dist_cutoff=r_c)
 
 n_steps_eq=Int64(floor(t_eq/dt))
 
