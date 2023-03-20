@@ -18,6 +18,7 @@ splitting=ARGS[9]
 
 L=cbrt(N/ρ)
 box_size = CubicBoundary(L,L,L)
+r_c = 2.0
 
 color_drift = ones(N)
 color_drift[1:2:end] .= -1
@@ -41,22 +42,30 @@ end
 
 forcing=ColorDriftForcing(η)
 
-atoms=[Atom(index=i,ϵ=1.0,σ=1.0,mass=1.0) for i=1:N]
+atoms=[Atom(index=i,ϵ=1.0,σ=2^(-1/6),mass=1.0) for i=1:N]
 coords=place_atoms(N,box_size;min_dist=0.8)
 velocities=[velocity(1.0,T,1.0) for i=1:N]
-inter=LennardJones(force_units=NoUnits,energy_units=NoUnits)
+
+inter=LennardJones(force_units=NoUnits,energy_units=NoUnits,cutoff=ShiftedForceCutoff(r_c),nl_only=true)
+nf = DistanceNeighborFinder(nb_matrix=trues(N,N),n_steps=10,dist_cutoff=r_c)
 
 n_steps_eq=Int64(floor(t_eq/dt))
 
 sim=LangevinSplitting(dt=dt,friction=γ,temperature=T,splitting=splitting;remove_CM_motion=false)
-sys=System(atoms=atoms,coords=coords,velocities=velocities,pairwise_inters=(inter,),general_inters=(forcing,),boundary=box_size,force_units=NoUnits,energy_units=NoUnits,k=1.0)
+sys=System(atoms=atoms,coords=coords,velocities=velocities,pairwise_inters=(inter,),general_inters=(forcing,),neighbor_finder=nf,boundary=box_size,force_units=NoUnits,energy_units=NoUnits,k=1.0)
 
 simulate!(sys,sim,n_steps_eq)
-sys=System(atoms=atoms,coords=sys.coords,velocities=sys.velocities,pairwise_inters=(inter,),general_inters=(forcing,),boundary=box_size,force_units=NoUnits,energy_units=NoUnits,k=1.0,loggers=(mobility=GeneralObservableLogger(colordrift_response,Float64,1),))
+sys=System(atoms=atoms,coords=sys.coords,velocities=sys.velocities,pairwise_inters=(inter,),general_inters=(forcing,),neighbor_finder=nf,boundary=box_size,force_units=NoUnits,energy_units=NoUnits,k=1.0,loggers=(mobility=GeneralObservableLogger(colordrift_response,Float64,1),))
 
 for i=1:n_iter_sim
     simulate!(sys,sim,n_steps_eq)
-    f=open("thermo_results/nemd_response_colordrift_$(η)_$(N).out","a")
+    f=open("thermo_results/nemd_response_colordrift_$(N)_$(ρ)_$(T)_$(η).out","a")
+
+    if any(isnan.(values(sys.loggers.mobility)))
+        throw(ErrorException("NaN values for the response"))
+        exit(1)
+    end
+
     write(f,values(sys.loggers.mobility))
     close(f)
     empty!(sys.loggers.mobility.history)
