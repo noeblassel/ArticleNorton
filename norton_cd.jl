@@ -30,8 +30,8 @@ atoms = [Atom(σ=2^(-1/6), ϵ=1.0, mass=1.0) for i in 1:N]
 velocities = [velocity(1.0, T, 1.0) for i = 1:N]
 
 inter=LennardJones(force_units=NoUnits,energy_units=NoUnits,cutoff=ShiftedForceCutoff(r_c),nl_only=true)
-
-nf = DistanceNeighborFinder(nb_matrix=trues(N,N),n_steps=1,dist_cutoff=r_c)
+steps_nf=5
+nf = (6r_c > L) ? DistanceNeighborFinder(nb_matrix=trues(N,N),n_steps=steps_nf,dist_cutoff=r_c) : CellListMapNeighborFinder(nb_matrix=trues(N,N),n_steps=steps_nf,dist_cutoff=r_c,unit_cell=box_size)
 
 n_steps_eq=floor(Int64,t_eq/1e-4)
 n_steps_sim=floor(Int64,t_eq/dt)
